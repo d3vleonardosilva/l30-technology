@@ -25,3 +25,9 @@ Six static icon cards on the home page (no separate pages or links).
 ## Notes
 - Main portfolio page and capability pages support English, Portuguese and Spanish through the language toggle.
 - This project is fully static and can be opened directly via `index.html` or hosted on any static hosting platform.
+
+## PCP Control Center — novo case demonstrativo
+
+Abra `pcp/index.html` no navegador ou acesse `/pcp/` após publicar.
+O simulador de Planejamento e Controle da Produção usa dados 100% fictícios, calcula capacidade e disponibilidade de materiais localmente no JavaScript e exporta CSV do cenário.
+Não há integração efetiva com TOTVS Protheus nem alegação de implantação real em cliente.
