@@ -70,26 +70,22 @@ async function signLicense(payload, env) {
   return { payload, signature: bytesToBase64(signature) };
 }
 
-async function verifyWebhookSignature(request, env) {
-  if (!env.MERCADOPAGO_WEBHOOK_SECRET) return false;
-  const signatureHeader = request.headers.get("x-signature") || "";
-  const requestId = request.headers.get("x-request-id") || "";
-  const dataId = new URL(request.url).searchParams.get("data.id") || "";
-  const parts = Object.fromEntries(signatureHeader.split(",").map(part => {
-    const index = part.indexOf("=");
-    return index > -1 ? [part.slice(0, index).trim(), part.slice(index + 1).trim()] : ["", ""];
-  }).filter(([key]) => key));
-  if (!parts.ts || !parts.v1 || !requestId || !dataId) return false;
-  const manifest = `id:${dataId};request-id:${requestId};ts:${parts.ts};`;
-  const key = await crypto.subtle.importKey(
-    "raw", new TextEncoder().encode(env.MERCADOPAGO_WEBHOOK_SECRET),
-    { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
-  );
-  const digest = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(manifest));
+async function verifyWebhookSignature(request, env, rawBody) {
+  if (!env.PADDLE_WEBHOOK_SECRET) return false;
+  const header = request.headers.get("Paddle-Signature") || "";
+  const parts = Object.fromEntries(header.split(";").map(part => {
+    const i = part.indexOf("=");
+    return i > -1 ? [part.slice(0, i), part.slice(i + 1)] : ["", ""];
+  }));
+  if (!parts.ts || !parts.h1) return false;
+  const signed = new TextEncoder().encode(parts.ts + ":" + rawBody);
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(env.PADDLE_WEBHOOK_SECRET),
+    { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const digest = await crypto.subtle.sign("HMAC", key, signed);
   const expected = [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, "0")).join("");
-  if (expected.length !== parts.v1.length) return false;
+  if (expected.length !== parts.h1.length) return false;
   let mismatch = 0;
-  for (let i = 0; i < expected.length; i++) mismatch |= expected.charCodeAt(i) ^ parts.v1.charCodeAt(i);
+  for (let i = 0; i < expected.length; i++) mismatch |= expected.charCodeAt(i) ^ parts.h1.charCodeAt(i);
   return mismatch === 0;
 }
 
@@ -130,143 +126,90 @@ async function createCheckout(request, env) {
   const name = String(body?.name || "").trim().slice(0, 120);
   const email = String(body?.email || "").trim().toLowerCase().slice(0, 254);
   const deviceId = String(body?.device_id || "").toUpperCase();
-  if (name.length < 2 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !validDeviceId(deviceId)) {
+  if (name.length < 2 || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email) || !validDeviceId(deviceId))
     return response({ error: "invalid_customer_or_device" }, request, env, 400);
-  }
-  if (!env.MERCADOPAGO_ACCESS_TOKEN) return response({ error: "payment_provider_not_configured" }, request, env, 503);
-  if (!env.ANNUAL_PRICE_BRL || !/^\d+\.\d{2}$/.test(env.ANNUAL_PRICE_BRL)) {
-    return response({ error: "annual_price_not_configured" }, request, env, 503);
-  }
-
+  if (!env.PADDLE_API_KEY || !env.PADDLE_PRICE_ID)
+    return response({ error: "paddle_not_configured" }, request, env, 503);
   const existingLicense = await env.DB.prepare(
     "SELECT id FROM licenses WHERE device_id = ? AND status = 'active'"
   ).bind(deviceId).first();
   if (existingLicense) return response({ error: "device_already_licensed" }, request, env, 409);
-
-  let customer = await env.DB.prepare(
-    "SELECT id FROM customers WHERE email = ?"
-  ).bind(email).first();
+  let customer = await env.DB.prepare("SELECT id FROM customers WHERE email = ?").bind(email).first();
   if (!customer) {
     const customerId = crypto.randomUUID();
-    await env.DB.prepare(
-      "INSERT INTO customers (id, name, email, created_at) VALUES (?, ?, ?, ?)"
-    ).bind(customerId, name, email, nowIso()).run();
+    await env.DB.prepare("INSERT INTO customers (id, name, email, created_at) VALUES (?, ?, ?, ?)")
+      .bind(customerId, name, email, nowIso()).run();
     customer = { id: customerId };
   } else {
-    await env.DB.prepare(
-      "UPDATE customers SET name = ? WHERE id = ?"
-    ).bind(name, customer.id).run();
+    await env.DB.prepare("UPDATE customers SET name = ? WHERE id = ?").bind(name, customer.id).run();
   }
-
   const localOrderId = crypto.randomUUID();
-  const amount = env.ANNUAL_PRICE_BRL;
   await env.DB.prepare(
     "INSERT INTO orders (id, customer_id, device_id, external_reference, amount_brl, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 'creating', ?, ?)"
-  ).bind(localOrderId, customer.id, deviceId, localOrderId, amount, nowIso(), nowIso()).run();
+  ).bind(localOrderId, customer.id, deviceId, localOrderId, "19.99 USD", nowIso(), nowIso()).run();
 
-  const mpResponse = await fetch("https://api.mercadopago.com/v1/orders", {
+  const paddleResponse = await fetch("https://api.paddle.com/transactions", {
     method: "POST",
-    headers: {
-      "Authorization": `Bearer ${env.MERCADOPAGO_ACCESS_TOKEN}`,
-      "Content-Type": "application/json",
-      "X-Idempotency-Key": crypto.randomUUID()
-    },
+    headers: { "Authorization": `Bearer ${env.PADDLE_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      type: "online",
-      processing_mode: "manual",
-      capture_mode: "automatic_async",
-      total_amount: amount,
-      external_reference: localOrderId,
-      description: "Floating Camera — licença anual (1 dispositivo)",
-      payer: { email },
-      items: [{ title: "Floating Camera — licença anual", quantity: 1, unit_price: amount }]
+      items: [{ price_id: env.PADDLE_PRICE_ID, quantity: 1 }],
+      collection_mode: "automatic",
+      custom_data: { l30_order_id: localOrderId, device_id: deviceId, product: "FloatingCamera", license_term: "annual" }
     })
   });
-  const mpOrder = await mpResponse.json().catch(() => ({}));
-  if (!mpResponse.ok || !mpOrder.id || !mpOrder.checkout_url) {
-    await env.DB.prepare(
-      "UPDATE orders SET status = 'provider_error', updated_at = ? WHERE id = ?"
-    ).bind(nowIso(), localOrderId).run();
-    return response({ error: "checkout_creation_failed", provider_status: mpResponse.status }, request, env, 502);
+  const result = await paddleResponse.json().catch(() => ({}));
+  const transaction = result.data;
+  if (!paddleResponse.ok || !transaction?.id || !transaction?.checkout?.url) {
+    await env.DB.prepare("UPDATE orders SET status = 'provider_error', updated_at = ? WHERE id = ?")
+      .bind(nowIso(), localOrderId).run();
+    return response({ error: "checkout_creation_failed", provider_status: paddleResponse.status }, request, env, 502);
   }
-
-  await env.DB.prepare(
-    "UPDATE orders SET provider_order_id = ?, status = ?, updated_at = ? WHERE id = ?"
-  ).bind(mpOrder.id, mpOrder.status || "created", nowIso(), localOrderId).run();
-
-  return response({ checkout_url: mpOrder.checkout_url, order_reference: localOrderId }, request, env, 201);
+  await env.DB.prepare("UPDATE orders SET provider_order_id = ?, status = ?, updated_at = ? WHERE id = ?")
+    .bind(transaction.id, transaction.status || "ready", nowIso(), localOrderId).run();
+  return response({ checkout_url: transaction.checkout.url, order_reference: localOrderId }, request, env, 201);
 }
 
-async function handleMercadoPagoWebhook(request, env) {
-  if (!(await verifyWebhookSignature(request, env))) return json({ error: "invalid_signature" }, 401);
-  const dataId = new URL(request.url).searchParams.get("data.id");
-  if (!dataId) return json({ received: true });
-
-  const providerResponse = await fetch(`https://api.mercadopago.com/v1/orders/${encodeURIComponent(dataId)}`, {
-    headers: { "Authorization": `Bearer ${env.MERCADOPAGO_ACCESS_TOKEN}` }
-  });
-  if (!providerResponse.ok) return json({ error: "provider_order_lookup_failed" }, 502);
-  const order = await providerResponse.json();
-  if (!order.external_reference) return json({ received: true, ignored: true });
-
+async function handlePaddleWebhook(request, env) {
+  const rawBody = await request.text();
+  if (!(await verifyWebhookSignature(request, env, rawBody))) return json({ error: "invalid_signature" }, 401);
+  let event;
+  try { event = JSON.parse(rawBody); } catch { return json({ error: "invalid_json" }, 400); }
+  if (event.event_type !== "transaction.completed") return json({ received: true, ignored: true });
+  const transaction = event.data || {};
+  const orderId = transaction.custom_data?.l30_order_id;
+  const deviceId = String(transaction.custom_data?.device_id || "").toUpperCase();
+  if (!orderId || !validDeviceId(deviceId) || transaction.status !== "completed")
+    return json({ received: true, ignored: true });
   const local = await env.DB.prepare(
-    "SELECT * FROM orders WHERE id = ? AND provider_order_id = ?"
-  ).bind(order.external_reference, dataId).first();
+    "SELECT * FROM orders WHERE id = ? AND device_id = ?"
+  ).bind(orderId, deviceId).first();
   if (!local) return json({ received: true, ignored: true });
-
-  const paid = Number(order.total_paid_amount || 0);
-  const expected = Number(local.amount_brl);
-  const isPaid = order.status === "processed" && order.status_detail === "accredited" &&
-    order.currency === "BRL" && Number.isFinite(paid) && paid >= expected;
-
-  if (!isPaid) {
-    await env.DB.prepare(
-      "UPDATE orders SET status = ?, updated_at = ? WHERE id = ?"
-    ).bind(String(order.status || "pending"), nowIso(), local.id).run();
-    return json({ received: true, status: order.status || "pending" });
-  }
-
-  const existing = await env.DB.prepare(
-    "SELECT token_json FROM licenses WHERE order_id = ?"
-  ).bind(local.id).first();
+  if (transaction.currency_code !== "USD" || Number(transaction.details?.totals?.grand_total || 0) < 1999)
+    return json({ error: "payment_amount_or_currency_mismatch" }, 409);
+  const existing = await env.DB.prepare("SELECT token_json FROM licenses WHERE order_id = ?")
+    .bind(local.id).first();
   if (existing) return json({ received: true, license_issued: true });
-
-  const customer = await env.DB.prepare(
-    "SELECT name FROM customers WHERE id = ?"
-  ).bind(local.customer_id).first();
+  const customer = await env.DB.prepare("SELECT name FROM customers WHERE id = ?")
+    .bind(local.customer_id).first();
   const issued = new Date();
   const expires = new Date(issued);
   expires.setUTCFullYear(expires.getUTCFullYear() + 1);
   const serial = crypto.randomUUID().replaceAll("-", "").slice(0, 16).toUpperCase();
   const payload = canonicalLicensePayload({
-    deviceId: local.device_id,
-    customer: customer?.name || "Floating Camera Customer",
-    issuedOn: dateOnly(issued),
-    expiresOn: dateOnly(expires),
-    serial
+    deviceId, customer: customer?.name || "Floating Camera Customer",
+    issuedOn: dateOnly(issued), expiresOn: dateOnly(expires), serial
   });
-
   let token;
-  try {
-    token = await signLicense(payload, env);
-  } catch {
-    return json({ error: "license_signing_not_configured" }, 503);
-  }
-
-  const licenseId = crypto.randomUUID();
+  try { token = await signLicense(payload, env); }
+  catch { return json({ error: "license_signing_not_configured" }, 503); }
   try {
     await env.DB.prepare(
       "INSERT INTO licenses (id, order_id, customer_id, device_id, issued_on, expires_on, serial, token_json, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)"
-    ).bind(licenseId, local.id, local.customer_id, local.device_id, payload.issued_on,
+    ).bind(crypto.randomUUID(), local.id, local.customer_id, deviceId, payload.issued_on,
       payload.expires_on, serial, JSON.stringify(token), nowIso()).run();
-  } catch {
-    return json({ error: "license_device_conflict" }, 409);
-  }
-
-  await env.DB.prepare(
-    "UPDATE orders SET status = 'paid', updated_at = ? WHERE id = ?"
-  ).bind(nowIso(), local.id).run();
-
+  } catch { return json({ error: "license_device_conflict" }, 409); }
+  await env.DB.prepare("UPDATE orders SET status = 'paid', updated_at = ? WHERE id = ?")
+    .bind(nowIso(), local.id).run();
   return json({ received: true, license_issued: true });
 }
 
@@ -292,7 +235,7 @@ export default {
     if (url.pathname === "/health" && request.method === "GET") return json({ status: "ok" });
     if (url.pathname === "/api/trial/start" && request.method === "POST") return startTrial(request, env);
     if (url.pathname === "/api/checkout/create" && request.method === "POST") return createCheckout(request, env);
-    if (url.pathname === "/api/webhooks/mercadopago" && request.method === "POST") return handleMercadoPagoWebhook(request, env);
+    if (url.pathname === "/api/webhooks/paddle" && request.method === "POST") return handlePaddleWebhook(request, env);
     if (url.pathname === "/api/license" && request.method === "GET") return getLicense(request, env);
     return response({ error: "not_found" }, request, env, 404);
   }
