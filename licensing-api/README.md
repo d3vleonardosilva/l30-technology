@@ -1,53 +1,55 @@
 # L30 Technology — Floating Camera Licensing API
 
-Initial backend scaffold for the Floating Camera online licensing service.
+Backend scaffold for international sales of Floating Camera.
 
-## Decisions encoded
+## Commercial policy
 
-- 7-day evaluation period, recorded server-side per Device ID.
-- One annual license is bound to exactly one Device ID.
-- Automatic online payment through Mercado Pago Checkout Pro (Orders API).
-- Annual license token remains compatible with the current Floating Camera Ed25519 verifier.
-- The app receives a signed JSON license only after the server verifies the Mercado Pago order as processed/accredited.
+- Annual license: **US$19.99**.
+- One license is bound to one 24-character Device ID.
+- License term: 12 months from issuance.
+- Free trial: 7 days, recorded server-side per Device ID.
+- Checkout: Paddle, automatic collection, one-time annual purchase (no automatic renewal).
+- Paddle localizes checkout currency where enabled in the seller account. The base catalog price remains USD 19.99.
 
-## Deployment target
+## Deployment
 
-Cloudflare Worker + D1 database. This is a separate service from the static portfolio site. Suggested production hostname: `api.l30.tec.br` (do not change existing site DNS until the Worker is ready).
+Target: Cloudflare Worker + D1. Suggested API hostname: `api.l30.tec.br`. Do not alter the existing portfolio DNS until the Worker is tested.
 
-## Required Cloudflare setup
+## Paddle setup
 
-1. Create a D1 database and apply `migrations/0001_initial.sql`.
-2. Create a Worker from this directory using `wrangler.jsonc`.
-3. Bind the D1 database as `DB`.
-4. Configure Worker secrets (never commit them):
-   - `MERCADOPAGO_ACCESS_TOKEN`: seller's production or test access token.
-   - `MERCADOPAGO_WEBHOOK_SECRET`: secret signature from Mercado Pago Webhooks.
-   - `LICENSE_PRIVATE_KEY_PKCS8_B64`: base64 PKCS#8 Ed25519 private key that matches the public key embedded in the current app.
-5. Configure variables:
-   - `ANNUAL_PRICE_BRL`: annual price, decimal string (e.g. `49.90`); intentionally unset until the owner decides the price.
-   - `SITE_ORIGIN`: exact public site origin, e.g. `https://www.l30.tec.br`.
+1. Apply `migrations/0001_initial.sql` to a Cloudflare D1 database.
+2. In Paddle, create a product named **Floating Camera — Annual License**.
+3. Create a **one-time** price of **USD 19.99**. Do not configure a recurring subscription price: the license expires after 12 months and is not auto-renewing.
+4. Enable automatic currency localization in Paddle if desired. The customer sees the applicable localized checkout amount; USD 19.99 is the base price.
+5. Configure a Paddle notification destination for `https://api.l30.tec.br/api/webhooks/paddle` and subscribe to `transaction.completed`.
+6. Bind D1 as `DB` and configure Worker secrets:
+   - `PADDLE_API_KEY`: Paddle API key (server-side only).
+   - `PADDLE_WEBHOOK_SECRET`: endpoint-specific Paddle notification secret.
+   - `LICENSE_PRIVATE_KEY_PKCS8_B64`: base64 PKCS#8 Ed25519 private key matching the public key already embedded in the desktop app.
+7. Configure Worker variables:
+   - `PADDLE_PRICE_ID`: Paddle one-time price ID for USD 19.99.
+   - `SITE_ORIGIN`: exact allowed site origin, e.g. `https://www.l30.tec.br`.
    - `LICENSE_PUBLIC_KEY_B64`: current app public key.
-6. Create the Mercado Pago application and configure the **Order (Mercado Pago)** webhook to:
-   `https://api.l30.tec.br/api/webhooks/mercadopago`
-7. Test in Mercado Pago test mode before production.
+8. Test using Paddle sandbox credentials and sandbox notification destination before requesting live approval.
 
 ## API routes
 
 - `GET /health`
 - `POST /api/trial/start` — body: `{ "device_id": "24_HEX_DEVICE_ID" }`
 - `POST /api/checkout/create` — body: `{ "name": "...", "email": "...", "device_id": "24_HEX_DEVICE_ID" }`
-- `POST /api/webhooks/mercadopago` — signed Order webhook.
-- `GET /api/license?device_id=24_HEX_DEVICE_ID` — returns the signed annual token if payment has been verified.
+- `POST /api/webhooks/paddle` — validates Paddle-Signature and provisions a license only for completed transactions.
+- `GET /api/license?device_id=24_HEX_DEVICE_ID` — returns the signed annual token if available.
 
-## Security notes
+## Security and launch requirements
 
 - Do not collect CPF unless a specific legal/accounting requirement is confirmed.
-- Never expose the Mercado Pago access token, webhook secret, or Ed25519 private key to browser code or GitHub.
-- A browser return URL is not proof of payment. The backend queries the Mercado Pago Orders API and checks the order status and paid amount before issuing a license.
-- Webhook signature validation uses HMAC-SHA256 and constant-time comparison.
-- The current desktop app uses a 24-character Device ID. The server binds each license to that ID and enforces one active license per device.
-- The existing app public key is preserved; the private key must match it exactly. Do not generate a replacement key until existing license compatibility is verified.
+- Never put Paddle API keys, webhook secrets, or the Ed25519 private key in browser code or Git.
+- Browser redirects are not proof of payment. Only a signature-verified Paddle webhook provisions the license.
+- The webhook checks the transaction's custom order/device references, completed status, USD currency, and minimum USD 19.99 total before issuing.
+- Preserve the existing Ed25519 public key and verify the corresponding private key before production. Do not generate a new key; that would invalidate compatibility with existing signed licenses.
+- The 7-day server-side trial endpoint is scaffolded, but the desktop app still needs integration and must fail safely when the service is unavailable.
+- Add admin authentication, license revocation, webhook replay/idempotency tests, rate limits, privacy notice, and end-to-end sandbox tests before launch.
 
-## Important implementation status
+## Status
 
-This is a first backend implementation scaffold. It is not production-ready until the Cloudflare D1 database, secrets, Mercado Pago test credentials, webhook, domain, and matching Ed25519 private key are configured and end-to-end tests pass.
+Development scaffold only. Not deployed and not ready to accept live payments. Live launch requires Paddle seller approval, Cloudflare configuration, secrets, matching signing key, app integration, and end-to-end testing.
