@@ -206,6 +206,7 @@ async function startTrial(request, env) {
     started_at: started.toISOString(),
     expires_at: expires.toISOString(),
     days_left: Math.ceil(remainingMs / 86400000),
+    server_time: now.toISOString(),
     token
   }, request, env);
 }
