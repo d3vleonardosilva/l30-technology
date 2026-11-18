@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS customers (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
+  provider_customer_id TEXT UNIQUE,
   created_at TEXT NOT NULL
 );
 
