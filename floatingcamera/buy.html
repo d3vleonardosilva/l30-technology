@@ -31,6 +31,8 @@
     button.primary{background:linear-gradient(100deg,#2b769a,#2d63a5);border-color:transparent;flex:1}
     button:disabled{opacity:.55;cursor:not-allowed}
     .switch{background:none;border:0;color:var(--cyan);padding:8px 0}
+    .recovery-title{font-size:22px;line-height:1.2;margin:10px 0 12px}
+    .recovery-panel[hidden]{display:none}
     #message{display:none;margin-top:18px;padding:13px 15px;border:1px solid var(--line);border-radius:11px;color:var(--muted);white-space:pre-wrap}
     #message.show{display:block}#message.error{border-color:#a94e5a;color:#ffd9de}
     .company-fields[hidden]{display:none}.divider{height:1px;background:var(--line);margin:24px 0}
@@ -93,11 +95,26 @@
         <label for="password" data-i18n="password">Password</label>
         <input id="password" type="password" autocomplete="current-password" minlength="8" required>
         <div class="hint" id="authModeText" data-i18n="signinHint">Sign in to continue to secure payment.</div>
+        <button class="switch" type="button" id="forgotPassword" data-i18n="forgotPassword">Forgot your password?</button>
 
         <div class="actions">
           <button class="primary" type="submit" id="submitButton" data-i18n="continue">Continue to secure checkout</button>
         </div>
         <button class="switch" type="button" id="toggleAuth" data-i18n="createAccount">New here? Create an account</button>
+      </form>
+
+      <form id="recoveryForm" class="recovery-panel" hidden>
+        <div class="eyebrow" data-i18n="recoveryEyebrow">ACCOUNT RECOVERY</div>
+        <h2 class="recovery-title" data-i18n="recoveryTitle">Choose a new password</h2>
+        <p class="intro" data-i18n="recoveryIntro">Enter and confirm your new password.</p>
+        <label for="newPassword" data-i18n="newPassword">New password</label>
+        <input id="newPassword" type="password" autocomplete="new-password" minlength="8" required>
+        <label for="confirmPassword" data-i18n="confirmPassword">Confirm new password</label>
+        <input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" required>
+        <div class="actions">
+          <button class="primary" type="submit" id="recoverySubmit" data-i18n="savePassword">Save new password</button>
+        </div>
+        <button class="switch" type="button" id="cancelRecovery" data-i18n="cancelRecovery">Back to sign in</button>
       </form>
 
       <div id="message" role="status" aria-live="polite"></div>
@@ -125,6 +142,14 @@
           back:"Back to L30 Technology",needCompany:"Enter your company name.",invalidSeats:"Enter a whole number of devices from 1 to 100.",
           configMissing:"Online accounts are not configured yet. Please contact L30 Technology.",
           confirmation:"Account created. Check your email to confirm it, then return here and sign in.",
+          forgotPassword:"Forgot your password?",recoveryEyebrow:"ACCOUNT RECOVERY",
+          recoveryTitle:"Choose a new password",recoveryIntro:"Enter and confirm your new password.",
+          newPassword:"New password",confirmPassword:"Confirm new password",savePassword:"Save new password",
+          cancelRecovery:"Back to sign in",recoveryEmailSent:"If an account exists for this address, a password reset email has been sent.",
+          recoveryError:"Could not send the reset email. Check the address and try again.",
+          passwordMismatch:"The passwords do not match.",passwordTooShort:"Use at least 8 characters.",
+          passwordUpdated:"Password updated successfully. Please sign in again.",
+          passwordUpdateError:"Could not update the password. Request a new reset link and try again.",
           checkoutError:"Could not start checkout. Please try again or contact support.",
           checkoutWait:"Preparing your secure checkout…",signinError:"Unable to sign in. Check your email and password.",
           signupError:"Unable to create your account. Check the details and try again."
@@ -143,6 +168,14 @@
           back:"Voltar para L30 Technology",needCompany:"Informe a razão social.",invalidSeats:"Informe uma quantidade inteira de dispositivos entre 1 e 100.",
           configMissing:"As contas online ainda não estão configuradas. Entre em contato com a L30 Technology.",
           confirmation:"Conta criada. Confirme seu e-mail e depois volte para entrar.",
+          forgotPassword:"Esqueceu sua senha?",recoveryEyebrow:"RECUPERAÇÃO DE CONTA",
+          recoveryTitle:"Defina uma nova senha",recoveryIntro:"Digite e confirme sua nova senha.",
+          newPassword:"Nova senha",confirmPassword:"Confirme a nova senha",savePassword:"Salvar nova senha",
+          cancelRecovery:"Voltar para entrar",recoveryEmailSent:"Se existir uma conta com esse endereço, enviaremos um e-mail para redefinir a senha.",
+          recoveryError:"Não foi possível enviar o e-mail. Confira o endereço e tente novamente.",
+          passwordMismatch:"As senhas não coincidem.",passwordTooShort:"Use pelo menos 8 caracteres.",
+          passwordUpdated:"Senha atualizada com sucesso. Entre novamente.",
+          passwordUpdateError:"Não foi possível atualizar a senha. Solicite um novo link e tente novamente.",
           checkoutError:"Não foi possível iniciar o pagamento. Tente novamente ou fale com o suporte.",
           checkoutWait:"Preparando seu pagamento seguro…",signinError:"Não foi possível entrar. Confira seu e-mail e senha.",
           signupError:"Não foi possível criar sua conta. Confira os dados e tente novamente."
@@ -161,6 +194,14 @@
           back:"Volver a L30 Technology",needCompany:"Introduce el nombre legal de la empresa.",invalidSeats:"Introduce un número entero de dispositivos entre 1 y 100.",
           configMissing:"Las cuentas en línea aún no están configuradas. Contacta con L30 Technology.",
           confirmation:"Cuenta creada. Confirma tu correo y vuelve aquí para iniciar sesión.",
+          forgotPassword:"¿Olvidaste tu contraseña?",recoveryEyebrow:"RECUPERACIÓN DE CUENTA",
+          recoveryTitle:"Establece una nueva contraseña",recoveryIntro:"Introduce y confirma tu nueva contraseña.",
+          newPassword:"Nueva contraseña",confirmPassword:"Confirma la nueva contraseña",savePassword:"Guardar nueva contraseña",
+          cancelRecovery:"Volver al inicio de sesión",recoveryEmailSent:"Si existe una cuenta con esta dirección, enviaremos un correo para restablecer la contraseña.",
+          recoveryError:"No se pudo enviar el correo. Comprueba la dirección e inténtalo de nuevo.",
+          passwordMismatch:"Las contraseñas no coinciden.",passwordTooShort:"Usa al menos 8 caracteres.",
+          passwordUpdated:"Contraseña actualizada. Inicia sesión de nuevo.",
+          passwordUpdateError:"No se pudo actualizar la contraseña. Solicita un nuevo enlace e inténtalo otra vez.",
           checkoutError:"No se pudo iniciar el pago. Inténtalo de nuevo o contacta con soporte.",
           checkoutWait:"Preparando tu pago seguro…",signinError:"No se pudo iniciar sesión. Comprueba tu correo y contraseña.",
           signupError:"No se pudo crear la cuenta. Comprueba los datos e inténtalo de nuevo."
@@ -173,7 +214,34 @@
       const $ = (id) => document.getElementById(id);
       const form = $("purchaseForm"), message = $("message"), submit = $("submitButton");
       const companyFields = $("companyFields"), customerType = $("customerType");
+      const recoveryForm = $("recoveryForm"), forgotPassword = $("forgotPassword");
+      let authClient = null;
       const t = (key) => translations[language][key] || translations.en[key];
+
+      function getClient() {
+        if (authClient) return authClient;
+        if (!window.supabase?.createClient ||
+            !window.L30_SUPABASE_URL || window.L30_SUPABASE_URL.includes("REPLACE_") ||
+            !window.L30_SUPABASE_ANON_KEY || window.L30_SUPABASE_ANON_KEY.includes("REPLACE_")) {
+          return null;
+        }
+        authClient = window.supabase.createClient(
+          window.L30_SUPABASE_URL,
+          window.L30_SUPABASE_ANON_KEY,
+          { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
+        );
+        authClient.auth.onAuthStateChange((event) => {
+          if (event === "PASSWORD_RECOVERY") {
+            form.hidden = true;
+            $("toggleAuth").hidden = true;
+            recoveryForm.hidden = false;
+            forgotPassword.hidden = true;
+            showMessage("");
+            $("newPassword").focus();
+          }
+        });
+        return authClient;
+      }
 
       function showMessage(text, isError=false) {
         message.textContent = text;
@@ -192,6 +260,7 @@
         });
         $("authModeText").textContent = t(creatingAccount ? "signupHint" : "signinHint");
         $("toggleAuth").textContent = t(creatingAccount ? "haveAccount" : "createAccount");
+        forgotPassword.hidden = creatingAccount;
         submit.textContent = t(creatingAccount ? "createAccount" : "continue");
       }
       $("language").addEventListener("change", (event) => {
@@ -205,6 +274,71 @@
         $("password").autocomplete = creatingAccount ? "new-password" : "current-password";
         applyLanguage();
         showMessage("");
+      });
+
+      forgotPassword.addEventListener("click", async () => {
+        const emailInput = $("email");
+        if (!emailInput.value.trim() || !emailInput.checkValidity()) {
+          emailInput.reportValidity();
+          return;
+        }
+        const client = getClient();
+        if (!client) { showMessage(t("configMissing"), true); return; }
+        forgotPassword.disabled = true;
+        try {
+          const { error } = await client.auth.resetPasswordForEmail(emailInput.value.trim(), {
+            redirectTo: window.location.origin + window.location.pathname
+          });
+          if (error) throw error;
+          showMessage(t("recoveryEmailSent"));
+        } catch (error) {
+          console.error("L30 password reset request failed", error);
+          showMessage(t("recoveryError"), true);
+        } finally {
+          forgotPassword.disabled = false;
+        }
+      });
+
+      $("cancelRecovery").addEventListener("click", async () => {
+        const client = getClient();
+        if (client) await client.auth.signOut();
+        recoveryForm.hidden = true;
+        form.hidden = false;
+        $("toggleAuth").hidden = false;
+        creatingAccount = false;
+        $("newPassword").value = "";
+        $("confirmPassword").value = "";
+        applyLanguage();
+        showMessage("");
+      });
+
+      recoveryForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const password = $("newPassword").value;
+        const confirmation = $("confirmPassword").value;
+        if (password.length < 8) { showMessage(t("passwordTooShort"), true); return; }
+        if (password !== confirmation) { showMessage(t("passwordMismatch"), true); return; }
+        const client = getClient();
+        if (!client) { showMessage(t("configMissing"), true); return; }
+        $("recoverySubmit").disabled = true;
+        try {
+          const { error } = await client.auth.updateUser({ password });
+          if (error) throw error;
+          await client.auth.signOut();
+          recoveryForm.hidden = true;
+          form.hidden = false;
+          $("toggleAuth").hidden = false;
+          creatingAccount = false;
+          $("newPassword").value = "";
+          $("confirmPassword").value = "";
+          applyLanguage();
+          showMessage(t("passwordUpdated"));
+        } catch (error) {
+          console.error("L30 password update failed", error);
+          showMessage(t("passwordUpdateError"), true);
+        } finally {
+          $("recoverySubmit").disabled = false;
+        }
       });
 
       form.addEventListener("submit", async (event) => {
@@ -227,11 +361,8 @@
         submit.disabled = true;
         showMessage(creatingAccount ? t("signupHint") : t("checkoutWait"));
         try {
-          const client = window.__l30Supabase || (window.__l30Supabase = window.supabase.createClient(
-            window.L30_SUPABASE_URL,
-            window.L30_SUPABASE_ANON_KEY,
-            { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
-          ));
+          const client = getClient();
+          if (!client) { showMessage(t("configMissing"), true); return; }
           const email = $("email").value.trim();
           const password = $("password").value;
 
@@ -273,6 +404,7 @@
         }
       });
       applyLanguage();
+      getClient();
     })();
   </script>
 </body>
