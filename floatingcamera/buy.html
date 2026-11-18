@@ -238,7 +238,10 @@
           if (creatingAccount) {
             const { data, error } = await client.auth.signUp({
               email, password,
-              options: { emailRedirectTo: window.location.origin + window.location.pathname }
+              options: {
+                emailRedirectTo: window.location.origin + window.location.pathname,
+                data: { language: $("language").value }
+              }
             });
             if (error) throw Object.assign(new Error(error.message), { kind: "signup" });
             if (!data.session) {
