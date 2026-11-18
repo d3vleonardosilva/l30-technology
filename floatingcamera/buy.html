@@ -222,12 +222,12 @@
         if (authClient) return authClient;
         if (!window.supabase?.createClient ||
             !window.L30_SUPABASE_URL || window.L30_SUPABASE_URL.includes("REPLACE_") ||
-            !window.L30_SUPABASE_ANON_KEY || window.L30_SUPABASE_ANON_KEY.includes("REPLACE_")) {
+            !window.L30_SUPABASE_PUBLISHABLE_KEY || window.L30_SUPABASE_PUBLISHABLE_KEY.includes("REPLACE_")) {
           return null;
         }
         authClient = window.supabase.createClient(
           window.L30_SUPABASE_URL,
-          window.L30_SUPABASE_ANON_KEY,
+          window.L30_SUPABASE_PUBLISHABLE_KEY,
           { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
         );
         authClient.auth.onAuthStateChange((event) => {
@@ -345,7 +345,7 @@
         event.preventDefault();
         if (!window.supabase?.createClient ||
             !window.L30_SUPABASE_URL || window.L30_SUPABASE_URL.includes("REPLACE_") ||
-            !window.L30_SUPABASE_ANON_KEY || window.L30_SUPABASE_ANON_KEY.includes("REPLACE_")) {
+            !window.L30_SUPABASE_PUBLISHABLE_KEY || window.L30_SUPABASE_PUBLISHABLE_KEY.includes("REPLACE_")) {
           showMessage(t("configMissing"), true); return;
         }
 
