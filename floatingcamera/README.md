@@ -27,3 +27,13 @@ Upload all files and the `assets` directory to a static host such as Cloudflare 
 - Confirm license pricing, terms, installer safety and device policies before launch.
 - The preview image is illustrative and should not be represented as an unmodified screenshot.
 - No forms, analytics or backend are present. Only the language preference is saved locally in browser storage.
+
+## Licensing v2 development scaffold
+
+The following files have been added on the isolated `licensing-v2` branch:
+- `buy.html`: multilingual customer registration/sign-in and checkout selection for individuals or businesses.
+- `supabase-config.js`: public browser-side Supabase configuration placeholders; only the anon/publishable key belongs here.
+- `pay.html`: Paddle.js payment-link page that opens transactions passed through the `_ptxn` query parameter.
+- `paddle-config.js`: public Paddle.js client-side token placeholder.
+
+These pages are **not production-ready or connected** until a Supabase project is provisioned, public configuration values are set, Paddle seller onboarding and website approval are completed, catalog price IDs and server secrets are set, the Edge Functions are deployed, and the Windows client is updated for online activation. Never put a Supabase service-role key, Paddle API key, webhook secret, or license signing private key in this static site.
