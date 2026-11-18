@@ -75,7 +75,8 @@ def encrypt_backup(private_der: bytes, key_id: str, public_b64: str, passphrase:
     salt = secrets.token_bytes(16)
     nonce = secrets.token_bytes(12)
     key = derive_backup_key(passphrase, salt)
-    ciphertext = AESGCM(key).encrypt(nonce, private_der, AAD)
+    authenticated_metadata = AAD + b"|" + key_id.encode("utf-8") + b"|" + public_b64.encode("ascii")
+    ciphertext = AESGCM(key).encrypt(nonce, private_der, authenticated_metadata)
     document = {
         "format": "L30-FC-ED25519-BACKUP-V1",
         "key_id": key_id,
@@ -97,6 +98,8 @@ def restore_backup(backup_path: Path, output_dir: Path) -> None:
     if output_dir.exists() and (output_dir / "private_key_pkcs8.b64").exists():
         raise FileExistsError("Já existe uma chave privada no destino. Não será sobrescrita.")
     output_dir.mkdir(parents=True, exist_ok=True)
+    if os.name != "nt":
+        output_dir.chmod(0o700)
     protect_windows_acl(output_dir)
 
     passphrase = getpass.getpass("Senha do backup: ")
@@ -104,7 +107,8 @@ def restore_backup(backup_path: Path, output_dir: Path) -> None:
     nonce = base64.b64decode(document["nonce"], validate=True)
     ciphertext = base64.b64decode(document["ciphertext"], validate=True)
     key = derive_backup_key(passphrase, salt)
-    private_der = AESGCM(key).decrypt(nonce, ciphertext, AAD)
+    authenticated_metadata = AAD + b"|" + document["key_id"].encode("utf-8") + b"|" + document["public_key_b64"].encode("ascii")
+    private_der = AESGCM(key).decrypt(nonce, ciphertext, authenticated_metadata)
 
     private_key = serialization.load_der_private_key(private_der, password=None)
     if not isinstance(private_key, Ed25519PrivateKey):
@@ -143,6 +147,8 @@ def generate(output_dir: Path, key_id: str) -> None:
             "A pasta de destino não está vazia. Escolha outra pasta; nenhuma chave foi sobrescrita."
         )
     output_dir.mkdir(parents=True, exist_ok=True)
+    if os.name != "nt":
+        output_dir.chmod(0o700)
     protect_windows_acl(output_dir)
 
     private_key = Ed25519PrivateKey.generate()
