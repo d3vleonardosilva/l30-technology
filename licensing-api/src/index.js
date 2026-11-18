@@ -189,11 +189,24 @@ async function startTrial(request, env) {
   const started = new Date(trial.started_at);
   const expires = addDays(started, 7);
   const remainingMs = Math.max(0, expires.getTime() - now.getTime());
+  let token;
+  try {
+    token = await signLicenseV2({
+      type: "trial",
+      product: "FloatingCamera",
+      device_id: deviceId,
+      started_at: started.toISOString(),
+      expires_at: expires.toISOString()
+    }, env);
+  } catch {
+    return response({ error: "trial_signing_not_configured" }, request, env, 503);
+  }
   return response({
     status: remainingMs > 0 ? "trial" : "expired",
     started_at: started.toISOString(),
     expires_at: expires.toISOString(),
-    days_left: Math.ceil(remainingMs / 86400000)
+    days_left: Math.ceil(remainingMs / 86400000),
+    token
   }, request, env);
 }
 
@@ -419,12 +432,29 @@ async function getLicense(request, env) {
   if (license.status !== "active") return json({ status: "revoked" });
   if (dateOnly(new Date()) > license.expires_on) return json({ status: "expired" });
 
-  return new Response(license.token_json, {
-    headers: {
-      "content-type": "application/json; charset=utf-8",
-      "cache-control": "no-store",
-      "x-content-type-options": "nosniff"
-    }
+  let annualToken;
+  let offlineLease;
+  const issuedAt = new Date();
+  const leaseExpires = addDays(issuedAt, 7);
+  try {
+    annualToken = JSON.parse(license.token_json);
+    offlineLease = await signLicenseV2({
+      type: "offline_lease",
+      product: "FloatingCamera",
+      device_id: deviceId,
+      license_serial: annualToken.payload.serial,
+      issued_at: issuedAt.toISOString(),
+      expires_at: leaseExpires.toISOString()
+    }, env);
+  } catch {
+    return json({ error: "offline_lease_signing_not_configured" }, 503);
+  }
+
+  return json({
+    status: "active",
+    license: annualToken,
+    offline_lease: offlineLease,
+    server_time: issuedAt.toISOString()
   });
 }
 
