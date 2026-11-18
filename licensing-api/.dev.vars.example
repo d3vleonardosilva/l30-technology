@@ -1,5 +1,7 @@
 # Local development only. Never commit real credentials.
+# Use Cloudflare Worker Secrets for real production values.
 PADDLE_API_KEY=
 PADDLE_WEBHOOK_SECRET=
-LICENSE_PRIVATE_KEY_PKCS8_B64=
+LICENSE_SIGNING_KEY_PKCS8_B64=
+LICENSE_ADMIN_TOKEN=
 PADDLE_PRICE_ID=
