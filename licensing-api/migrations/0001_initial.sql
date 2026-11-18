@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS orders (
   device_id TEXT NOT NULL,
   provider TEXT NOT NULL,
   provider_order_id TEXT UNIQUE,
+  provider_price_id TEXT,
   external_reference TEXT NOT NULL UNIQUE,
   amount_minor INTEGER NOT NULL,
   currency_code TEXT NOT NULL,
