@@ -210,6 +210,10 @@ async function createCheckout(request, env) {
     return response({ error: "paddle_not_configured" }, request, env, 503);
   }
 
+  await env.DB.prepare(
+    "UPDATE licenses SET status = 'expired' WHERE device_id = ? AND status = 'active' AND expires_on < ?"
+  ).bind(deviceId, dateOnly(new Date())).run();
+
   const existingLicense = await env.DB.prepare(
     "SELECT id FROM licenses WHERE device_id = ? AND status = 'active' AND expires_on >= ? LIMIT 1"
   ).bind(deviceId, dateOnly(new Date())).first();
@@ -441,6 +445,10 @@ async function adminIssueLicense(request, env) {
   if (name.length < 2 || !validEmail(email) || !validDeviceId(deviceId)) {
     return json({ error: "invalid_customer_or_device" }, 400);
   }
+
+  await env.DB.prepare(
+    "UPDATE licenses SET status = 'expired' WHERE device_id = ? AND status = 'active' AND expires_on < ?"
+  ).bind(deviceId, dateOnly(new Date())).run();
 
   const existing = await env.DB.prepare(
     "SELECT id FROM licenses WHERE device_id = ? AND status = 'active' AND expires_on >= ? LIMIT 1"
