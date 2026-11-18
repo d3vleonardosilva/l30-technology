@@ -240,11 +240,13 @@ async function createCheckout(request, env) {
   if (
     price.id !== env.PADDLE_PRICE_ID ||
     price.status !== "active" ||
+    price.type !== "standard" ||
     price.billing_cycle !== null ||
     price.trial_period !== null ||
     String(price.unit_price?.amount) !== "1999" ||
     price.unit_price?.currency_code !== "USD" ||
-    (Array.isArray(price.unit_price_overrides) && price.unit_price_overrides.length > 0)
+    !Array.isArray(price.unit_price_overrides) ||
+    price.unit_price_overrides.length !== 0
   ) {
     return response({ error: "paddle_price_policy_mismatch" }, request, env, 503);
   }
