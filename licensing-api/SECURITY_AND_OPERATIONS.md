@@ -44,6 +44,14 @@ Use o painel Cloudflare ou o Wrangler para cadastrar LICENSE_ADMIN_TOKEN, PADDLE
 - Uma chave comprometida exige revogação operacional, análise de licenças emitidas, nova chave, atualização do aplicativo e plano de comunicação.
 - A perda de uma chave privada não se corrige derivando a chave a partir da pública. Restaura-se o backup criptografado ou gira-se para uma nova chave.
 
+## Página de pagamento Paddle
+
+- Aprovar `www.l30.tec.br` em Paddle Website Approval.
+- Definir `https://www.l30.tec.br/floatingcamera/checkout.html` como default payment link no sandbox.
+- Substituir o marcador da página pelo token público de cliente do sandbox. Esse token é para o navegador e não é a API key.
+- Testar a passagem de `?_ptxn=txn_...` e confirmar que Paddle.js abre a transação correta.
+- Criar configuração separada de produção apenas após a aprovação comercial; usar token público live e ambiente live. Nunca misturar tokens sandbox/live.
+
 ## Proteções operacionais obrigatórias antes de produção
 
 - Criar o D1 de produção e aplicar as migrações em sandbox primeiro.
