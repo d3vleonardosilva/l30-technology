@@ -10,6 +10,7 @@ Secure licensing service foundation for Floating Camera. This source is in a dev
 - Free trial: 7 days, started and tracked server-side.
 - No auto-renewal or recurring subscription.
 - Paddle is the payment provider; only a verified completed transaction can trigger automatic issuance.
+- Initial checkout catalog is USD 19.99. Keep currency localization disabled until localized amounts are recorded and verified end-to-end.
 
 ## Architecture
 
@@ -19,6 +20,7 @@ Secure licensing service foundation for Floating Camera. This source is in a dev
 - D1 stores customer, order, trial, license, webhook-idempotency and audit records.
 - Existing version-1 licenses remain verifiable by the legacy public key in the desktop client.
 - Each v2 key has a permanent key_id; retired public keys remain in the desktop trust keyring.
+- The v2 license embeds an opaque local customer UUID, not the buyer's name or email.
 
 ## License v2 format
 
@@ -64,7 +66,7 @@ Never commit a .dev.vars file, private key, plaintext backup, provider credentia
 
 - GET /health — service health.
 - POST /api/trial/start — start or query a server-side 7-day trial; body includes device_id.
-- POST /api/checkout/create — creates a Paddle transaction; body includes name, email and device_id.
+- POST /api/checkout/create — finds or creates a Paddle customer by exact email, binds its Paddle customer ID to the local customer, then creates a transaction for that customer and device.
 - POST /api/webhooks/paddle — verifies Paddle signature and timestamp; processes transaction.completed idempotently.
 - GET /api/license?device_id=... — returns the latest active signed token for a device, or a status.
 - POST /api/admin/licenses/issue — manual one-year issue; requires Authorization: Bearer ... with LICENSE_ADMIN_TOKEN; protect this route with Cloudflare Access.
@@ -78,12 +80,15 @@ Do not apply this schema to an existing database without reviewing its current s
 
 ## Paddle security
 
+The Paddle API key needs the least-privilege scopes required by this Worker: `customer.read`, `customer.write`, and `transaction.write`. The checkout flow looks up an exact customer email, creates the provider customer if needed, binds its `customer_id` to the local customer row, and includes that ID in the transaction. The completed webhook must match the provider transaction ID, local order/device, and bound customer ID before issuing.
+
 The webhook:
 - verifies the raw request body with the notification destination secret;
 - checks the signed timestamp using the documented 5-second tolerance;
 - supports multiple h1 signatures during provider-side key rotation;
 - requires a transaction.completed event;
 - verifies the local order ID, provider transaction ID, device ID, product term, currency and minimum price;
+- confirms the Paddle customer ID stored on the local order matches the transaction's customer ID;
 - records event IDs and stores issued tokens idempotently.
 
 Paddle recommends its SDK helper for signature verification and documents the timestamp tolerance and raw-body requirement: https://developer.paddle.com/webhooks/about/signature-verification/
@@ -96,10 +101,10 @@ Paddle recommends its SDK helper for signature verification and documents the ti
 4. Protect /api/admin/* with Cloudflare Access, MFA and the independent admin token.
 5. Add rate limits for trial and checkout endpoints.
 6. Add refund and chargeback handling, support transfer/reissue rules and customer privacy notice.
-7. Integrate the Windows client with the API for trial start, license retrieval and periodic revocation checks, including a documented offline grace period.
-8. Run automated unit, integration and end-to-end tests with Paddle sandbox.
-9. Review legal pages, tax/payment setup and Paddle seller approval.
-10. Deploy to a separate staging Worker and API hostname. Only then consider production rollout.
+7. Finish device-identity hardening (Windows-protected installation key), define reinstall/transfer support, and test the documented 7-day signed offline lease.
+8. Add automated API integration tests and full Paddle sandbox tests, including customer binding, successful/failed checkout, duplicate/out-of-order webhook, refund and chargeback.
+9. Configure Cloudflare Access + MFA for `/api/admin/*`, rate limits for trial and checkout, alerts and tested D1 exports/restores.
+10. Review legal pages, tax/payment setup and Paddle seller approval; deploy to a separate staging Worker and API hostname before any production rollout.
 
 ## Current status
 
@@ -109,13 +114,17 @@ Completed in this development branch:
 - initial D1 schema with license key IDs, webhook-event deduplication and administrative audit;
 - Paddle timestamp and signature checks hardened;
 - manual issue and revoke endpoints require a separate secret;
-- local key-generation and encrypted-recovery utility.
+- local key-generation and encrypted-recovery utility with round-trip and tamper-detection tests;
+- Windows client self-service checkout screen, server-side trial request, online license retrieval and signed 7-day offline lease verification;
+- exact Paddle customer lookup/creation and provider-customer binding in checkout/webhook;
+- regression tests confirming both stored v1 licenses remain valid.
 
 Not yet completed:
 - production key generation, public-key registration and secret provisioning;
-- online client integration and offline grace-period behavior;
+- online client compatibility testing against a deployed staging API;
 - Cloudflare Access and rate-limit configuration;
-- D1 sandbox tests, Paddle sandbox E2E tests, refund/chargeback automation;
-- security review and production deployment.
+- D1 sandbox setup and backup/restore test;
+- Paddle sandbox end-to-end tests, refund/chargeback automation;
+- Windows installation-identity protection, security review and production deployment.
 
 No live checkout should be advertised until all launch gates have passed.
