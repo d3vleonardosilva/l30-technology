@@ -67,6 +67,21 @@ function canonicalJson(value) {
   return JSON.stringify(sortJson(value));
 }
 
+export function isApprovedOneTimePrice(price, expectedPriceId) {
+  return Boolean(
+    price &&
+    price.id === expectedPriceId &&
+    price.status === "active" &&
+    price.type === "standard" &&
+    price.billing_cycle === null &&
+    price.trial_period === null &&
+    String(price.unit_price?.amount) === "1999" &&
+    price.unit_price?.currency_code === "USD" &&
+    Array.isArray(price.unit_price_overrides) &&
+    price.unit_price_overrides.length === 0
+  );
+}
+
 function canonicalLicensePayload({ deviceId, customer, issuedOn, expiresOn, serial }) {
   return {
     customer,
@@ -237,17 +252,7 @@ async function createCheckout(request, env) {
   if (!priceResponse.ok || !price) {
     return response({ error: "paddle_price_lookup_failed", provider_status: priceResponse.status }, request, env, 502);
   }
-  if (
-    price.id !== env.PADDLE_PRICE_ID ||
-    price.status !== "active" ||
-    price.type !== "standard" ||
-    price.billing_cycle !== null ||
-    price.trial_period !== null ||
-    String(price.unit_price?.amount) !== "1999" ||
-    price.unit_price?.currency_code !== "USD" ||
-    !Array.isArray(price.unit_price_overrides) ||
-    price.unit_price_overrides.length !== 0
-  ) {
+  if (!isApprovedOneTimePrice(price, env.PADDLE_PRICE_ID)) {
     return response({ error: "paddle_price_policy_mismatch" }, request, env, 503);
   }
 
