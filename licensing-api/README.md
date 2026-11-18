@@ -78,6 +78,14 @@ migrations/0001_initial.sql is the initial schema for the new service. It has cu
 
 Do not apply this schema to an existing database without reviewing its current state. This branch is a prototype; create a separate sandbox D1 first.
 
+## Paddle default payment link
+
+The L30 site contains `floatingcamera/checkout.html`, intended as the approved default payment-link page. Configure the Paddle sandbox website approval and default payment link as:
+
+`https://www.l30.tec.br/floatingcamera/checkout.html`
+
+The page currently has a placeholder sandbox client-side token. Replace it only with a Paddle **client-side token** for the matching environment. The page initializes Paddle.js and reads the `_ptxn` transaction reference. Client-side tokens are intended for browser use; never put API keys, webhook secrets, signing keys or admin tokens into the page. Sandbox and live environments require separate configuration and testing. The app accepts checkout URLs only from HTTPS subdomains of `l30.tec.br`.
+
 ## Paddle security
 
 The Paddle API key needs the least-privilege scopes required by this Worker: `customer.read`, `customer.write`, and `transaction.write`. The checkout flow looks up an exact customer email, creates the provider customer if needed, binds its `customer_id` to the local customer row, and includes that ID in the transaction. The completed webhook must match the provider transaction ID, local order/device, and bound customer ID before issuing.
@@ -100,9 +108,9 @@ Paddle recommends its SDK helper for signature verification and documents the ti
 3. Create a sandbox D1 database, apply migrations and test restores.
 4. Protect /api/admin/* with Cloudflare Access, MFA and the independent admin token.
 5. Add rate limits for trial and checkout endpoints.
-6. Add refund and chargeback handling, support transfer/reissue rules and customer privacy notice.
-7. Finish device-identity hardening (Windows-protected installation key), define reinstall/transfer support, and test the documented 7-day signed offline lease.
-8. Add automated API integration tests and full Paddle sandbox tests, including customer binding, successful/failed checkout, duplicate/out-of-order webhook, refund and chargeback.
+7. Add refund and chargeback handling, support transfer/reissue rules and customer privacy notice.
+8. Finish device-identity hardening (Windows-protected installation key), define reinstall/transfer support, and test the documented 7-day signed offline lease.
+9. Add automated API integration tests and full Paddle sandbox tests, including customer binding, successful/failed checkout, duplicate/out-of-order webhook, refund and chargeback.
 9. Configure Cloudflare Access + MFA for `/api/admin/*`, rate limits for trial and checkout, alerts and tested D1 exports/restores.
 10. Review legal pages, tax/payment setup and Paddle seller approval; deploy to a separate staging Worker and API hostname before any production rollout.
 
