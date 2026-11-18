@@ -57,8 +57,9 @@ Use o painel Cloudflare ou o Wrangler para cadastrar LICENSE_ADMIN_TOKEN, PADDLE
 - Criar o D1 de produção e aplicar as migrações em sandbox primeiro.
 - Aplicar regra Cloudflare Access ao caminho /api/admin/* e manter o segredo LICENSE_ADMIN_TOKEN como segunda barreira.
 - Criar regras de rate limiting para /api/trial/start e /api/checkout/create.
-- Criar a chave de API Paddle com permissões mínimas `customer.read`, `customer.write` e `transaction.write`.
+- Criar a chave de API Paddle com permissões mínimas `customer.read`, `customer.write`, `price.read` e `transaction.write`.
 - Manter a localização de moeda do Paddle desabilitada no primeiro lançamento, pois o registro atual compara valores na moeda-base USD. Só habilitá-la depois de armazenar e validar o valor/moeda final de cada transação.
+- Confirmar que o preço consultado na API Paddle está ativo, tem `billing_cycle = null`, `trial_period = null`, moeda USD, valor 1999 centavos e nenhuma substituição de moeda; o webhook também precisa conferir o price ID e quantidade 1.
 - Configurar webhook Paddle somente para os eventos necessários e validar a assinatura, timestamp de 5 segundos e event_id.
 - Testar pagamento completo, pagamento recusado, webhook repetido, webhook antigo, valor/currency incorretos, order id incorreto, emissão manual, revogação e conflito de dispositivo.
 - Definir o tratamento de reembolso/chargeback para revogação e suporte.
