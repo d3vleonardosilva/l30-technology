@@ -223,6 +223,31 @@ async function createCheckout(request, env) {
   if (!env.PADDLE_API_KEY || !env.PADDLE_PRICE_ID) {
     return response({ error: "paddle_not_configured" }, request, env, 503);
   }
+  if (!/^pri_[a-z0-9]{26}$/.test(env.PADDLE_PRICE_ID)) {
+    return response({ error: "invalid_paddle_price_configuration" }, request, env, 503);
+  }
+
+  // Enforce the commercial policy server-side: one-time USD 19.99 only.
+  const priceResponse = await fetch(
+    "https://api.paddle.com/prices/" + encodeURIComponent(env.PADDLE_PRICE_ID),
+    { headers: { "Authorization": "Bearer " + env.PADDLE_API_KEY } }
+  );
+  const priceResult = await priceResponse.json().catch(() => ({}));
+  const price = priceResult.data;
+  if (!priceResponse.ok || !price) {
+    return response({ error: "paddle_price_lookup_failed", provider_status: priceResponse.status }, request, env, 502);
+  }
+  if (
+    price.id !== env.PADDLE_PRICE_ID ||
+    price.status !== "active" ||
+    price.billing_cycle !== null ||
+    price.trial_period !== null ||
+    String(price.unit_price?.amount) !== "1999" ||
+    price.unit_price?.currency_code !== "USD" ||
+    (Array.isArray(price.unit_price_overrides) && price.unit_price_overrides.length > 0)
+  ) {
+    return response({ error: "paddle_price_policy_mismatch" }, request, env, 503);
+  }
 
   await env.DB.prepare(
     "UPDATE licenses SET status = 'expired' WHERE device_id = ? AND status = 'active' AND expires_on < ?"
@@ -303,8 +328,8 @@ async function createCheckout(request, env) {
 
   const localOrderId = crypto.randomUUID();
   await env.DB.prepare(
-    "INSERT INTO orders (id, customer_id, device_id, provider, external_reference, amount_minor, currency_code, status, created_at, updated_at) VALUES (?, ?, ?, 'paddle', ?, 1999, 'USD', 'creating', ?, ?)"
-  ).bind(localOrderId, customer.id, deviceId, localOrderId, nowIso(), nowIso()).run();
+    "INSERT INTO orders (id, customer_id, device_id, provider, provider_price_id, external_reference, amount_minor, currency_code, status, created_at, updated_at) VALUES (?, ?, ?, 'paddle', ?, ?, 1999, 'USD', 'creating', ?, ?)"
+  ).bind(localOrderId, customer.id, deviceId, env.PADDLE_PRICE_ID, localOrderId, nowIso(), nowIso()).run();
 
   const paddleResponse = await fetch("https://api.paddle.com/transactions", {
     method: "POST",
@@ -459,11 +484,15 @@ async function handlePaddleWebhook(request, env) {
   if (!localOrder.provider_customer_id || transaction.customer_id !== localOrder.provider_customer_id) {
     return json({ error: "transaction_customer_mismatch" }, 409);
   }
-  if (transaction.custom_data?.product !== "FloatingCamera" ||
+  const items = Array.isArray(transaction.items) ? transaction.items : [];
+  if (items.length !== 1 ||
+      items[0]?.price_id !== localOrder.provider_price_id ||
+      Number(items[0]?.quantity) !== 1 ||
+      transaction.custom_data?.product !== "FloatingCamera" ||
       transaction.custom_data?.license_term !== "annual" ||
       transaction.currency_code !== localOrder.currency_code ||
       Number(transaction.details?.totals?.grand_total || 0) < localOrder.amount_minor) {
-    return json({ error: "payment_amount_currency_or_product_mismatch" }, 409);
+    return json({ error: "payment_amount_currency_price_or_product_mismatch" }, 409);
   }
 
   try {
