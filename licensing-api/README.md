@@ -88,14 +88,14 @@ The page currently has a placeholder sandbox client-side token. Replace it only 
 
 ## Paddle security
 
-The Paddle API key needs the least-privilege scopes required by this Worker: `customer.read`, `customer.write`, and `transaction.write`. The checkout flow looks up an exact customer email, creates the provider customer if needed, binds its `customer_id` to the local customer row, and includes that ID in the transaction. The completed webhook must match the provider transaction ID, local order/device, and bound customer ID before issuing.
+The Paddle API key needs the least-privilege scopes required by this Worker: `customer.read`, `customer.write`, `price.read`, and `transaction.write`. The checkout flow looks up an exact customer email, creates the provider customer if needed, binds its `customer_id` to the local customer row, and includes that ID in the transaction. The Worker also fetches the configured price before creating checkout and refuses it unless it is active, non-recurring, exactly USD 19.99, has no trial period or currency overrides. The completed webhook must match the provider transaction ID, exact stored price ID and quantity, local order/device, and bound customer ID before issuing.
 
 The webhook:
 - verifies the raw request body with the notification destination secret;
 - checks the signed timestamp using the documented 5-second tolerance;
 - supports multiple h1 signatures during provider-side key rotation;
 - requires a transaction.completed event;
-- verifies the local order ID, provider transaction ID, device ID, product term, currency and minimum price;
+- verifies the local order ID, provider transaction ID, device ID, bound Paddle customer ID, exact price ID and quantity, product term, currency and minimum price;
 - confirms the Paddle customer ID stored on the local order matches the transaction's customer ID;
 - records event IDs and stores issued tokens idempotently.
 
