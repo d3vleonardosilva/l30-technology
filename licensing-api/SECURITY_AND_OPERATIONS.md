@@ -49,6 +49,8 @@ Use o painel Cloudflare ou o Wrangler para cadastrar LICENSE_ADMIN_TOKEN, PADDLE
 - Criar o D1 de produção e aplicar as migrações em sandbox primeiro.
 - Aplicar regra Cloudflare Access ao caminho /api/admin/* e manter o segredo LICENSE_ADMIN_TOKEN como segunda barreira.
 - Criar regras de rate limiting para /api/trial/start e /api/checkout/create.
+- Criar a chave de API Paddle com permissões mínimas `customer.read`, `customer.write` e `transaction.write`.
+- Manter a localização de moeda do Paddle desabilitada no primeiro lançamento, pois o registro atual compara valores na moeda-base USD. Só habilitá-la depois de armazenar e validar o valor/moeda final de cada transação.
 - Configurar webhook Paddle somente para os eventos necessários e validar a assinatura, timestamp de 5 segundos e event_id.
 - Testar pagamento completo, pagamento recusado, webhook repetido, webhook antigo, valor/currency incorretos, order id incorreto, emissão manual, revogação e conflito de dispositivo.
 - Definir o tratamento de reembolso/chargeback para revogação e suporte.
@@ -60,9 +62,10 @@ Use o painel Cloudflare ou o Wrangler para cadastrar LICENSE_ADMIN_TOKEN, PADDLE
 ## Limites conhecidos
 
 - O Device ID atual combina nome do computador e endereço MAC local. Ele é um identificador prático, não uma prova criptográfica inviolável de hardware. A versão futura deverá avaliar uma identidade de instalação com chave local protegida pelo Windows DPAPI e procedimento de transferência/reinstalação.
-- A licença assinada offline pode ser copiada, mas só valida no dispositivo cujo ID está no payload. Revogação exige consulta online periódica; definir a frequência e a tolerância offline é uma decisão de produto.
+- A licença assinada offline pode ser copiada, mas só valida no dispositivo cujo ID está no payload. O aplicativo consulta o serviço e utiliza concessão offline assinada por até sete dias; depois desse prazo precisa reconectar. A identificação atual ainda depende de nome do computador e MAC, portanto não é resistência criptográfica forte à clonagem.
 - A avaliação gratuita deve ser confirmada pelo servidor e protegida por rate limiting; o estado local atual não é suficiente para a oferta comercial.
-- Esta base ainda requer integração do cliente desktop com API, política de reembolsos, testes E2E e aprovação comercial do Paddle.
+- A interface Windows agora inclui fluxo de checkout e verificação do pagamento na branch de desenvolvimento; a integração só poderá ser considerada concluída depois de testes ponta a ponta contra uma API de staging realmente implantada.
+- Esta base ainda requer política de reembolsos, testes E2E e aprovação comercial do Paddle.
 
 ## Backups D1
 
