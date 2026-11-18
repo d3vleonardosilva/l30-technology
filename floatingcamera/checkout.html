@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Floating Camera — Secure checkout | L30 Technology</title>
+  <style>
+    :root { color-scheme: light; font-family: Inter, "Segoe UI", Arial, sans-serif; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f4f6f8; color: #17212b; }
+    main { width: min(92vw, 520px); padding: 36px; border: 1px solid #dce2e8; border-radius: 18px; background: #fff; box-shadow: 0 16px 50px rgba(18, 35, 52, .08); }
+    h1 { margin: 0 0 10px; font-size: 25px; }
+    p { color: #536273; line-height: 1.6; }
+    .status { padding: 14px 16px; border-radius: 10px; background: #f1f5f9; font-size: 14px; }
+    .brand { margin-top: 28px; font-size: 12px; color: #718096; letter-spacing: .06em; text-transform: uppercase; }
+  </style>
+  <!-- Paddle.js is required on the approved default payment-link page. -->
+  <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+</head>
+<body>
+  <main>
+    <h1>Floating Camera</h1>
+    <p>This page securely opens a checkout created by L30 Technology.</p>
+    <div id="checkout-status" class="status" role="status" aria-live="polite">
+      Preparing secure checkout…
+    </div>
+    <div class="brand">L30 Technology</div>
+  </main>
+
+  <script>
+    /*
+      Configure only after Paddle approves the website:
+      - Sandbox: use a sandbox client-side token and set environment to "sandbox".
+      - Live: use a live client-side token and set environment to "production".
+      Client-side tokens are intended for browser use. Never put PADDLE_API_KEY,
+      PADDLE_WEBHOOK_SECRET, LICENSE_SIGNING_KEY_PKCS8_B64, or LICENSE_ADMIN_TOKEN here.
+    */
+    const PADDLE_ENVIRONMENT = "sandbox";
+    const PADDLE_CLIENT_SIDE_TOKEN = "REPLACE_WITH_PADDLE_SANDBOX_CLIENT_SIDE_TOKEN";
+
+    const status = document.getElementById("checkout-status");
+    const transactionId = new URLSearchParams(window.location.search).get("_ptxn");
+
+    if (!transactionId) {
+      status.textContent = "No checkout transaction was supplied. Return to Floating Camera and start checkout again.";
+    } else if (!/^txn_[a-z0-9]{26}$/i.test(transactionId)) {
+      status.textContent = "The checkout reference is invalid. Return to Floating Camera and start again.";
+    } else if (!PADDLE_CLIENT_SIDE_TOKEN || PADDLE_CLIENT_SIDE_TOKEN.startsWith("REPLACE_")) {
+      status.textContent = "Secure checkout is not configured yet. Please try again later.";
+    } else if (!window.Paddle) {
+      status.textContent = "The payment service could not be loaded. Check your connection and try again.";
+    } else {
+      try {
+        if (PADDLE_ENVIRONMENT === "sandbox") {
+          Paddle.Environment.set("sandbox");
+        }
+        Paddle.Initialize({ token: PADDLE_CLIENT_SIDE_TOKEN });
+        // Paddle.js reads the _ptxn query parameter from this approved payment-link page
+        // and opens the transaction checkout automatically.
+        status.textContent = "Opening Paddle's secure checkout…";
+      } catch (error) {
+        status.textContent = "Checkout could not be initialized. Please return to Floating Camera and try again.";
+      }
+    }
+  </script>
+</body>
+</html>
