@@ -236,19 +236,69 @@ async function createCheckout(request, env) {
   }
 
   let customer = await env.DB.prepare(
-    "SELECT id FROM customers WHERE email = ?"
+    "SELECT id, provider_customer_id FROM customers WHERE email = ?"
   ).bind(email).first();
 
   if (!customer) {
     const customerId = crypto.randomUUID();
     await env.DB.prepare(
-      "INSERT INTO customers (id, name, email, created_at) VALUES (?, ?, ?, ?)"
+      "INSERT INTO customers (id, name, email, provider_customer_id, created_at) VALUES (?, ?, ?, NULL, ?)"
     ).bind(customerId, name, email, nowIso()).run();
-    customer = { id: customerId };
+    customer = { id: customerId, provider_customer_id: null };
   } else {
     await env.DB.prepare(
       "UPDATE customers SET name = ? WHERE id = ?"
     ).bind(name, customer.id).run();
+  }
+
+  // Bind the local customer record to the provider customer before creating
+  // a transaction. This prevents the app's email and Paddle's payer from drifting.
+  let providerCustomerId = customer.provider_customer_id;
+  if (!providerCustomerId) {
+    const lookupUrl = new URL("https://api.paddle.com/customers");
+    lookupUrl.searchParams.set("email", email);
+    lookupUrl.searchParams.set("per_page", "1");
+    const lookupResponse = await fetch(lookupUrl.toString(), {
+      headers: { "Authorization": "Bearer " + env.PADDLE_API_KEY }
+    });
+    const lookupResult = await lookupResponse.json().catch(() => ({}));
+    if (!lookupResponse.ok) {
+      return response({ error: "paddle_customer_lookup_failed", provider_status: lookupResponse.status }, request, env, 502);
+    }
+
+    const existingProviderCustomer = (lookupResult.data || []).find(
+      item => String(item.email || "").toLowerCase() === email && item.status === "active"
+    );
+
+    if (existingProviderCustomer?.id) {
+      providerCustomerId = existingProviderCustomer.id;
+    } else {
+      const createCustomerResponse = await fetch("https://api.paddle.com/customers", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + env.PADDLE_API_KEY,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          locale: "en",
+          custom_data: { l30_customer_id: customer.id }
+        })
+      });
+      const createCustomerResult = await createCustomerResponse.json().catch(() => ({}));
+      if (!createCustomerResponse.ok || !createCustomerResult.data?.id) {
+        return response({
+          error: "paddle_customer_creation_failed",
+          provider_status: createCustomerResponse.status
+        }, request, env, 502);
+      }
+      providerCustomerId = createCustomerResult.data.id;
+    }
+
+    await env.DB.prepare(
+      "UPDATE customers SET provider_customer_id = ? WHERE id = ?"
+    ).bind(providerCustomerId, customer.id).run();
   }
 
   const localOrderId = crypto.randomUUID();
@@ -264,6 +314,7 @@ async function createCheckout(request, env) {
     },
     body: JSON.stringify({
       items: [{ price_id: env.PADDLE_PRICE_ID, quantity: 1 }],
+      customer_id: providerCustomerId,
       collection_mode: "automatic",
       custom_data: {
         l30_order_id: localOrderId,
@@ -323,7 +374,7 @@ async function issuePaidOrderLicense(env, localOrder, eventId, eventType) {
 
   const payload = canonicalLicensePayload({
     deviceId: localOrder.device_id,
-    customer: customer?.name || "Floating Camera Customer",
+    customer: localOrder.customer_id,
     issuedOn: dateOnly(issued),
     expiresOn: dateOnly(expires),
     serial
@@ -398,12 +449,15 @@ async function handlePaddleWebhook(request, env) {
   }
 
   const localOrder = await env.DB.prepare(
-    "SELECT * FROM orders WHERE id = ? AND device_id = ? AND provider = 'paddle'"
+    "SELECT orders.*, customers.provider_customer_id FROM orders JOIN customers ON customers.id = orders.customer_id WHERE orders.id = ? AND orders.device_id = ? AND orders.provider = 'paddle'"
   ).bind(orderId, deviceId).first();
 
   if (!localOrder) return json({ received: true, ignored: true });
   if (!localOrder.provider_order_id || transaction.id !== localOrder.provider_order_id) {
     return json({ error: "transaction_order_mismatch" }, 409);
+  }
+  if (!localOrder.provider_customer_id || transaction.customer_id !== localOrder.provider_customer_id) {
+    return json({ error: "transaction_customer_mismatch" }, 409);
   }
   if (transaction.custom_data?.product !== "FloatingCamera" ||
       transaction.custom_data?.license_term !== "annual" ||
@@ -509,7 +563,7 @@ async function adminIssueLicense(request, env) {
   const serial = crypto.randomUUID().replaceAll("-", "").slice(0, 16).toUpperCase();
   const payload = canonicalLicensePayload({
     deviceId,
-    customer: name,
+    customer: customer.id,
     issuedOn: dateOnly(issued),
     expiresOn: dateOnly(expires),
     serial
