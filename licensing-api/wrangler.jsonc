@@ -2,7 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "l30-floating-camera-licensing",
   "main": "src/index.js",
-  "compatibility_date": "2026-11-17",
+  "compatibility_date": "2026-11-18",
   "compatibility_flags": ["nodejs_compat"],
   "d1_databases": [
     {
@@ -14,6 +14,6 @@
   ],
   "vars": {
     "SITE_ORIGIN": "https://www.l30.tec.br",
-    "LICENSE_PUBLIC_KEY_B64": "5BQA5rf27/ZBEqUMMX2dCe/+29rLtUl66CGfVns7OYY="
+    "LICENSE_SIGNING_KEY_ID": "l30-floating-camera-ed25519-2026-11"
   }
 }
