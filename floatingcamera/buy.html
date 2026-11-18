@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#080d17">
-  <meta name="description" content="Choose your Floating Camera Pro license for personal or business use.">
-  <title>Floating Camera Pro · Choose your license · L30 Technology</title>
+  <meta name="description" content="Use Floating Camera Free forever with a watermark, or try Pro free for 7 days. Choose monthly or annual billing.">
+  <title>Floating Camera Pro · Monthly or annual plan · L30 Technology</title>
   <style>
     :root{--bg:#080d17;--ink:#f5f9ff;--muted:#a9b7cd;--line:#29374d;--cyan:#68e5f3;--blue:#579bff;--surface:#111b2c;--max:760px}
     *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
@@ -36,8 +36,16 @@
     #message{display:none;margin-top:18px;padding:13px 15px;border:1px solid var(--line);border-radius:11px;color:var(--muted);white-space:pre-wrap}
     #message.show{display:block}#message.error{border-color:#a94e5a;color:#ffd9de}
     .company-fields[hidden]{display:none}.divider{height:1px;background:var(--line);margin:24px 0}
+    .pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0 26px}
+    .pricing-card{border:1px solid var(--line);border-radius:14px;background:#0c1422;padding:16px}
+    .pricing-card.featured{border-color:#42b9a9;box-shadow:0 0 0 1px #42b9a955}
+    .pricing-card h2{font-size:16px;margin:8px 0}
+    .pricing-card .price{font-size:28px;line-height:1.2;font-weight:800;letter-spacing:-.04em}
+    .pricing-card .detail{font-size:13px;color:var(--muted);margin:5px 0}
+    .pricing-card .tag{display:inline-block;border-radius:20px;background:#163a3a;color:#91f3d7;padding:4px 9px;font-size:11px;font-weight:800}
+    .free-note{border:1px solid var(--line);background:#0c1422;color:var(--muted);padding:12px 14px;border-radius:11px;font-size:13px;margin:0 0 22px}
     footer{text-align:center;color:var(--muted);font-size:12px;margin-top:24px}
-    @media(max-width:560px){.grid,.choices{grid-template-columns:1fr}header{align-items:flex-start}.wrap{padding:28px 0}}
+    @media(max-width:560px){.grid,.choices,.pricing-grid{grid-template-columns:1fr}header{align-items:flex-start}.wrap{padding:28px 0}}
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./supabase-config.js"></script>
@@ -52,9 +60,24 @@
     </header>
 
     <section class="card">
-      <div class="eyebrow" data-i18n="eyebrow">LICENSE CENTER</div>
-      <h1 data-i18n="title">Choose your Floating Camera Pro license</h1>
-      <p class="intro" data-i18n="intro">For individuals and businesses. Secure checkout is provided by Paddle; license activation is managed by L30 Technology.</p>
+      <div class="eyebrow" data-i18n="eyebrow">FLOATING CAMERA PRO</div>
+      <h1 data-i18n="title">Remove the watermark with Pro</h1>
+      <p class="intro" data-i18n="intro">Floating Camera Free is available forever with the L30 Technology watermark. Pro removes the watermark and includes a 7-day free trial.</p>
+      <div class="pricing-grid">
+        <article class="pricing-card featured">
+          <span class="tag" data-i18n="annualTag">BEST VALUE · 7-DAY FREE TRIAL</span>
+          <h2 data-i18n="annualCardTitle">Annual Pro</h2>
+          <div class="price">US$ 1.25 <span class="detail" data-i18n="perMonth">/ month equivalent</span></div>
+          <p class="detail" data-i18n="annualBilling">US$ 14.99 billed annually after the free trial.</p>
+        </article>
+        <article class="pricing-card">
+          <span class="tag" data-i18n="monthlyTag">7-DAY FREE TRIAL</span>
+          <h2 data-i18n="monthlyCardTitle">Monthly Pro</h2>
+          <div class="price">US$ 2.49 <span class="detail" data-i18n="perMonthActual">/ month</span></div>
+          <p class="detail" data-i18n="monthlyBilling">Billed monthly after the free trial.</p>
+        </article>
+      </div>
+      <p class="free-note" data-i18n="freeNote">Prefer not to subscribe? Keep using Floating Camera Free without an expiration date. Only the watermark remains.</p>
 
       <form id="purchaseForm">
         <div class="grid">
@@ -68,8 +91,8 @@
           <div>
             <label for="billingMode" data-i18n="billingMode">Billing option</label>
             <select id="billingMode">
-              <option value="annual_once" data-i18n="annualOnce">12 months · One-time payment</option>
-              <option value="annual_subscription" data-i18n="annualSubscription">12 months · Annual auto-renewal</option>
+              <option value="annual_subscription" selected data-i18n="annualSubscription">Annual · US$ 1.25/month equivalent · US$ 14.99 billed yearly · 7-day free trial</option>
+              <option value="monthly_subscription" data-i18n="monthlySubscription">Monthly · US$ 2.49/month · 7-day free trial</option>
             </select>
           </div>
         </div>
@@ -129,10 +152,16 @@
     (() => {
       const translations = {
         en: {
-          eyebrow:"LICENSE CENTER",title:"Choose your Floating Camera Pro license",
-          intro:"For individuals and businesses. Secure checkout is provided by Paddle; license activation is managed by L30 Technology.",
+          eyebrow:"FLOATING CAMERA PRO",title:"Remove the watermark with Pro",
+          intro:"Floating Camera Free is available forever with the L30 Technology watermark. Pro removes the watermark and includes a 7-day free trial.",
+          annualTag:"BEST VALUE · 7-DAY FREE TRIAL",annualCardTitle:"Annual Pro",
+          perMonth:"/ month equivalent",annualBilling:"US$ 14.99 billed annually after the free trial.",
+          monthlyTag:"7-DAY FREE TRIAL",monthlyCardTitle:"Monthly Pro",perMonthActual:"/ month",
+          monthlyBilling:"Billed monthly after the free trial.",
+          freeNote:"Prefer not to subscribe? Keep using Floating Camera Free without an expiration date. Only the watermark remains.",
           customerType:"Customer type",individual:"Individual",business:"Business",billingMode:"Billing option",
-          annualOnce:"12 months · One-time payment",annualSubscription:"12 months · Annual auto-renewal",
+          monthlySubscription:"Monthly · US$ 2.49/month · 7-day free trial",
+          annualSubscription:"Annual · US$ 1.25/month equivalent · US$ 14.99 billed yearly · 7-day free trial",
           companyName:"Legal company name",companyPlaceholder:"Company name",seats:"Number of devices",
           seatsHint:"Each device uses one license seat. Maximum 100 per order.",account:"YOUR L30 ACCOUNT",
           email:"Email address",password:"Password",signinHint:"Sign in to continue to secure payment.",
@@ -155,10 +184,16 @@
           signupError:"Unable to create your account. Check the details and try again."
         },
         pt: {
-          eyebrow:"CENTRAL DE LICENÇAS",title:"Escolha sua licença Floating Camera Pro",
-          intro:"Para pessoas físicas e empresas. O pagamento é processado com segurança pela Paddle; a ativação é gerenciada pela L30 Technology.",
+          eyebrow:"FLOATING CAMERA PRO",title:"Remova a marca-d’água com o Pro",
+          intro:"O Floating Camera Free é gratuito para sempre, com a marca-d’água L30 Technology. O Pro remove a marca e inclui 7 dias grátis.",
+          annualTag:"MELHOR CUSTO-BENEFÍCIO · 7 DIAS GRÁTIS",annualCardTitle:"Pro anual",
+          perMonth:"/ mês equivalente",annualBilling:"US$ 14,99 cobrados anualmente após o período gratuito.",
+          monthlyTag:"7 DIAS GRÁTIS",monthlyCardTitle:"Pro mensal",perMonthActual:"/ mês",
+          monthlyBilling:"Cobrança mensal após o período gratuito.",
+          freeNote:"Prefere não assinar? Continue usando o Floating Camera Free sem prazo de validade. Apenas a marca-d’água permanece.",
           customerType:"Tipo de cliente",individual:"Pessoa física",business:"Empresa",billingMode:"Modalidade de cobrança",
-          annualOnce:"12 meses · Pagamento único",annualSubscription:"12 meses · Renovação anual automática",
+          monthlySubscription:"Mensal · US$ 2,49/mês · 7 dias grátis",
+          annualSubscription:"Anual · equivalente a US$ 1,25/mês · US$ 14,99 cobrados por ano · 7 dias grátis",
           companyName:"Razão social",companyPlaceholder:"Nome da empresa",seats:"Quantidade de dispositivos",
           seatsHint:"Cada dispositivo utiliza uma licença. Máximo de 100 por pedido.",account:"SUA CONTA L30",
           email:"Endereço de e-mail",password:"Senha",signinHint:"Entre na sua conta para continuar ao pagamento seguro.",
@@ -181,10 +216,16 @@
           signupError:"Não foi possível criar sua conta. Confira os dados e tente novamente."
         },
         es: {
-          eyebrow:"CENTRO DE LICENCIAS",title:"Elige tu licencia Floating Camera Pro",
-          intro:"Para personas y empresas. Paddle procesa el pago de forma segura; L30 Technology gestiona la activación.",
+          eyebrow:"FLOATING CAMERA PRO",title:"Elimina la marca de agua con Pro",
+          intro:"Floating Camera Free es gratis para siempre con la marca de agua de L30 Technology. Pro elimina la marca e incluye 7 días gratis.",
+          annualTag:"MEJOR OFERTA · 7 DÍAS GRATIS",annualCardTitle:"Pro anual",
+          perMonth:"/ mes equivalente",annualBilling:"US$ 14,99 cobrados anualmente después del período gratuito.",
+          monthlyTag:"7 DÍAS GRATIS",monthlyCardTitle:"Pro mensual",perMonthActual:"/ mes",
+          monthlyBilling:"Cobro mensual después del período gratuito.",
+          freeNote:"¿Prefieres no suscribirte? Sigue usando Floating Camera Free sin fecha de vencimiento. Solo permanece la marca de agua.",
           customerType:"Tipo de cliente",individual:"Persona",business:"Empresa",billingMode:"Modalidad de pago",
-          annualOnce:"12 meses · Pago único",annualSubscription:"12 meses · Renovación anual automática",
+          monthlySubscription:"Mensual · US$ 2,49/mes · 7 días gratis",
+          annualSubscription:"Anual · equivalente a US$ 1,25/mes · US$ 14,99 cobrados por año · 7 días gratis",
           companyName:"Nombre legal de la empresa",companyPlaceholder:"Nombre de la empresa",seats:"Cantidad de dispositivos",
           seatsHint:"Cada dispositivo utiliza una licencia. Máximo de 100 por pedido.",account:"TU CUENTA L30",
           email:"Correo electrónico",password:"Contraseña",signinHint:"Inicia sesión para continuar al pago seguro.",
