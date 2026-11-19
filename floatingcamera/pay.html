@@ -46,10 +46,10 @@
     h1{margin:12px 0 8px;font-size:clamp(30px,4vw,46px);line-height:1.08;letter-spacing:-.055em}
     .gradient{background:linear-gradient(98deg,#d9f3ff,#82baff 53%,#78f0e7);color:transparent;background-clip:text}
     .page-intro{max-width:760px;margin:0;color:var(--muted);font-size:15px}
-    .checkout-grid{display:grid;grid-template-columns:minmax(280px,.72fr) minmax(460px,1.28fr);gap:20px;align-items:start}
+    .checkout-grid{display:grid;grid-template-columns:minmax(280px,.72fr) minmax(460px,1.28fr);gap:20px;align-items:stretch}
     .summary-card,.form-card{min-width:0;border:1px solid #34536e;border-radius:21px;background:linear-gradient(150deg,#15253c,#101a2b 80%);box-shadow:0 28px 80px #0006}
-    .summary-card{padding:27px;position:sticky;top:100px}
-    .form-card{padding:18px;background:#101b2b}
+    .summary-card{padding:27px;position:relative;height:100%}
+    .form-card{padding:18px;background:#101b2b;height:100%;display:flex;flex-direction:column}
     .summary-kicker{color:#91d7ff;font-size:11px;font-weight:850;letter-spacing:.15em;text-transform:uppercase}
     .trial-title{font-size:clamp(25px,3vw,34px);line-height:1.12;font-weight:850;letter-spacing:-.045em;margin:18px 0 20px;color:#f4faff}
     .trial-title .gradient{display:block;margin-top:4px}
@@ -67,9 +67,11 @@
     .secure-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:3px 4px 15px}
     .secure-heading strong{font-size:14px;letter-spacing:.01em}
     .secure-heading span{color:#8daac7;font-size:11px}
-    .checkout-frame{width:100%;min-width:312px;min-height:600px}
+    .checkout-frame{width:100%;min-width:312px;min-height:0;flex:1}
     .checkout-frame iframe{display:block;width:100%;border:0;background:transparent}
-    #status{display:flex;align-items:center;gap:10px;min-height:48px;padding:12px 14px;margin-top:14px;border:1px solid #2d485e;border-radius:12px;background:#0c1727;color:#b9d8e9;font-size:12px}
+    .email-context{display:flex;align-items:center;gap:9px;min-height:40px;margin:0 2px 12px;padding:9px 12px;border:1px solid #2d485e;border-radius:11px;background:#0c1727;color:#c5d9ec;font-size:11px;line-height:1.45;overflow-wrap:anywhere}
+    .email-context:before{content:"✉";color:var(--cyan);font-size:14px;flex:0 0 auto}
+    #status{display:flex;align-items:center;gap:9px;min-height:36px;padding:8px 11px;margin-top:9px;border:1px solid #2d485e;border-radius:11px;background:#0c1727;color:#b9d8e9;font-size:11px}
     #status:before{content:"";width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:#68e5f3;box-shadow:0 0 14px #68e5f3}
     .back-link{display:inline-flex;align-items:center;gap:8px;margin-top:23px;color:#b6e4ff;font-size:13px;font-weight:700}
     .back-link:hover{color:var(--cyan)}
@@ -87,9 +89,9 @@
       .nav{min-height:70px}.navlinks{display:none}
       main{padding:38px 0 52px}
       .checkout-grid{grid-template-columns:1fr}
-      .summary-card{position:static}
-      .form-card{padding:12px}
-      .checkout-frame{min-width:0;min-height:650px}
+      .summary-card{position:relative;height:auto}
+      .form-card{padding:12px;height:auto}
+      .checkout-frame{min-width:0;min-height:0}
     }
     @media(max-width:560px){
       .wrap,.page{width:calc(100% - 34px)}
@@ -97,8 +99,8 @@
       .nav{gap:12px}.navright{gap:7px}.secure-pill{padding:7px 9px;font-size:10px}
       .page-heading{margin-bottom:20px}
       .summary-card{padding:21px}
-      .form-card{padding:7px;border-radius:16px}
-      .checkout-frame{min-height:680px}
+      .form-card{padding:7px;border-radius:16px;height:auto}
+      .checkout-frame{min-height:0}
       .footer-inner{align-items:flex-start;flex-direction:column}.footer-links{gap:13px}
     }
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
@@ -162,7 +164,6 @@
             <span data-i18n="dueToday">Due today</span>
             <strong id="dueToday">—</strong>
           </div>
-          <div class="summary-note" id="emailContext" aria-live="polite">We’ll prefill the email address from your L30 account when available.</div>
           <div class="summary-note" id="renewalNote" data-i18n="renewalNote">After the free trial, your subscription renews automatically at the amount shown, unless cancelled.</div>
         </aside>
 
@@ -171,6 +172,7 @@
             <strong data-i18n="paymentHeading">Payment details</strong>
             <span data-i18n="secureLabel">Secured by Paddle</span>
           </div>
+          <div class="email-context" id="emailContext" aria-live="polite">We’ll prefill the email address from your L30 account when available.</div>
           <div class="checkout-frame paddle-inline-checkout"></div>
           <div id="status" role="status" aria-live="polite" data-i18n="preparing">Preparing your secure payment form…</div>
         </section>
@@ -373,7 +375,7 @@
         const checkoutSettings = {
           displayMode: "inline",
           frameTarget: "paddle-inline-checkout",
-          frameInitialHeight: "450",
+          frameInitialHeight: "360",
           frameStyle: "width:100%;min-width:312px;background-color:transparent;border:0;",
           theme: "dark",
           locale: checkoutLocale,
