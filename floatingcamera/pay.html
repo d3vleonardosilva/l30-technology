@@ -360,7 +360,7 @@
             settings: {
               displayMode: "inline",
               frameTarget: "paddle-inline-checkout",
-              frameInitialHeight: "850",
+              frameInitialHeight: "450",
               frameStyle: "width:100%;min-width:312px;background-color:transparent;border:0;",
               theme: "dark",
               locale: checkoutLocale,
@@ -382,7 +382,8 @@
           }
         });
 
-        window.Paddle.Checkout.open({ transactionId });
+        // Paddle.js automatically opens the transaction from the _ptxn query parameter.
+        // Avoid an additional explicit open so the transaction is embedded only once.
       } catch (error) {
         console.error("Paddle inline checkout initialization failed", error);
         setStatus("failed");
