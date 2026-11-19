@@ -36,12 +36,12 @@ This branch is for controlled Sandbox testing and is not the production site bra
 
 ## Required checks before merging or production
 
-1. In Supabase Authentication → URL Configuration, authorize the exact deployed `buy.html` URL as a redirect URL, and ensure the Site URL and email confirmation/SMTP settings are correct.
-2. In Paddle Sandbox, confirm the default payment link is `https://www.l30.tec.br/floatingcamera/pay.html`, the approved domain matches the site and the monthly/annual Price IDs have the intended 7-day free trial.
-3. Test a new account, email confirmation, sign-in, password reset, monthly checkout, annual checkout, business seats, duplicate webhook delivery, subscription cancellation and payment failure.
-4. Confirm the resulting entitlement and test activation in the Windows Preview.3.
-5. Only after Sandbox validation, create separate Live Paddle products/prices/tokens/secrets and a separate production Supabase project. Never reuse Sandbox credentials for real customers.
-6. Update legal pages, support, pricing and installer distribution before public launch.
+1. In Supabase Authentication → URL Configuration, authorize the exact deployed `buy.html` URL as a redirect URL, and ensure the Site URL and email confirmation/SMTP settings are correct.\n2. Enable leaked-password protection in Supabase Authentication → Password Security; the current project security advisor reports this protection is disabled.
+3. In Paddle Sandbox, confirm the default payment link is `https://www.l30.tec.br/floatingcamera/pay.html`, the approved domain matches the site and the monthly/annual Price IDs have the intended 7-day free trial.
+4. Test a new account, email confirmation, sign-in, password reset, monthly checkout, annual checkout, business seats, duplicate webhook delivery, subscription cancellation and payment failure.
+5. Confirm the resulting entitlement and test activation in the Windows Preview.3.
+6. Only after Sandbox validation, create separate Live Paddle products/prices/tokens/secrets and a separate production Supabase project. Never reuse Sandbox credentials for real customers.
+7. Update legal pages, support, pricing and installer distribution before public launch.
 
 ## Security
 
