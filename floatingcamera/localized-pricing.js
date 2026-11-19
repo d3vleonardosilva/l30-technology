@@ -56,7 +56,7 @@
     if (token.startsWith("test_")) window.Paddle.Environment.set("sandbox");
     window.Paddle.Initialize({ token });
 
-    const response = await fetch(supabaseUrl.replace(/\\/$/, "") + "/functions/v1/pricing-catalog", {
+    const response = await fetch(supabaseUrl.replace(/\/$/, "") + "/functions/v1/pricing-catalog", {
       method: "GET",
       headers: { apikey: publishableKey }
     });
