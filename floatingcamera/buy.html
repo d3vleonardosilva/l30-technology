@@ -288,8 +288,12 @@
         }
       };
 
-      let language = (navigator.language || "en").toLowerCase().startsWith("pt") ? "pt"
-        : (navigator.language || "").toLowerCase().startsWith("es") ? "es" : "en";
+      const savedLanguage = localStorage.getItem("fc-language");
+      const browserLanguage = (navigator.language || "en").toLowerCase();
+      let language = ["en", "pt", "es"].includes(savedLanguage)
+        ? savedLanguage
+        : browserLanguage.startsWith("pt") ? "pt"
+        : browserLanguage.startsWith("es") ? "es" : "en";
       let creatingAccount = false;
       const $ = (id) => document.getElementById(id);
       const requestedPlan = new URLSearchParams(window.location.search).get("plan");
@@ -336,6 +340,7 @@
       function applyLanguage() {
         document.documentElement.lang = language;
         $("language").value = language;
+        localStorage.setItem("fc-language", language);
         document.querySelectorAll("[data-i18n]").forEach((el) => {
           const value = t(el.dataset.i18n);
           if (el.tagName === "OPTION") el.textContent = value;
