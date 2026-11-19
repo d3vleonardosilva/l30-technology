@@ -104,7 +104,11 @@
               <input id="description" maxlength="240" placeholder="Campanha de lançamento">
             </div>
           </div>
-          <div class="actions"><button class="primary" id="createButton" type="submit">Cadastrar cupom</button></div>
+          <div class="actions">
+            <button class="primary" id="createButton" type="submit">Cadastrar cupom</button>
+            <button id="preparePricesButton" type="button">Testar Paddle para este prazo</button>
+          </div>
+          <p class="hint">O teste verifica as permissões da chave Paddle Sandbox e prepara os preços de teste para os planos mensal e anual. Não cria cobranças.</p>
         </form>
       </section>
 
@@ -249,6 +253,26 @@
         showNotice("Sessão encerrada.");
       });
       $("refreshButton").addEventListener("click", loadCoupons);
+      $("preparePricesButton").addEventListener("click", async () => {
+        const button = $("preparePricesButton");
+        button.disabled = true;
+        try {
+          const trialDays = Number($("trialDays").value);
+          const result = await invoke({action:"prepare_trial_prices",trial_days:trialDays});
+          const newCount = (result.prepared || []).filter((item) => item.created_now).length;
+          showNotice("Integração Paddle Sandbox aprovada para " + trialDays + " dias. " +
+            result.prepared.length + " preço(s) disponíveis; " + newCount + " criado(s) agora. Nenhuma cobrança foi feita.");
+        } catch (error) {
+          const message = error.message === "paddle_price_read_permission_missing"
+            ? "A chave da Paddle não tem a permissão price.read. Gere/atualize a chave Sandbox com essa permissão."
+            : error.message === "paddle_price_write_permission_missing"
+              ? "A chave da Paddle não tem a permissão price.write. Gere/atualize a chave Sandbox com essa permissão."
+              : "Não foi possível preparar os preços: " + error.message;
+          showNotice(message, true);
+        } finally {
+          button.disabled = false;
+        }
+      });
       $("couponCode").addEventListener("input", () => {
         const field = $("couponCode");
         const start = field.selectionStart;
