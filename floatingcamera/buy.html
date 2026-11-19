@@ -435,7 +435,18 @@
             }
           });
           if (error || !data?.checkout_url) throw Object.assign(new Error(error?.message || "missing_checkout_url"), { kind: "checkout" });
-          window.location.assign(data.checkout_url);
+
+          const checkoutDestination = new URL(data.checkout_url);
+          const isLocalPreview = ["127.0.0.1", "localhost"].includes(window.location.hostname);
+          if (isLocalPreview) {
+            if (checkoutDestination.protocol !== "https:" ||
+                !["www.l30.tec.br", "l30.tec.br"].includes(checkoutDestination.hostname)) {
+              throw Object.assign(new Error("unexpected_checkout_domain"), { kind: "checkout" });
+            }
+            checkoutDestination.protocol = window.location.protocol;
+            checkoutDestination.host = window.location.host;
+          }
+          window.location.assign(checkoutDestination.toString());
         } catch (error) {
           console.error("L30 purchase flow failed", error);
           const key = error?.kind === "signup" ? "signupError" : error?.kind === "signin" ? "signinError" : "checkoutError";
