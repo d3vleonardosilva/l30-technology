@@ -198,7 +198,7 @@
           securePill:"SECURE CHECKOUT",eyebrow:"FLOATING CAMERA PRO · L30 TECHNOLOGY",
           heading:"Complete your Pro order",
           intro:"Review your plan and complete payment in the secure Paddle form. Your camera video stays on your device.",
-          summaryKicker:"ORDER SUMMARY",trialPrefix:"Your",trialSuffix:"free trial",
+          summaryKicker:"ORDER SUMMARY",trialHeadline:"Free trial",trialDuration:"for",noTrialHeadline:"Your subscription",noTrialDuration:"starts now",
           loadingPlan:"Subscription plan",billingFrequency:"Billing frequency",trialLength:"Free trial",
           taxes:"Taxes",dueToday:"Due today",paymentHeading:"Payment details",secureLabel:"Secured by Paddle",
           preparing:"Preparing your secure payment form…",
@@ -219,7 +219,7 @@
           securePill:"PAGAMENTO SEGURO",eyebrow:"FLOATING CAMERA PRO · L30 TECHNOLOGY",
           heading:"Conclua seu pedido Pro",
           intro:"Confira seu plano e conclua o pagamento pelo formulário seguro do Paddle. O vídeo da sua câmera permanece no seu dispositivo.",
-          summaryKicker:"RESUMO DO PEDIDO",trialPrefix:"Seu",trialSuffix:"teste grátis",
+          summaryKicker:"RESUMO DO PEDIDO",trialHeadline:"Teste grátis",trialDuration:"de",noTrialHeadline:"Sua assinatura",noTrialDuration:"começa agora",
           loadingPlan:"Plano de assinatura",billingFrequency:"Periodicidade",trialLength:"Período grátis",
           taxes:"Impostos",dueToday:"Valor de hoje",paymentHeading:"Dados de pagamento",secureLabel:"Protegido pelo Paddle",
           preparing:"Preparando o formulário de pagamento seguro…",
@@ -240,7 +240,7 @@
           securePill:"PAGO SEGURO",eyebrow:"FLOATING CAMERA PRO · L30 TECHNOLOGY",
           heading:"Completa tu pedido Pro",
           intro:"Revisa tu plan y completa el pago en el formulario seguro de Paddle. El video de tu cámara permanece en tu dispositivo.",
-          summaryKicker:"RESUMEN DEL PEDIDO",trialPrefix:"Tu",trialSuffix:"prueba gratis",
+          summaryKicker:"RESUMEN DEL PEDIDO",trialHeadline:"Prueba gratuita",trialDuration:"de",noTrialHeadline:"Tu suscripción",noTrialDuration:"comienza ahora",
           loadingPlan:"Plan de suscripción",billingFrequency:"Frecuencia de cobro",trialLength:"Prueba gratis",
           taxes:"Impuestos",dueToday:"Total de hoy",paymentHeading:"Datos de pago",secureLabel:"Protegido por Paddle",
           preparing:"Preparando el formulario de pago seguro…",
@@ -343,8 +343,12 @@
         document.getElementById("dueToday").textContent = formatMoney(todayAmount, currency);
 
         const trialTitle = document.getElementById("trialTitle");
-        const prefix = trial ? t("trialPrefix") + " " + trialLabel(trial) : t("trialNone");
-        trialTitle.textContent = prefix;
+        const headline = document.createElement("span");
+        const duration = document.createElement("span");
+        duration.className = "gradient";
+        headline.textContent = trial ? t("trialHeadline") : t("noTrialHeadline");
+        duration.textContent = trial ? t("trialDuration") + " " + trialLabel(trial) : t("noTrialDuration");
+        trialTitle.replaceChildren(headline, duration);
       }
 
       try {
