@@ -162,6 +162,7 @@
             <span data-i18n="dueToday">Due today</span>
             <strong id="dueToday">—</strong>
           </div>
+          <div class="summary-note" id="emailContext" aria-live="polite">We’ll prefill the email address from your L30 account when available.</div>
           <div class="summary-note" id="renewalNote" data-i18n="renewalNote">After the free trial, your subscription renews automatically at the amount shown, unless cancelled.</div>
         </aside>
 
@@ -212,6 +213,7 @@
           renewalNote:"After the free trial, your subscription renews automatically at the amount shown, unless cancelled.",
           firstCharge:"First renewal",perMonth:"Monthly",perYear:"Yearly",perWeek:"Weekly",perDay:"Daily",
           days:"days",weeks:"weeks",months:"months",years:"years",trialNone:"No free trial",
+          emailPrefill:"L30 account email, prefilled in the secure form:",emailInstruction:"Use the same email address you use for your L30 account in the secure payment form.",
           back:"← Back to plans",rights:"All rights reserved.",mainSite:"Main website"
         },
         pt: {
@@ -233,6 +235,7 @@
           renewalNote:"Após o período grátis, sua assinatura será renovada automaticamente pelo valor informado, até que seja cancelada.",
           firstCharge:"Primeira renovação",perMonth:"Mensal",perYear:"Anual",perWeek:"Semanal",perDay:"Diário",
           days:"dias",weeks:"semanas",months:"meses",years:"anos",trialNone:"Sem período grátis",
+          emailPrefill:"E-mail da sua conta L30, preenchido no formulário seguro:",emailInstruction:"Use no formulário de pagamento o mesmo endereço de e-mail da sua conta L30.",
           back:"← Voltar aos planos",rights:"Todos os direitos reservados.",mainSite:"Site principal"
         },
         es: {
@@ -254,6 +257,7 @@
           renewalNote:"Después de la prueba gratuita, tu suscripción se renovará automáticamente por el importe indicado, hasta que la canceles.",
           firstCharge:"Primera renovación",perMonth:"Mensual",perYear:"Anual",perWeek:"Semanal",perDay:"Diario",
           days:"días",weeks:"semanas",months:"meses",years:"años",trialNone:"Sin prueba gratuita",
+          emailPrefill:"Correo de tu cuenta L30, rellenado en el formulario seguro:",emailInstruction:"Usa en el formulario de pago la misma dirección de correo electrónico de tu cuenta L30.",
           back:"← Volver a los planes",rights:"Todos los derechos reservados.",mainSite:"Sitio principal"
         }
       };
@@ -272,6 +276,12 @@
       const setStatus = (key) => { status.textContent = t(key); };
       const transactionId = new URLSearchParams(window.location.search).get("_ptxn");
       const token = window.L30_PADDLE_CLIENT_TOKEN;
+      const checkoutEmail = sessionStorage.getItem("fc-checkout-customer-email") || "";
+      sessionStorage.removeItem("fc-checkout-customer-email");
+      const emailContext = document.getElementById("emailContext");
+      emailContext.textContent = checkoutEmail
+        ? t("emailPrefill") + " " + checkoutEmail
+        : t("emailInstruction");
 
       if (!transactionId || !/^txn_[a-zA-Z0-9]+$/.test(transactionId)) {
         setStatus("missing");
@@ -352,21 +362,26 @@
       }
 
       try {
+        // Keep the transaction ID in memory, but remove _ptxn before Paddle initializes.
+        // This disables automatic URL opening so we can prefill the authenticated email ourselves.
+        const cleanUrl = new URL(window.location.href);
+        cleanUrl.searchParams.delete("_ptxn");
+        window.history.replaceState(window.history.state, "", cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
+
         if (token.startsWith("test_")) window.Paddle.Environment.set("sandbox");
         const checkoutLocale = language === "pt" ? "pt-BR" : language === "es" ? "es" : "en";
+        const checkoutSettings = {
+          displayMode: "inline",
+          frameTarget: "paddle-inline-checkout",
+          frameInitialHeight: "450",
+          frameStyle: "width:100%;min-width:312px;background-color:transparent;border:0;",
+          theme: "dark",
+          locale: checkoutLocale,
+          variant: "multi-page"
+        };
         window.Paddle.Initialize({
           token,
-          checkout: {
-            settings: {
-              displayMode: "inline",
-              frameTarget: "paddle-inline-checkout",
-              frameInitialHeight: "450",
-              frameStyle: "width:100%;min-width:312px;background-color:transparent;border:0;",
-              theme: "dark",
-              locale: checkoutLocale,
-              variant: "multi-page"
-            }
-          },
+          checkout: { settings: checkoutSettings },
           eventCallback: (event) => {
             if (!event || !event.name) return;
             if (event.name === "checkout.loaded" || event.name === "checkout.updated" || event.name === "checkout.items.updated" || event.name === "checkout.discount.applied" || event.name === "checkout.discount.removed") {
@@ -382,8 +397,9 @@
           }
         });
 
-        // Paddle.js automatically opens the transaction from the _ptxn query parameter.
-        // Avoid an additional explicit open so the transaction is embedded only once.
+        const checkoutOptions = { transactionId, settings: checkoutSettings };
+        if (checkoutEmail) checkoutOptions.customer = { email: checkoutEmail };
+        window.Paddle.Checkout.open(checkoutOptions);
       } catch (error) {
         console.error("Paddle inline checkout initialization failed", error);
         setStatus("failed");
