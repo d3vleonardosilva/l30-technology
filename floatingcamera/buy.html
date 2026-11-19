@@ -476,7 +476,8 @@
               customer_type: customer,
               seats,
               organization_name: customer === "business" ? $("companyName").value.trim() : undefined,
-              country_code: undefined
+              country_code: undefined,
+              currency_code: language === "pt" ? "BRL" : "USD"
             }
           });
           if (error || !data?.checkout_url) throw Object.assign(new Error(error?.message || "missing_checkout_url"), { kind: "checkout" });
