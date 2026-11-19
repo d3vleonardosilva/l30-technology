@@ -48,7 +48,7 @@
     h1{margin:12px 0 8px;font-size:clamp(30px,4vw,46px);line-height:1.08;letter-spacing:-.055em}
     .gradient{background:linear-gradient(98deg,#d9f3ff,#82baff 53%,#78f0e7);color:transparent;background-clip:text}
     .page-intro{max-width:760px;margin:0;color:var(--muted);font-size:15px}
-    .checkout-grid{display:grid;grid-template-columns:minmax(280px,.72fr) minmax(460px,1.28fr);gap:20px;align-items:stretch}
+    .checkout-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:stretch}
     .summary-card,.form-card{min-width:0;border:1px solid #34536e;border-radius:21px;background:linear-gradient(150deg,#15253c,#101a2b 80%);box-shadow:0 28px 80px #0006}
     .summary-card{padding:27px;position:relative;height:100%}
     .form-card{padding:18px;background:#101b2b;height:100%;display:flex;flex-direction:column}
@@ -84,7 +84,7 @@
     .footer-links a{font-size:12px}
     .footer-links a:hover{color:var(--cyan)}
     @media(max-width:920px){
-      .checkout-grid{grid-template-columns:minmax(250px,.75fr) minmax(390px,1.25fr);gap:14px}
+      .checkout-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
       .summary-card{padding:22px}
     }
     @media(max-width:760px){
