@@ -51,12 +51,15 @@
 
       try {
         if (token.startsWith("test_")) window.Paddle.Environment.set("sandbox");
+        const selectedLanguage = (localStorage.getItem("fc-language") || "en").toLowerCase();
+        const checkoutLocale = selectedLanguage === "pt" ? "pt-BR" : selectedLanguage === "es" ? "es" : "en";
         window.Paddle.Initialize({
           token,
           checkout: {
             settings: {
               displayMode: "overlay",
-              theme: "dark"
+              theme: "dark",
+              locale: checkoutLocale
             }
           },
           eventCallback: (event) => {
