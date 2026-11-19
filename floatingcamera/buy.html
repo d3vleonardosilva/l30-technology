@@ -12,7 +12,7 @@
     a{color:var(--cyan);text-decoration:none}.wrap{width:min(var(--max),calc(100% - 36px));margin:0 auto;padding:48px 0}
     header{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:34px}
     .brand{font-weight:750;letter-spacing:.02em}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:.18em}
-    .language{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 10px;border-radius:9px}
+    .language{background:#111e31;color:#e8f3ff;border:1px solid #35445c;padding:10px 12px;border-radius:12px;font-size:12px;font-weight:800;width:auto;min-width:72px;font-family:inherit;line-height:1.35;letter-spacing:normal;cursor:pointer}
     .site-topbar{position:sticky;top:0;z-index:50;background:#080f1ded;border-bottom:1px solid #ffffff13;backdrop-filter:blur(20px)}
     .site-nav{width:min(1180px,calc(100% - 48px));min-height:78px;margin:0 auto;display:flex;align-items:center;gap:28px}
     .site-brand{display:flex;align-items:center;gap:11px;flex-shrink:0;color:var(--ink);font-size:17px;font-weight:800;line-height:1.1;letter-spacing:-.035em;text-decoration:none}
@@ -22,9 +22,6 @@
     .site-navlinks a{font-size:13px;font-weight:650;color:#c1cee0;text-decoration:none}
     .site-navlinks a:hover{color:var(--cyan)}
     .site-navright{display:flex;align-items:center;gap:11px}
-    .site-language-wrap{position:relative;flex-shrink:0}
-    .site-language{appearance:none;width:auto;min-width:72px;margin:0;border:1px solid #35445c;background:#111e31;color:#e8f3ff;padding:10px 30px 10px 12px;border-radius:12px;font-size:12px;font-weight:800;line-height:1.35;cursor:pointer}
-    .site-language-chevron{position:absolute;right:11px;top:50%;transform:translateY(-55%);pointer-events:none;color:#e8f3ff;font-size:12px}
     .site-cta{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:10px 16px;border-radius:13px;border:1px solid transparent;background:linear-gradient(105deg,#66b6ff,#7ce9ed);color:#071321;text-decoration:none;font-weight:750;font-size:13px;line-height:1.35;white-space:nowrap;box-shadow:0 12px 35px #2b8ed02c;transition:transform .2s}
     .site-cta:hover{transform:translateY(-2px)}
     .site-menu{display:none;align-items:center;justify-content:center;background:#152439;border:1px solid #344861;border-radius:10px;width:42px;height:42px;padding:0;color:white;font-size:22px}
@@ -62,7 +59,7 @@
     footer{text-align:center;color:var(--muted);font-size:12px;margin-top:24px}
     @media(max-width:1020px){.site-navlinks{gap:15px}.site-nav{gap:18px}}
     @media(max-width:800px){.site-nav{min-height:70px}.site-menu{display:flex}.site-navright{margin-left:auto}.site-navlinks{display:none;position:absolute;top:69px;left:0;right:0;background:#0d192a;border-bottom:1px solid #30445b;padding:18px 24px;flex-direction:column;align-items:stretch;gap:0}.site-navlinks.open{display:flex}.site-navlinks a{padding:12px 0}.site-cta{display:none}}
-    @media(max-width:560px){.grid,.choices,.pricing-grid{grid-template-columns:1fr}.wrap{padding:28px 0}.site-nav{width:calc(100% - 34px)}.site-brand{font-size:14px}.site-brand img{width:37px;height:37px}.site-brand small{font-size:8px}.site-language{padding:9px 28px 9px 9px}.site-navright{gap:7px}}
+    @media(max-width:560px){.grid,.choices,.pricing-grid{grid-template-columns:1fr}.wrap{padding:28px 0}.site-nav{width:calc(100% - 34px)}.site-brand{font-size:14px}.site-brand img{width:37px;height:37px}.site-brand small{font-size:8px}.language{padding:9px 8px}.site-navright{gap:7px}}
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./supabase-config.js"></script>
@@ -82,12 +79,9 @@
         <a href="index.html#contact" data-i18n="nav_contact">Contact</a>
       </div>
       <div class="site-navright">
-        <div class="site-language-wrap">
-          <select class="site-language" id="language" aria-label="Language">
-            <option value="en">🇬🇧 EN</option><option value="pt">🇧🇷 PT</option><option value="es">🇪🇸 ES</option>
-          </select>
-          <span class="site-language-chevron" aria-hidden="true">▾</span>
-        </div>
+        <select class="language" id="language" aria-label="Language">
+          <option value="en">🇬🇧 EN</option><option value="pt">🇧🇷 PT</option><option value="es">🇪🇸 ES</option>
+        </select>
         <a href="#purchaseForm" class="site-cta" data-i18n="nav_cta">Get started ↗</a>
         <button class="site-menu" id="siteMenu" type="button" aria-controls="siteNavlinks" aria-expanded="false" aria-label="Open menu">☰</button>
       </div>
