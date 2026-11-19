@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#08111f">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Floating Camera · Conta e Checkout Sandbox | L30 Technology</title>
+  <style>
+    :root{color-scheme:dark;--bg:#08111f;--panel:#111f32;--panel2:#162840;--line:#2d4562;--text:#f1f7ff;--muted:#a9bad0;--cyan:#78dff0;--blue:#70aaff;--danger:#ff9d9d;--ok:#8ce4bd}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% 0%,#1b477e55,transparent 38%),var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+    a{color:#9bdcf5}button,input,select{font:inherit}button{cursor:pointer}
+    .wrap{width:min(960px,calc(100% - 32px));margin:0 auto;padding:34px 0 70px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:25px}
+    .brand{font-weight:850;letter-spacing:-.03em;font-size:18px}.brand small{display:block;color:#95acc6;letter-spacing:.18em;font-size:9px;margin-top:3px}
+    .chip{display:inline-flex;border:1px solid #8b713c;background:#3c2e16;color:#ffdda0;padding:7px 11px;border-radius:99px;font-size:11px;font-weight:850;letter-spacing:.12em}
+    h1{font-size:clamp(31px,5vw,48px);line-height:1.08;letter-spacing:-.055em;margin:22px 0 10px}
+    .lead{color:var(--muted);max-width:680px;margin:0 0 27px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+    .card{background:linear-gradient(145deg,#14263d,#101b2c);border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:0 18px 55px #0003}
+    .card h2{font-size:20px;letter-spacing:-.025em;margin:0 0 7px}.muted{color:var(--muted);font-size:13px;margin:0 0 18px}
+    label{display:block;color:#dce9f8;font-weight:700;font-size:13px;margin:13px 0 6px}
+    input,select{width:100%;background:#081525;border:1px solid #39516e;border-radius:10px;color:#f5f9ff;padding:12px 13px;outline:none}
+    input:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #78dff022}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:17px}
+    .btn{border:1px solid #52718f;background:#1a304b;color:#edf7ff;padding:11px 15px;border-radius:10px;font-weight:800}
+    .btn.primary{background:linear-gradient(100deg,#75c7ff,#7de5e1);color:#071421;border-color:transparent}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+    .linkbtn{background:none;border:0;padding:5px 0;color:#9bdcf5;text-decoration:underline;text-underline-offset:3px}
+    .hidden{display:none!important}
+    .notice{border:1px solid #655333;background:#282316;border-radius:12px;padding:13px 15px;color:#f5d99e;font-size:13px;margin:20px 0}
+    .status{display:none;border-radius:11px;padding:11px 13px;margin-top:14px;font-size:13px;overflow-wrap:anywhere}
+    .status.show{display:block}.status.error{border:1px solid #78464b;background:#351f25;color:#ffd2d2}.status.success{border:1px solid #356d5b;background:#142d27;color:#b9f4d7}.status.info{border:1px solid #395c7d;background:#14263b;color:#c5e5ff}
+    .planprice{font-size:25px;font-weight:900;letter-spacing:-.04em;margin:8px 0}.tagline{color:#a8d8ff;font-size:12px;font-weight:800}
+    .accountbar{display:flex;justify-content:space-between;gap:12px;align-items:center;background:#0a1728;border:1px solid #304863;padding:12px 14px;border-radius:12px;margin-bottom:17px}
+    .accountbar strong{display:block}.accountbar small{color:var(--muted)}
+    footer{color:#8fa3bd;font-size:12px;margin-top:24px}
+    @media(max-width:760px){.grid{grid-template-columns:1fr}.wrap{padding-top:22px}.card{padding:19px}}
+    @media(max-width:420px){header{align-items:flex-start;flex-direction:column}.row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <div class="brand">Floating Camera<small>BY L30 TECHNOLOGY</small></div>
+      <span class="chip">AMBIENTE DE TESTES · SANDBOX</span>
+    </header>
+
+    <h1>Conta L30 e assinatura Pro</h1>
+    <p class="lead">Página de homologação do fluxo de conta, checkout Paddle e ativação do Floating Camera. As transações são criadas no ambiente Sandbox; não use dados de pagamento reais.</p>
+
+    <div class="notice">
+      <strong>Somente para testes.</strong> Esta página aponta para o projeto Supabase de staging e para a configuração Sandbox da Paddle. Não divulgue como página de compra e não a utilize para pagamentos reais.
+    </div>
+
+    <section id="authCard" class="grid">
+      <article class="card">
+        <h2>Entrar na conta L30</h2>
+        <p class="muted">Use sua conta de homologação para continuar ao checkout.</p>
+        <form id="loginForm">
+          <label for="loginEmail">E-mail</label>
+          <input id="loginEmail" type="email" autocomplete="email" required>
+          <label for="loginPassword">Senha</label>
+          <input id="loginPassword" type="password" autocomplete="current-password" minlength="8" required>
+          <div class="actions"><button class="btn primary" type="submit" id="loginButton">Entrar</button></div>
+        </form>
+      </article>
+
+      <article class="card">
+        <h2>Criar conta L30</h2>
+        <p class="muted">O e-mail pode precisar de confirmação antes do primeiro acesso.</p>
+        <form id="signupForm">
+          <label for="signupName">Nome</label>
+          <input id="signupName" type="text" autocomplete="name" maxlength="120" required>
+          <label for="signupEmail">E-mail</label>
+          <input id="signupEmail" type="email" autocomplete="email" required>
+          <label for="signupPassword">Criar senha</label>
+          <input id="signupPassword" type="password" autocomplete="new-password" minlength="8" required>
+          <div class="actions"><button class="btn" type="submit" id="signupButton">Criar conta</button></div>
+        </form>
+      </article>
+    </section>
+
+    <section id="checkoutCard" class="card hidden">
+      <div class="accountbar">
+        <div><small>Conta conectada</small><strong id="accountEmail"></strong></div>
+        <button class="linkbtn" id="logoutButton" type="button">Sair</button>
+      </div>
+      <h2>Escolha o Floating Camera Pro</h2>
+      <p class="muted">Selecione o ciclo de cobrança e o tipo de compra. O checkout hospedado é criado pelo servidor; os preços nunca são enviados livremente pelo navegador.</p>
+      <form id="checkoutForm">
+        <div class="row">
+          <div>
+            <label for="billingMode">Plano</label>
+            <select id="billingMode" required>
+              <option value="monthly_subscription">Mensal · US$ 2,49 / mês</option>
+              <option value="annual_subscription">Anual · US$ 14,99 / ano</option>
+            </select>
+          </div>
+          <div>
+            <label for="customerType">Tipo de cliente</label>
+            <select id="customerType" required>
+              <option value="individual">Pessoa física · 1 dispositivo</option>
+              <option value="business">Empresa · múltiplos dispositivos</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="businessFields" class="hidden">
+          <div class="row">
+            <div>
+              <label for="organizationName">Nome da empresa</label>
+              <input id="organizationName" type="text" maxlength="180" autocomplete="organization">
+            </div>
+            <div>
+              <label for="seats">Quantidade de dispositivos</label>
+              <input id="seats" type="number" min="1" max="100" value="2">
+            </div>
+          </div>
+        </div>
+
+        <div class="notice">
+          O período de avaliação, a moeda final, os impostos e o valor a cobrar são apresentados e controlados pelo checkout hospedado da Paddle Sandbox. Confira os dados antes de concluir qualquer simulação.
+        </div>
+        <div class="actions"><button class="btn primary" type="submit" id="checkoutButton">Continuar para o checkout Sandbox</button></div>
+      </form>
+    </section>
+
+    <div id="pageStatus" class="status" role="status" aria-live="polite"></div>
+    <footer>
+      L30 Technology · Floating Camera · Página técnica de homologação. O modo Free do aplicativo não exige conta ou cartão.
+    </footer>
+  </main>
+
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+    // These are public client settings. Never place a service-role key, Paddle API key,
+    // webhook secret or Ed25519 private key in this file.
+    const SUPABASE_URL = "https://lgtxcqmwpwxhvnygmsav.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_yLBrikcSNl-r2B2wul0yvg_obdpSwqN";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+    });
+
+    const $ = (id) => document.getElementById(id);
+    const authCard = $("authCard");
+    const checkoutCard = $("checkoutCard");
+    const pageStatus = $("pageStatus");
+    let busy = false;
+
+    function status(message, kind = "info") {
+      pageStatus.textContent = message;
+      pageStatus.className = "status show " + kind;
+    }
+
+    function setBusy(value, buttonId) {
+      busy = value;
+      if (buttonId) $(buttonId).disabled = value;
+    }
+
+    function renderSession(session) {
+      const loggedIn = Boolean(session?.user);
+      authCard.classList.toggle("hidden", loggedIn);
+      checkoutCard.classList.toggle("hidden", !loggedIn);
+      if (loggedIn) $("accountEmail").textContent = session.user.email || "Conta L30";
+    }
+
+    async function refreshSession() {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      renderSession(data.session);
+      return data.session;
+    }
+
+    $("loginForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (busy) return;
+      setBusy(true, "loginButton");
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: $("loginEmail").value.trim(),
+          password: $("loginPassword").value
+        });
+        if (error) throw error;
+        renderSession(data.session);
+        status("Login realizado. Você já pode escolher o plano para continuar.", "success");
+      } catch (error) {
+        status(error?.message || "Não foi possível entrar. Confira os dados e tente novamente.", "error");
+      } finally {
+        setBusy(false, "loginButton");
+      }
+    });
+
+    $("signupForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (busy) return;
+      setBusy(true, "signupButton");
+      try {
+        const redirectTo = window.location.origin + window.location.pathname;
+        const { data, error } = await supabase.auth.signUp({
+          email: $("signupEmail").value.trim(),
+          password: $("signupPassword").value,
+          options: {
+            data: { full_name: $("signupName").value.trim() },
+            emailRedirectTo: redirectTo
+          }
+        });
+        if (error) throw error;
+        if (data.session) {
+          renderSession(data.session);
+          status("Conta criada e login realizado.", "success");
+        } else {
+          status("Conta criada. Confira seu e-mail e confirme o cadastro antes de entrar.", "success");
+        }
+      } catch (error) {
+        status(error?.message || "Não foi possível criar a conta. Tente novamente.", "error");
+      } finally {
+        setBusy(false, "signupButton");
+      }
+    });
+
+    $("customerType").addEventListener("change", () => {
+      const business = $("customerType").value === "business";
+      $("businessFields").classList.toggle("hidden", !business);
+      $("organizationName").required = business;
+      $("seats").required = business;
+    });
+
+    $("logoutButton").addEventListener("click", async () => {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        status("Não foi possível encerrar a sessão.", "error");
+        return;
+      }
+      renderSession(null);
+      status("Você saiu da conta L30.", "info");
+    });
+
+    $("checkoutForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (busy) return;
+      setBusy(true, "checkoutButton");
+      try {
+        const session = await refreshSession();
+        if (!session?.access_token) throw new Error("Entre novamente na conta L30 para continuar.");
+
+        const customerType = $("customerType").value;
+        const payload = {
+          billing_mode: $("billingMode").value,
+          customer_type: customerType,
+          seats: customerType === "business" ? Number($("seats").value) : 1,
+          country_code: "BR"
+        };
+        if (customerType === "business") {
+          payload.organization_name = $("organizationName").value.trim();
+        }
+
+        const { data, error } = await supabase.functions.invoke("create-checkout", {
+          body: payload,
+          headers: { Authorization: "Bearer " + session.access_token }
+        });
+        if (error) throw error;
+        if (!data?.checkout_url || typeof data.checkout_url !== "string") {
+          throw new Error("O servidor não retornou um endereço de checkout válido.");
+        }
+        status("Checkout Sandbox criado. Redirecionando para a Paddle…", "success");
+        window.location.assign(data.checkout_url);
+      } catch (error) {
+        const message = error?.message || "Não foi possível iniciar o checkout.";
+        status(message, "error");
+      } finally {
+        setBusy(false, "checkoutButton");
+      }
+    });
+
+    supabase.auth.onAuthStateChange((_event, session) => renderSession(session));
+    refreshSession().catch(() => {
+      renderSession(null);
+      status("Não foi possível verificar a sessão. Atualize a página e tente novamente.", "error");
+    });
+  </script>
+</body>
+</html>
