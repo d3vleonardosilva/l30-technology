@@ -149,7 +149,27 @@
         return client;
       }
       async function invoke(body) {
-        const { data, error } = await getClient().functions.invoke("manage-coupons", { body });
+        const supabase = getClient();
+        if (!supabase) throw new Error("supabase_not_configured");
+
+        // Pass the signed-in user's access token explicitly. This avoids an
+        // Authorization header being omitted when the function client is
+        // invoked after a page restore or an auth-state refresh.
+        let { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) throw sessionError;
+        let accessToken = sessionData?.session?.access_token;
+
+        if (!accessToken) {
+          const refreshed = await supabase.auth.refreshSession();
+          if (refreshed.error) throw refreshed.error;
+          accessToken = refreshed.data?.session?.access_token;
+        }
+        if (!accessToken) throw new Error("authentication_required");
+
+        const { data, error } = await supabase.functions.invoke("manage-coupons", {
+          body,
+          headers: { Authorization: "Bearer " + accessToken }
+        });
         if (error) {
           let reason = error.message;
           try {
