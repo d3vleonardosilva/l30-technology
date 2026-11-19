@@ -436,16 +436,16 @@
           });
           if (error || !data?.checkout_url) throw Object.assign(new Error(error?.message || "missing_checkout_url"), { kind: "checkout" });
 
-          const checkoutDestination = new URL(data.checkout_url);
-          const isLocalPreview = ["127.0.0.1", "localhost"].includes(window.location.hostname);
-          if (isLocalPreview) {
-            if (checkoutDestination.protocol !== "https:" ||
-                !["www.l30.tec.br", "l30.tec.br"].includes(checkoutDestination.hostname)) {
-              throw Object.assign(new Error("unexpected_checkout_domain"), { kind: "checkout" });
-            }
-            checkoutDestination.protocol = window.location.protocol;
-            checkoutDestination.host = window.location.host;
+          const paddleCheckoutUrl = new URL(data.checkout_url);
+          if (paddleCheckoutUrl.protocol !== "https:" ||
+              !paddleCheckoutUrl.searchParams.has("_ptxn")) {
+            throw Object.assign(new Error("invalid_paddle_checkout_url"), { kind: "checkout" });
           }
+
+          // Keep the Paddle transaction ID, but open the pay page on this same
+          // deployment (GitHub/Cloudflare preview or the eventual production site).
+          const checkoutDestination = new URL("./pay.html", window.location.href);
+          checkoutDestination.search = paddleCheckoutUrl.search;
           window.location.assign(checkoutDestination.toString());
         } catch (error) {
           console.error("L30 purchase flow failed", error);
