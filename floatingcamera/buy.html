@@ -253,6 +253,12 @@
         : (navigator.language || "").toLowerCase().startsWith("es") ? "es" : "en";
       let creatingAccount = false;
       const $ = (id) => document.getElementById(id);
+      const requestedPlan = new URLSearchParams(window.location.search).get("plan");
+      if (requestedPlan === "monthly") {
+        $("billingMode").value = "monthly_subscription";
+      } else if (requestedPlan === "annual") {
+        $("billingMode").value = "annual_subscription";
+      }
       const form = $("purchaseForm"), message = $("message"), submit = $("submitButton");
       const companyFields = $("companyFields"), customerType = $("customerType");
       const recoveryForm = $("recoveryForm"), forgotPassword = $("forgotPassword");
