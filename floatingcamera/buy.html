@@ -492,6 +492,11 @@
           // deployment (GitHub/Cloudflare preview or the eventual production site).
           const checkoutDestination = new URL("./pay.html", window.location.href);
           checkoutDestination.search = paddleCheckoutUrl.search;
+          if (typeof data.customer_email === "string" && data.customer_email.includes("@")) {
+            sessionStorage.setItem("fc-checkout-customer-email", data.customer_email);
+          } else {
+            sessionStorage.removeItem("fc-checkout-customer-email");
+          }
           window.location.assign(checkoutDestination.toString());
         } catch (error) {
           console.error("L30 purchase flow failed", error);
