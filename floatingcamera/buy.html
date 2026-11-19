@@ -141,6 +141,12 @@
           </div>
         </div>
 
+        <div class="coupon-field">
+          <label for="couponCode" data-i18n="couponCode">Promotional code (optional)</label>
+          <input id="couponCode" type="text" maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="L30TESTE15">
+          <div class="hint" data-i18n="couponHint">Enter a promotional code to receive a different free-trial period.</div>
+        </div>
+
         <div class="divider"></div>
         <div class="eyebrow" data-i18n="account">YOUR L30 ACCOUNT</div>
         <label for="email" data-i18n="email">Email address</label>
@@ -212,7 +218,10 @@
           passwordUpdateError:"Could not update the password. Request a new reset link and try again.",
           checkoutError:"Could not start checkout. Please try again or contact support.",
           checkoutWait:"Preparing your secure checkout…",signinError:"Unable to sign in. Check your email and password.",
-          signupError:"Unable to create your account. Check the details and try again."
+          signupError:"Unable to create your account. Check the details and try again.",
+          couponCode:"Promotional code (optional)",couponHint:"Enter a promotional code to receive a different free-trial period.",
+          couponError:"This promotional code is invalid, expired, already used, or unavailable for this plan.",
+          couponPermissionError:"The promotional trial could not be prepared. The L30 administrator must enable price read/write permissions on the Paddle Sandbox API key."
         },
         pt: {
           nav_features:"Recursos",nav_how:"Como funciona",nav_license:"Licenciamento",nav_faq:"Perguntas",nav_contact:"Contato",nav_cta:"Começar ↗",
@@ -245,7 +254,10 @@
           passwordUpdateError:"Não foi possível atualizar a senha. Solicite um novo link e tente novamente.",
           checkoutError:"Não foi possível iniciar o pagamento. Tente novamente ou fale com o suporte.",
           checkoutWait:"Preparando seu pagamento seguro…",signinError:"Não foi possível entrar. Confira seu e-mail e senha.",
-          signupError:"Não foi possível criar sua conta. Confira os dados e tente novamente."
+          signupError:"Não foi possível criar sua conta. Confira os dados e tente novamente.",
+          couponCode:"Código promocional (opcional)",couponHint:"Informe um código promocional para receber um período de teste diferente.",
+          couponError:"Este código promocional é inválido, expirou, já foi utilizado ou não está disponível para este plano.",
+          couponPermissionError:"Não foi possível preparar o teste promocional. O administrador L30 precisa habilitar as permissões de leitura e gravação de preços na chave Paddle Sandbox."
         },
         es: {
           nav_features:"Funciones",nav_how:"Cómo funciona",nav_license:"Licencias",nav_faq:"Preguntas",nav_contact:"Contacto",nav_cta:"Empezar ↗",
@@ -278,7 +290,10 @@
           passwordUpdateError:"No se pudo actualizar la contraseña. Solicita un nuevo enlace e inténtalo otra vez.",
           checkoutError:"No se pudo iniciar el pago. Inténtalo de nuevo o contacta con soporte.",
           checkoutWait:"Preparando tu pago seguro…",signinError:"No se pudo iniciar sesión. Comprueba tu correo y contraseña.",
-          signupError:"No se pudo crear la cuenta. Comprueba los datos e inténtalo de nuevo."
+          signupError:"No se pudo crear la cuenta. Comprueba los datos e inténtalo de nuevo.",
+          couponCode:"Código promocional (opcional)",couponHint:"Introduce un código promocional para recibir un período de prueba diferente.",
+          couponError:"Este código promocional no es válido, ha caducado, ya se utilizó o no está disponible para este plan.",
+          couponPermissionError:"No se pudo preparar la prueba promocional. El administrador L30 debe habilitar los permisos de lectura y escritura de precios en la clave Paddle Sandbox."
         }
       };
 
@@ -354,6 +369,12 @@
       });
       customerType.addEventListener("change", () => {
         companyFields.hidden = customerType.value !== "business";
+      });
+      $("couponCode").addEventListener("input", () => {
+        const field = $("couponCode");
+        const start = field.selectionStart;
+        field.value = field.value.toUpperCase().replace(/[^A-Z0-9_-]/g, "");
+        field.setSelectionRange(start, start);
       });
       $("toggleAuth").addEventListener("click", () => {
         creatingAccount = !creatingAccount;
@@ -477,10 +498,23 @@
               seats,
               organization_name: customer === "business" ? $("companyName").value.trim() : undefined,
               country_code: undefined,
-              currency_code: language === "pt" ? "BRL" : "USD"
+              currency_code: language === "pt" ? "BRL" : "USD",
+              coupon_code: $("couponCode").value.trim().toUpperCase() || undefined
             }
           });
-          if (error || !data?.checkout_url) throw Object.assign(new Error(error?.message || "missing_checkout_url"), { kind: "checkout" });
+          if (error) {
+            let serverError = null;
+            try {
+              const response = error.context?.clone ? error.context.clone() : error.context;
+              const payload = response?.json ? await response.json() : null;
+              serverError = payload?.error ?? null;
+            } catch {}
+            throw Object.assign(new Error(serverError || error.message || "checkout_failed"), {
+              kind: "checkout",
+              code: serverError
+            });
+          }
+          if (!data?.checkout_url) throw Object.assign(new Error("missing_checkout_url"), { kind: "checkout" });
 
           const paddleCheckoutUrl = new URL(data.checkout_url);
           if (paddleCheckoutUrl.protocol !== "https:" ||
@@ -500,8 +534,12 @@
           window.location.assign(checkoutDestination.toString());
         } catch (error) {
           console.error("L30 purchase flow failed", error);
-          const key = error?.kind === "signup" ? "signupError" : error?.kind === "signin" ? "signinError" : "checkoutError";
-          showMessage(t(key), true);
+          const code = error?.code || "";
+          const messageText = code.startsWith("coupon_") ? t("couponError")
+            : (code === "paddle_price_read_permission_missing" || code === "paddle_price_write_permission_missing")
+              ? t("couponPermissionError")
+              : t(error?.kind === "signup" ? "signupError" : error?.kind === "signin" ? "signinError" : "checkoutError");
+          showMessage(messageText, true);
         } finally {
           submit.disabled = false;
         }
