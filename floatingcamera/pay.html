@@ -18,7 +18,8 @@
     html{scroll-behavior:smooth}
     body{
       margin:0;min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden;
-      background:radial-gradient(ellipse at 82% 18%,#1b477e55,transparent 42%),
+      background:
+        radial-gradient(ellipse at 82% 18%,#1b477e55,transparent 42%),
         radial-gradient(ellipse at 10% 78%,#102e4a44,transparent 42%),var(--bg);
       color:var(--ink);font:16px/1.65 system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
     }
@@ -36,24 +37,41 @@
     .navright{display:flex;align-items:center;gap:11px}
     .secure-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid #29445c;border-radius:999px;background:#111d31b5;color:#bde5f2;font-size:11px;font-weight:750;letter-spacing:.03em;white-space:nowrap}
     .secure-pill:before{content:"";width:7px;height:7px;border-radius:50%;background:#69e5d7;box-shadow:0 0 14px #69e5d7}
-    .button{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:1px solid transparent;padding:10px 16px;border-radius:13px;background:linear-gradient(105deg,#66b6ff,#7ce9ed);color:#071321;font-weight:750;font-size:13px;line-height:1.35;white-space:nowrap;box-shadow:0 12px 35px #2b8ed02c;transition:transform .2s}
-    .button:hover{transform:translateY(-2px)}
-    main{position:relative;flex:1;display:grid;place-items:center;padding:76px 0 86px}
-    main:before{position:absolute;content:"";inset:0;opacity:.16;pointer-events:none;background-image:radial-gradient(#79bcff 1px,transparent 1px);background-size:28px 28px;mask-image:linear-gradient(90deg,transparent 15%,black 75%,transparent)}
-    .checkout-wrap{position:relative;width:min(100% - 48px,760px);margin:auto}
-    .checkout-card{position:relative;overflow:hidden;padding:clamp(26px,5vw,46px);border:1px solid #34536e;border-radius:24px;background:radial-gradient(circle at 90% 0%,#19497555 0%,transparent 43%),linear-gradient(145deg,#15253c,#101a2b 78%);box-shadow:0 35px 100px #0008,0 0 0 7px #ffffff05}
-    .checkout-card:before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#66b6ff,#7ce9ed)}
+    main{position:relative;flex:1;padding:52px 0 68px}
+    main:before{position:absolute;content:"";inset:0;opacity:.13;pointer-events:none;background-image:radial-gradient(#79bcff 1px,transparent 1px);background-size:28px 28px;mask-image:linear-gradient(90deg,transparent 10%,black 75%,transparent)}
+    .page{position:relative;width:min(var(--max),calc(100% - 48px));margin:auto}
+    .page-heading{margin:0 0 28px}
     .eyebrow{display:flex;align-items:center;gap:9px;color:#91d7ff;font-size:11px;font-weight:850;letter-spacing:.16em;text-transform:uppercase}
     .eyebrow:before{content:"";width:8px;height:8px;border-radius:50%;background:#69e5d7;box-shadow:0 0 16px #69e5d7}
-    h1{max-width:590px;margin:18px 0 14px;font-size:clamp(32px,5vw,48px);line-height:1.08;letter-spacing:-.055em}
+    h1{margin:12px 0 8px;font-size:clamp(30px,4vw,46px);line-height:1.08;letter-spacing:-.055em}
     .gradient{background:linear-gradient(98deg,#d9f3ff,#82baff 53%,#78f0e7);color:transparent;background-clip:text}
-    .intro{max-width:590px;margin:0;color:var(--muted);font-size:16px;line-height:1.7}
-    .trust-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:28px 0 24px}
-    .trust-item{display:flex;align-items:center;gap:11px;padding:14px;border:1px solid #2d4058;border-radius:14px;background:#0c1727a8;color:#c9d9ec;font-size:12px;line-height:1.4}
-    .trust-icon{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border:1px solid #35678b;border-radius:10px;background:#193b60;color:#81dfff;font-size:17px}
-    #status{min-height:58px;display:flex;align-items:center;gap:12px;padding:15px 17px;border:1px solid #3b5873;border-radius:13px;background:#10243a;color:#d7edff;font-size:14px}
-    #status:before{content:"";width:9px;height:9px;flex:0 0 9px;border-radius:50%;background:#68e5f3;box-shadow:0 0 14px #68e5f3}
-    .back-link{display:inline-flex;align-items:center;gap:8px;margin-top:22px;color:#b6e4ff;font-size:13px;font-weight:700}
+    .page-intro{max-width:760px;margin:0;color:var(--muted);font-size:15px}
+    .checkout-grid{display:grid;grid-template-columns:minmax(280px,.72fr) minmax(460px,1.28fr);gap:20px;align-items:start}
+    .summary-card,.form-card{min-width:0;border:1px solid #34536e;border-radius:21px;background:linear-gradient(150deg,#15253c,#101a2b 80%);box-shadow:0 28px 80px #0006}
+    .summary-card{padding:27px;position:sticky;top:100px}
+    .form-card{padding:18px;background:#101b2b}
+    .summary-kicker{color:#91d7ff;font-size:11px;font-weight:850;letter-spacing:.15em;text-transform:uppercase}
+    .trial-title{font-size:clamp(25px,3vw,34px);line-height:1.12;font-weight:850;letter-spacing:-.045em;margin:18px 0 20px;color:#f4faff}
+    .trial-title .gradient{display:block;margin-top:4px}
+    .product-row{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;padding:17px 0;border-top:1px solid #ffffff16;border-bottom:1px solid #ffffff16}
+    .product-name{font-size:15px;font-weight:750}
+    .product-plan{margin-top:4px;color:var(--muted);font-size:12px}
+    .product-price{font-size:15px;font-weight:800;text-align:right;white-space:nowrap}
+    .summary-details{display:grid;gap:13px;margin-top:20px}
+    .summary-detail{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;font-size:13px}
+    .summary-detail span:first-child{color:var(--muted)}
+    .summary-detail strong{text-align:right;font-weight:750}
+    .summary-total{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding-top:16px;margin-top:4px;border-top:1px solid #ffffff20;font-size:14px}
+    .summary-total strong{font-size:17px}
+    .summary-note{margin:18px 0 0;padding:12px 13px;border:1px solid #2d485e;border-radius:12px;background:#0c1727;color:#b7cbe0;font-size:11px;line-height:1.55}
+    .secure-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:3px 4px 15px}
+    .secure-heading strong{font-size:14px;letter-spacing:.01em}
+    .secure-heading span{color:#8daac7;font-size:11px}
+    .checkout-frame{width:100%;min-width:312px;min-height:600px}
+    .checkout-frame iframe{display:block;width:100%;border:0;background:transparent}
+    #status{display:flex;align-items:center;gap:10px;min-height:48px;padding:12px 14px;margin-top:14px;border:1px solid #2d485e;border-radius:12px;background:#0c1727;color:#b9d8e9;font-size:12px}
+    #status:before{content:"";width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:#68e5f3;box-shadow:0 0 14px #68e5f3}
+    .back-link{display:inline-flex;align-items:center;gap:8px;margin-top:23px;color:#b6e4ff;font-size:13px;font-weight:700}
     .back-link:hover{color:var(--cyan)}
     footer{padding:25px 0;border-top:1px solid #26354a;background:#070c15;color:#9fb1c6}
     .footer-inner{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
@@ -61,12 +79,26 @@
     .footer-links{display:flex;gap:18px;flex-wrap:wrap}
     .footer-links a{font-size:12px}
     .footer-links a:hover{color:var(--cyan)}
-    @media(max-width:800px){.nav{min-height:70px}.navlinks{display:none}.navright{margin-left:auto}main{padding:54px 0 64px}}
+    @media(max-width:920px){
+      .checkout-grid{grid-template-columns:minmax(250px,.75fr) minmax(390px,1.25fr);gap:14px}
+      .summary-card{padding:22px}
+    }
+    @media(max-width:760px){
+      .nav{min-height:70px}.navlinks{display:none}
+      main{padding:38px 0 52px}
+      .checkout-grid{grid-template-columns:1fr}
+      .summary-card{position:static}
+      .form-card{padding:12px}
+      .checkout-frame{min-width:0;min-height:650px}
+    }
     @media(max-width:560px){
-      .wrap{width:calc(100% - 34px)}.brand{font-size:14px}.brand img{width:37px;height:37px}.brand small{font-size:8px}
+      .wrap,.page{width:calc(100% - 34px)}
+      .brand{font-size:14px}.brand img{width:37px;height:37px}.brand small{font-size:8px}
       .nav{gap:12px}.navright{gap:7px}.secure-pill{padding:7px 9px;font-size:10px}
-      .checkout-wrap{width:calc(100% - 34px)}.checkout-card{padding:25px 20px;border-radius:19px}
-      .trust-grid{grid-template-columns:1fr;gap:9px}.trust-item{padding:11px}
+      .page-heading{margin-bottom:20px}
+      .summary-card{padding:21px}
+      .form-card{padding:7px;border-radius:16px}
+      .checkout-frame{min-height:680px}
       .footer-inner{align-items:flex-start;flex-direction:column}.footer-links{gap:13px}
     }
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
@@ -94,18 +126,56 @@
   </header>
 
   <main>
-    <div class="checkout-wrap">
-      <section class="checkout-card">
+    <div class="page">
+      <div class="page-heading">
         <div class="eyebrow" data-i18n="eyebrow">FLOATING CAMERA PRO · L30 TECHNOLOGY</div>
-        <h1><span class="gradient" data-i18n="title">Your Pro experience</span><br><span data-i18n="titleLine2">starts here.</span></h1>
-        <p class="intro" data-i18n="intro">Complete your payment in Paddle's secure checkout. Your camera video stays on your device and is never sent to the payment provider.</p>
-        <div class="trust-grid">
-          <div class="trust-item"><span class="trust-icon" aria-hidden="true">⌑</span><span data-i18n="trustPayment">Secure payment processing</span></div>
-          <div class="trust-item"><span class="trust-icon" aria-hidden="true">▣</span><span data-i18n="trustPrivacy">Your camera video stays private</span></div>
-        </div>
-        <div id="status" role="status" aria-live="polite">Preparing secure checkout…</div>
-        <a class="back-link" href="buy.html" data-i18n="back">← Back to plans</a>
-      </section>
+        <h1><span class="gradient" data-i18n="heading">Complete your Pro order</span></h1>
+        <p class="page-intro" data-i18n="intro">Review your plan and complete payment in the secure Paddle form. Your camera video stays on your device.</p>
+      </div>
+
+      <div class="checkout-grid">
+        <aside class="summary-card" aria-label="Order summary">
+          <div class="summary-kicker" data-i18n="summaryKicker">ORDER SUMMARY</div>
+          <div class="trial-title" id="trialTitle"><span data-i18n="trialPrefix">Your 7-day</span><span class="gradient" data-i18n="trialSuffix">free trial</span></div>
+          <div class="product-row">
+            <div>
+              <div class="product-name" id="productName">Floating Camera Pro</div>
+              <div class="product-plan" id="planName" data-i18n="loadingPlan">Subscription plan</div>
+            </div>
+            <div class="product-price" id="recurringPrice">—</div>
+          </div>
+          <div class="summary-details">
+            <div class="summary-detail">
+              <span data-i18n="billingFrequency">Billing frequency</span>
+              <strong id="billingFrequency">—</strong>
+            </div>
+            <div class="summary-detail">
+              <span data-i18n="trialLength">Free trial</span>
+              <strong id="trialLength">—</strong>
+            </div>
+            <div class="summary-detail">
+              <span data-i18n="taxes">Taxes</span>
+              <strong id="taxAmount">—</strong>
+            </div>
+          </div>
+          <div class="summary-total">
+            <span data-i18n="dueToday">Due today</span>
+            <strong id="dueToday">—</strong>
+          </div>
+          <div class="summary-note" id="renewalNote" data-i18n="renewalNote">After the free trial, your subscription renews automatically at the amount shown, unless cancelled.</div>
+        </aside>
+
+        <section class="form-card" aria-label="Secure Paddle payment form">
+          <div class="secure-heading">
+            <strong data-i18n="paymentHeading">Payment details</strong>
+            <span data-i18n="secureLabel">Secured by Paddle</span>
+          </div>
+          <div class="checkout-frame paddle-inline-checkout"></div>
+          <div id="status" role="status" aria-live="polite" data-i18n="preparing">Preparing your secure payment form…</div>
+        </section>
+      </div>
+
+      <a class="back-link" href="buy.html" data-i18n="back">← Back to plans</a>
     </div>
   </main>
 
@@ -126,69 +196,86 @@
         en: {
           features:"Features",how:"How it works",licensing:"Licensing",contact:"Contact",
           securePill:"SECURE CHECKOUT",eyebrow:"FLOATING CAMERA PRO · L30 TECHNOLOGY",
-          title:"Your Pro experience",titleLine2:"starts here.",
-          intro:"Complete your payment in Paddle's secure checkout. Your camera video stays on your device and is never sent to the payment provider.",
-          trustPayment:"Secure payment processing",trustPrivacy:"Your camera video stays private",
-          preparing:"Preparing secure checkout…",missing:"No active payment link was found. Return to the plans page and choose a plan.",
+          heading:"Complete your Pro order",
+          intro:"Review your plan and complete payment in the secure Paddle form. Your camera video stays on your device.",
+          summaryKicker:"ORDER SUMMARY",trialPrefix:"Your",trialSuffix:"free trial",
+          loadingPlan:"Subscription plan",billingFrequency:"Billing frequency",trialLength:"Free trial",
+          taxes:"Taxes",dueToday:"Due today",paymentHeading:"Payment details",secureLabel:"Secured by Paddle",
+          preparing:"Preparing your secure payment form…",
+          missing:"No active payment transaction was found. Return to the plans page and choose a plan.",
           config:"Checkout is not configured yet. Please contact L30 Technology.",
-          load:"The secure checkout could not be loaded. Check your connection and try again.",
-          waiting:"Checkout opened securely. Complete your payment in the Paddle window.",
-          completed:"Checkout submitted. We are waiting for final payment confirmation before activating your license.",
+          load:"The secure payment form could not be loaded. Check your connection and try again.",
+          loaded:"Your secure payment form is ready. Review the order summary before continuing.",
+          completed:"Payment submitted. We are waiting for Paddle's final confirmation before activating your license.",
           closed:"Checkout closed. You can return to the plans page and try again.",
-          failed:"Secure checkout could not be initialized. Please contact L30 Technology.",
+          failed:"The secure checkout could not be initialized. Please contact L30 Technology.",
+          renewalNote:"After the free trial, your subscription renews automatically at the amount shown, unless cancelled.",
+          firstCharge:"First renewal",perMonth:"Monthly",perYear:"Yearly",perWeek:"Weekly",perDay:"Daily",
+          days:"days",weeks:"weeks",months:"months",years:"years",trialNone:"No free trial",
           back:"← Back to plans",rights:"All rights reserved.",mainSite:"Main website"
         },
         pt: {
           features:"Recursos",how:"Como funciona",licensing:"Licenciamento",contact:"Contato",
           securePill:"PAGAMENTO SEGURO",eyebrow:"FLOATING CAMERA PRO · L30 TECHNOLOGY",
-          title:"Sua experiência Pro",titleLine2:"começa aqui.",
-          intro:"Conclua o pagamento no checkout seguro do Paddle. O vídeo da sua câmera permanece no seu dispositivo e nunca é enviado ao provedor de pagamento.",
-          trustPayment:"Processamento seguro do pagamento",trustPrivacy:"Seu vídeo permanece privado",
-          preparing:"Preparando o pagamento seguro…",missing:"Nenhum link de pagamento ativo foi encontrado. Volte aos planos e escolha uma opção.",
+          heading:"Conclua seu pedido Pro",
+          intro:"Confira seu plano e conclua o pagamento pelo formulário seguro do Paddle. O vídeo da sua câmera permanece no seu dispositivo.",
+          summaryKicker:"RESUMO DO PEDIDO",trialPrefix:"Seu",trialSuffix:"teste grátis",
+          loadingPlan:"Plano de assinatura",billingFrequency:"Periodicidade",trialLength:"Período grátis",
+          taxes:"Impostos",dueToday:"Valor de hoje",paymentHeading:"Dados de pagamento",secureLabel:"Protegido pelo Paddle",
+          preparing:"Preparando o formulário de pagamento seguro…",
+          missing:"Nenhuma transação ativa foi encontrada. Volte aos planos e escolha uma opção.",
           config:"O checkout ainda não está configurado. Entre em contato com a L30 Technology.",
-          load:"Não foi possível carregar o checkout seguro. Verifique sua conexão e tente novamente.",
-          waiting:"Checkout seguro aberto. Conclua o pagamento na janela do Paddle.",
-          completed:"Pagamento enviado. Estamos aguardando a confirmação final antes de ativar sua licença.",
+          load:"Não foi possível carregar o formulário seguro. Verifique sua conexão e tente novamente.",
+          loaded:"Seu formulário seguro está pronto. Confira o resumo do pedido antes de continuar.",
+          completed:"Pagamento enviado. Estamos aguardando a confirmação final do Paddle antes de ativar sua licença.",
           closed:"Checkout fechado. Você pode voltar aos planos e tentar novamente.",
           failed:"Não foi possível iniciar o checkout seguro. Entre em contato com a L30 Technology.",
+          renewalNote:"Após o período grátis, sua assinatura será renovada automaticamente pelo valor informado, até que seja cancelada.",
+          firstCharge:"Primeira renovação",perMonth:"Mensal",perYear:"Anual",perWeek:"Semanal",perDay:"Diário",
+          days:"dias",weeks:"semanas",months:"meses",years:"anos",trialNone:"Sem período grátis",
           back:"← Voltar aos planos",rights:"Todos os direitos reservados.",mainSite:"Site principal"
         },
         es: {
           features:"Funciones",how:"Cómo funciona",licensing:"Licencias",contact:"Contacto",
           securePill:"PAGO SEGURO",eyebrow:"FLOATING CAMERA PRO · L30 TECHNOLOGY",
-          title:"Tu experiencia Pro",titleLine2:"empieza aquí.",
-          intro:"Completa el pago en el checkout seguro de Paddle. El video de tu cámara permanece en tu dispositivo y nunca se envía al proveedor de pagos.",
-          trustPayment:"Procesamiento de pago seguro",trustPrivacy:"Tu video permanece privado",
-          preparing:"Preparando el pago seguro…",missing:"No se encontró un enlace de pago activo. Vuelve a los planes y elige una opción.",
+          heading:"Completa tu pedido Pro",
+          intro:"Revisa tu plan y completa el pago en el formulario seguro de Paddle. El video de tu cámara permanece en tu dispositivo.",
+          summaryKicker:"RESUMEN DEL PEDIDO",trialPrefix:"Tu",trialSuffix:"prueba gratis",
+          loadingPlan:"Plan de suscripción",billingFrequency:"Frecuencia de cobro",trialLength:"Prueba gratis",
+          taxes:"Impuestos",dueToday:"Total de hoy",paymentHeading:"Datos de pago",secureLabel:"Protegido por Paddle",
+          preparing:"Preparando el formulario de pago seguro…",
+          missing:"No se encontró una transacción activa. Vuelve a los planes y elige una opción.",
           config:"El checkout aún no está configurado. Contacta con L30 Technology.",
-          load:"No se pudo cargar el checkout seguro. Comprueba tu conexión e inténtalo de nuevo.",
-          waiting:"Checkout seguro abierto. Completa el pago en la ventana de Paddle.",
-          completed:"Pago enviado. Esperamos la confirmación final antes de activar tu licencia.",
+          load:"No se pudo cargar el formulario seguro. Comprueba tu conexión e inténtalo de nuevo.",
+          loaded:"Tu formulario seguro está listo. Revisa el resumen del pedido antes de continuar.",
+          completed:"Pago enviado. Esperamos la confirmación final de Paddle antes de activar tu licencia.",
           closed:"Checkout cerrado. Puedes volver a los planes e intentarlo de nuevo.",
           failed:"No se pudo iniciar el checkout seguro. Contacta con L30 Technology.",
+          renewalNote:"Después de la prueba gratuita, tu suscripción se renovará automáticamente por el importe indicado, hasta que la canceles.",
+          firstCharge:"Primera renovación",perMonth:"Mensual",perYear:"Anual",perWeek:"Semanal",perDay:"Diario",
+          days:"días",weeks:"semanas",months:"meses",years:"años",trialNone:"Sin prueba gratuita",
           back:"← Volver a los planes",rights:"Todos los derechos reservados.",mainSite:"Sitio principal"
         }
       };
 
-      const language = (() => {
-        const saved = (localStorage.getItem("fc-language") || "en").toLowerCase();
-        return saved.startsWith("pt") ? "pt" : saved.startsWith("es") ? "es" : "en";
-      })();
+      const savedLanguage = (localStorage.getItem("fc-language") || "en").toLowerCase();
+      const language = savedLanguage.startsWith("pt") ? "pt" : savedLanguage.startsWith("es") ? "es" : "en";
+      const locale = language === "pt" ? "pt-BR" : language === "es" ? "es-ES" : "en-US";
       const t = (key) => translations[language][key] || translations.en[key];
-      document.documentElement.lang = language === "pt" ? "pt-BR" : language;
+      document.documentElement.lang = locale;
       document.querySelectorAll("[data-i18n]").forEach((element) => {
         element.textContent = t(element.dataset.i18n);
       });
-      document.getElementById("year").textContent = new Date().getFullYear();
+      document.getElementById("year").textContent = String(new Date().getFullYear());
 
       const status = document.getElementById("status");
       const setStatus = (key) => { status.textContent = t(key); };
       const transactionId = new URLSearchParams(window.location.search).get("_ptxn");
       const token = window.L30_PADDLE_CLIENT_TOKEN;
 
-      if (!transactionId) {
+      if (!transactionId || !/^txn_[a-zA-Z0-9]+$/.test(transactionId)) {
         setStatus("missing");
-        return;
+        throw new Error("Missing or invalid Paddle transaction ID.");
       }
       if (!token || token.startsWith("REPLACE_")) {
         setStatus("config");
@@ -199,6 +286,67 @@
         return;
       }
 
+      function formatMoney(amount, currency) {
+        const numericAmount = Number(amount);
+        if (!Number.isFinite(numericAmount)) return "—";
+        try {
+          return new Intl.NumberFormat(locale, {
+            style: "currency",
+            currency: currency || "USD"
+          }).format(numericAmount);
+        } catch {
+          return String(numericAmount);
+        }
+      }
+
+      function intervalLabel(cycle) {
+        if (!cycle || !cycle.interval) return t("perMonth");
+        const frequency = Number(cycle.frequency || 1);
+        const interval = cycle.interval;
+        if (frequency === 1) {
+          if (interval === "year") return t("perYear");
+          if (interval === "week") return t("perWeek");
+          if (interval === "day") return t("perDay");
+          return t("perMonth");
+        }
+        const unitKey = interval === "year" ? "years" : interval === "week" ? "weeks" : interval === "day" ? "days" : "months";
+        return frequency + " " + t(unitKey);
+      }
+
+      function trialLabel(trial) {
+        if (!trial || !trial.frequency || !trial.interval) return t("trialNone");
+        const frequency = Number(trial.frequency);
+        const unitKey = trial.interval === "year" ? "years" : trial.interval === "week" ? "weeks" : trial.interval === "day" ? "days" : "months";
+        return frequency + " " + t(unitKey);
+      }
+
+      function renderSummary(data) {
+        if (!data || !Array.isArray(data.items) || !data.items.length) return;
+        const currency = data.currency_code || "USD";
+        const item = data.items[0];
+        const productName = item.product && item.product.name ? item.product.name : "Floating Camera Pro";
+        const priceName = item.price_name || "";
+        const trial = item.trial_period || null;
+        const cycle = item.billing_cycle || null;
+        const recurring = data.recurring_totals || item.recurring_totals || {};
+        const totals = data.totals || {};
+        const recurringAmount = recurring.total != null ? recurring.total : (recurring.subtotal != null ? recurring.subtotal : null);
+        const todayAmount = totals.total != null ? totals.total : (totals.balance != null ? totals.balance : 0);
+        const taxAmount = recurring.tax != null ? recurring.tax : (totals.tax != null ? totals.tax : 0);
+
+        document.getElementById("productName").textContent = productName;
+        document.getElementById("planName").textContent = priceName || intervalLabel(cycle);
+        document.getElementById("recurringPrice").textContent = recurringAmount == null ? "—" : formatMoney(recurringAmount, currency) + " / " + intervalLabel(cycle).toLowerCase();
+        document.getElementById("billingFrequency").textContent = intervalLabel(cycle);
+        document.getElementById("trialLength").textContent = trialLabel(trial);
+        document.getElementById("taxAmount").textContent = formatMoney(taxAmount, currency);
+        document.getElementById("dueToday").textContent = formatMoney(todayAmount, currency);
+
+        const trialTitle = document.getElementById("trialTitle");
+        const prefix = trial ? t("trialPrefix") + " " + trialLabel(trial) : t("trialNone");
+        trialTitle.textContent = prefix;
+      }
+
       try {
         if (token.startsWith("test_")) window.Paddle.Environment.set("sandbox");
         const checkoutLocale = language === "pt" ? "pt-BR" : language === "es" ? "es" : "en";
@@ -206,23 +354,33 @@
           token,
           checkout: {
             settings: {
-              displayMode: "overlay",
+              displayMode: "inline",
+              frameTarget: "paddle-inline-checkout",
+              frameInitialHeight: "850",
+              frameStyle: "width:100%;min-width:312px;background-color:transparent;border:0;",
               theme: "dark",
-              locale: checkoutLocale
+              locale: checkoutLocale,
+              variant: "multi-page"
             }
           },
           eventCallback: (event) => {
-            if (event?.name === "checkout.loaded") {
-              setStatus("waiting");
-            } else if (event?.name === "checkout.completed") {
+            if (!event || !event.name) return;
+            if (event.name === "checkout.loaded" || event.name === "checkout.updated" || event.name === "checkout.items.updated" || event.name === "checkout.discount.applied" || event.name === "checkout.discount.removed") {
+              renderSummary(event.data);
+              setStatus("loaded");
+            } else if (event.name === "checkout.completed") {
               setStatus("completed");
-            } else if (event?.name === "checkout.closed") {
+            } else if (event.name === "checkout.closed") {
               setStatus("closed");
+            } else if (event.name === "checkout.error" || event.name === "checkout.warning") {
+              setStatus("failed");
             }
           }
         });
+
+        window.Paddle.Checkout.open({ transactionId });
       } catch (error) {
-        console.error("Paddle initialization failed", error);
+        console.error("Paddle inline checkout initialization failed", error);
         setStatus("failed");
       }
     })();
