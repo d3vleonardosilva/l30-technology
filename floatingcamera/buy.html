@@ -97,14 +97,14 @@
         <article class="pricing-card featured">
           <span class="tag" data-i18n="annualTag">BEST VALUE · 7-DAY FREE TRIAL</span>
           <h2 data-i18n="annualCardTitle">Annual Pro</h2>
-          <div class="price">US$ 1.25 <span class="detail" data-i18n="perMonth">/ month equivalent</span></div>
-          <p class="detail" data-i18n="annualBilling">US$ 14.99 billed annually after the free trial.</p>
+          <div class="price" data-localized-price-plan="annual">US$ 14.99 / year</div>
+          <p class="detail" data-i18n="annualBilling">Billed annually after the 7-day free trial.</p>
         </article>
         <article class="pricing-card">
           <span class="tag" data-i18n="monthlyTag">7-DAY FREE TRIAL</span>
           <h2 data-i18n="monthlyCardTitle">Monthly Pro</h2>
-          <div class="price">US$ 2.49 <span class="detail" data-i18n="perMonthActual">/ month</span></div>
-          <p class="detail" data-i18n="monthlyBilling">Billed monthly after the free trial.</p>
+          <div class="price" data-localized-price-plan="monthly">US$ 2.49 / month</div>
+          <p class="detail" data-i18n="monthlyBilling">Billed monthly after the 7-day free trial.</p>
         </article>
       </div>
       <p class="free-note" data-i18n="freeNote">Prefer not to subscribe? Keep using Floating Camera Free without an expiration date. Only the watermark remains.</p>
@@ -121,8 +121,8 @@
           <div>
             <label for="billingMode" data-i18n="billingMode">Billing option</label>
             <select id="billingMode">
-              <option value="annual_subscription" selected data-i18n="annualSubscription">Annual · US$ 1.25/month equivalent · US$ 14.99 billed yearly · 7-day free trial</option>
-              <option value="monthly_subscription" data-i18n="monthlySubscription">Monthly · US$ 2.49/month · 7-day free trial</option>
+              <option value="annual_subscription" selected data-i18n="annualSubscription" data-localized-price-option="annual">Annual · US$ 14.99/year · 7-day free trial</option>
+              <option value="monthly_subscription" data-i18n="monthlySubscription" data-localized-price-option="monthly">Monthly · US$ 2.49/month · 7-day free trial</option>
             </select>
           </div>
         </div>
@@ -219,13 +219,13 @@
           eyebrow:"FLOATING CAMERA PRO",title:"Remova a marca-d’água com o Pro",
           intro:"O Floating Camera Free é gratuito para sempre, com a marca-d’água L30 Technology. O Pro remove a marca e inclui 7 dias grátis.",
           annualTag:"MELHOR CUSTO-BENEFÍCIO · 7 DIAS GRÁTIS",annualCardTitle:"Pro anual",
-          perMonth:"/ mês equivalente",annualBilling:"US$ 14,99 cobrados anualmente após o período gratuito.",
+          perMonth:"/ mês equivalente",annualBilling:"Cobrança anual após o teste grátis de 7 dias.",
           monthlyTag:"7 DIAS GRÁTIS",monthlyCardTitle:"Pro mensal",perMonthActual:"/ mês",
-          monthlyBilling:"Cobrança mensal após o período gratuito.",
+          monthlyBilling:"Cobrança mensal após o teste grátis de 7 dias.",
           freeNote:"Prefere não assinar? Continue usando o Floating Camera Free sem prazo de validade. Apenas a marca-d’água permanece.",
           customerType:"Tipo de cliente",individual:"Pessoa física",business:"Empresa",billingMode:"Modalidade de cobrança",
           monthlySubscription:"Mensal · US$ 2,49/mês · 7 dias grátis",
-          annualSubscription:"Anual · equivalente a US$ 1,25/mês · US$ 14,99 cobrados por ano · 7 dias grátis",
+          annualSubscription:"Anual · US$ 14,99/ano · 7 dias grátis",
           companyName:"Razão social",companyPlaceholder:"Nome da empresa",seats:"Quantidade de dispositivos",
           seatsHint:"Cada dispositivo utiliza uma licença. Máximo de 100 por pedido.",account:"SUA CONTA L30",
           email:"Endereço de e-mail",password:"Senha",signinHint:"Entre na sua conta para continuar ao pagamento seguro.",
@@ -252,13 +252,13 @@
           eyebrow:"FLOATING CAMERA PRO",title:"Elimina la marca de agua con Pro",
           intro:"Floating Camera Free es gratis para siempre con la marca de agua de L30 Technology. Pro elimina la marca e incluye 7 días gratis.",
           annualTag:"MEJOR OFERTA · 7 DÍAS GRATIS",annualCardTitle:"Pro anual",
-          perMonth:"/ mes equivalente",annualBilling:"US$ 14,99 cobrados anualmente después del período gratuito.",
+          perMonth:"/ mes equivalente",annualBilling:"Cobro anual después de la prueba gratuita de 7 días.",
           monthlyTag:"7 DÍAS GRATIS",monthlyCardTitle:"Pro mensual",perMonthActual:"/ mes",
-          monthlyBilling:"Cobro mensual después del período gratuito.",
+          monthlyBilling:"Cobro mensual después de la prueba gratuita de 7 días.",
           freeNote:"¿Prefieres no suscribirte? Sigue usando Floating Camera Free sin fecha de vencimiento. Solo permanece la marca de agua.",
           customerType:"Tipo de cliente",individual:"Persona",business:"Empresa",billingMode:"Modalidad de pago",
           monthlySubscription:"Mensual · US$ 2,49/mes · 7 días gratis",
-          annualSubscription:"Anual · equivalente a US$ 1,25/mes · US$ 14,99 cobrados por año · 7 días gratis",
+          annualSubscription:"Anual · US$ 14,99/año · 7 días gratis",
           companyName:"Nombre legal de la empresa",companyPlaceholder:"Nombre de la empresa",seats:"Cantidad de dispositivos",
           seatsHint:"Cada dispositivo utiliza una licencia. Máximo de 100 por pedido.",account:"TU CUENTA L30",
           email:"Correo electrónico",password:"Contraseña",signinHint:"Inicia sesión para continuar al pago seguro.",
@@ -335,6 +335,7 @@
         document.documentElement.lang = language;
         $("language").value = language;
         localStorage.setItem("fc-language", language);
+        window.dispatchEvent(new Event("fc-language-changed"));
         document.querySelectorAll("[data-i18n]").forEach((el) => {
           const value = t(el.dataset.i18n);
           if (el.tagName === "OPTION") el.textContent = value;
@@ -516,5 +517,8 @@
       getClient();
     })();
   </script>
+  <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+  <script src="./paddle-config.js"></script>
+  <script src="./localized-pricing.js"></script>
 </body>
 </html>
