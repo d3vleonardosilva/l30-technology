@@ -292,9 +292,12 @@
           button.addEventListener("click", async () => {
             button.disabled = true;
             try {
-              await invoke({action:"toggle",id:button.dataset.toggle,is_active:button.dataset.active !== "true"});
+              const activating = button.dataset.active !== "true";
+              await invoke({action:"toggle",id:button.dataset.toggle,is_active:activating});
               await loadCoupons();
-              showNotice("Status do cupom atualizado.");
+              showNotice(activating
+                ? "Cupom ativado. Novas utilizações estão liberadas."
+                : "Cupom desativado. Novas utilizações bloqueadas; licenças já concedidas permanecem válidas até o vencimento ou cancelamento normal da assinatura.");
             } catch (error) {
               showNotice("Não foi possível alterar o cupom: " + error.message, true);
               button.disabled = false;
