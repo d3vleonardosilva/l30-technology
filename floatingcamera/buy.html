@@ -153,6 +153,11 @@
         <input id="email" type="email" autocomplete="email" required placeholder="name@company.com">
         <label for="password" data-i18n="password">Password</label>
         <input id="password" type="password" autocomplete="current-password" minlength="8" required>
+        <div class="hint" id="signupPasswordHint" data-i18n="signupPasswordHint" hidden>Use at least 8 characters, including an uppercase letter, a lowercase letter, and a special character.</div>
+        <div id="signupConfirmField" hidden>
+          <label for="signupPasswordConfirm" data-i18n="signupConfirmPassword">Confirm password</label>
+          <input id="signupPasswordConfirm" type="password" autocomplete="new-password" minlength="8">
+        </div>
         <div class="hint" id="authModeText" data-i18n="signinHint">Sign in to continue to secure payment.</div>
         <button class="switch" type="button" id="forgotPassword" data-i18n="forgotPassword">Forgot your password?</button>
 
@@ -168,6 +173,7 @@
         <p class="intro" data-i18n="recoveryIntro">Enter and confirm your new password.</p>
         <label for="newPassword" data-i18n="newPassword">New password</label>
         <input id="newPassword" type="password" autocomplete="new-password" minlength="8" required>
+        <div class="hint" data-i18n="signupPasswordHint">Use at least 8 characters, including an uppercase letter, a lowercase letter, and a special character.</div>
         <label for="confirmPassword" data-i18n="confirmPassword">Confirm new password</label>
         <input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" required>
         <div class="actions">
@@ -214,6 +220,9 @@
           cancelRecovery:"Back to sign in",recoveryEmailSent:"If an account exists for this address, a password reset email has been sent.",
           recoveryError:"Could not send the reset email. Check the address and try again.",
           passwordMismatch:"The passwords do not match.",passwordTooShort:"Use at least 8 characters.",
+          signupConfirmPassword:"Confirm password",
+          signupPasswordHint:"Use at least 8 characters, including an uppercase letter, a lowercase letter, and a special character.",
+          passwordRequirementsError:"Use at least 8 characters, at least one uppercase letter, one lowercase letter, and one special character.",
           passwordUpdated:"Password updated successfully. Please sign in again.",
           passwordUpdateError:"Could not update the password. Request a new reset link and try again.",
           checkoutError:"Could not start checkout. Please try again or contact support.",
@@ -250,6 +259,9 @@
           cancelRecovery:"Voltar para entrar",recoveryEmailSent:"Se existir uma conta com esse endereço, enviaremos um e-mail para redefinir a senha.",
           recoveryError:"Não foi possível enviar o e-mail. Confira o endereço e tente novamente.",
           passwordMismatch:"As senhas não coincidem.",passwordTooShort:"Use pelo menos 8 caracteres.",
+          signupConfirmPassword:"Confirme a senha",
+          signupPasswordHint:"Use pelo menos 8 caracteres, incluindo uma letra maiúscula, uma letra minúscula e um caractere especial.",
+          passwordRequirementsError:"A senha deve ter pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula e um caractere especial.",
           passwordUpdated:"Senha atualizada com sucesso. Entre novamente.",
           passwordUpdateError:"Não foi possível atualizar a senha. Solicite um novo link e tente novamente.",
           checkoutError:"Não foi possível iniciar o pagamento. Tente novamente ou fale com o suporte.",
@@ -286,6 +298,9 @@
           cancelRecovery:"Volver al inicio de sesión",recoveryEmailSent:"Si existe una cuenta con esta dirección, enviaremos un correo para restablecer la contraseña.",
           recoveryError:"No se pudo enviar el correo. Comprueba la dirección e inténtalo de nuevo.",
           passwordMismatch:"Las contraseñas no coinciden.",passwordTooShort:"Usa al menos 8 caracteres.",
+          signupConfirmPassword:"Confirma la contraseña",
+          signupPasswordHint:"Usa al menos 8 caracteres, incluyendo una letra mayúscula, una minúscula y un carácter especial.",
+          passwordRequirementsError:"La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula y un carácter especial.",
           passwordUpdated:"Contraseña actualizada. Inicia sesión de nuevo.",
           passwordUpdateError:"No se pudo actualizar la contraseña. Solicita un nuevo enlace e inténtalo otra vez.",
           checkoutError:"No se pudo iniciar el pago. Inténtalo de nuevo o contacta con soporte.",
@@ -316,6 +331,13 @@
       const recoveryForm = $("recoveryForm"), forgotPassword = $("forgotPassword");
       let authClient = null;
       const t = (key) => translations[language][key] || translations.en[key];
+      const SPECIAL_PASSWORD_CHARACTERS = "!@#$%^&*()_+-=[]{};':" + String.fromCharCode(34, 92) + "|<>?,./" + String.fromCharCode(96) + "~";
+      function passwordMeetsPolicy(password) {
+        return password.length >= 8 &&
+          /[A-Z]/.test(password) &&
+          /[a-z]/.test(password) &&
+          [...password].some((character) => SPECIAL_PASSWORD_CHARACTERS.includes(character));
+      }
 
       function getClient() {
         if (authClient) return authClient;
@@ -361,6 +383,11 @@
         });
         $("authModeText").textContent = t(creatingAccount ? "signupHint" : "signinHint");
         $("toggleAuth").textContent = t(creatingAccount ? "haveAccount" : "createAccount");
+        $("signupPasswordHint").hidden = !creatingAccount;
+        $("signupConfirmField").hidden = !creatingAccount;
+        $("signupPasswordConfirm").required = creatingAccount;
+        $("signupPasswordConfirm").autocomplete = "new-password";
+        $("password").autocomplete = creatingAccount ? "new-password" : "current-password";
         forgotPassword.hidden = creatingAccount;
         submit.textContent = t(creatingAccount ? "createAccount" : "continue");
       }
@@ -378,7 +405,7 @@
       });
       $("toggleAuth").addEventListener("click", () => {
         creatingAccount = !creatingAccount;
-        $("password").autocomplete = creatingAccount ? "new-password" : "current-password";
+        if (!creatingAccount) $("signupPasswordConfirm").value = "";
         applyLanguage();
         showMessage("");
       });
@@ -423,7 +450,7 @@
         event.preventDefault();
         const password = $("newPassword").value;
         const confirmation = $("confirmPassword").value;
-        if (password.length < 8) { showMessage(t("passwordTooShort"), true); return; }
+        if (!passwordMeetsPolicy(password)) { showMessage(t("passwordRequirementsError"), true); $("newPassword").focus(); return; }
         if (password !== confirmation) { showMessage(t("passwordMismatch"), true); return; }
         const client = getClient();
         if (!client) { showMessage(t("configMissing"), true); return; }
@@ -472,6 +499,20 @@
           if (!client) { showMessage(t("configMissing"), true); return; }
           const email = $("email").value.trim();
           const password = $("password").value;
+
+          if (creatingAccount) {
+            const passwordConfirmation = $("signupPasswordConfirm").value;
+            if (!passwordMeetsPolicy(password)) {
+              showMessage(t("passwordRequirementsError"), true);
+              $("password").focus();
+              return;
+            }
+            if (password !== passwordConfirmation) {
+              showMessage(t("passwordMismatch"), true);
+              $("signupPasswordConfirm").focus();
+              return;
+            }
+          }
 
           if (creatingAccount) {
             const { data, error } = await client.auth.signUp({
