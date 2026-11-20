@@ -25,10 +25,16 @@
     #notice{display:none;padding:12px 14px;border:1px solid var(--line);border-radius:10px;color:var(--muted);margin:16px 0;white-space:pre-wrap}
     #notice.show{display:block}#notice.error{border-color:#9a4a59;color:#ffd9df}
     #adminPanel[hidden],#loginCard[hidden]{display:none}
-    .table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:760px}th,td{padding:12px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+    .table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:850px}th,td{padding:12px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
     th{font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}td{font-size:13px}
     .code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:#9deefa;font-weight:800;letter-spacing:.04em}
     .status{display:inline-block;padding:4px 9px;border-radius:20px;font-size:11px;font-weight:800}.on{background:#123b34;color:#8ceac6}.off{background:#44212a;color:#ffadb7}
+    .coupon-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+    dialog.edit-dialog{width:min(720px,calc(100% - 24px));max-height:calc(100% - 32px);overflow:auto;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:18px;padding:clamp(18px,4vw,28px);box-shadow:0 24px 80px #0009}
+    dialog.edit-dialog::backdrop{background:#020611c9;backdrop-filter:blur(3px)}
+    dialog.edit-dialog h2{margin:0}
+    dialog.edit-dialog .dialog-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    dialog.edit-dialog .dialog-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
     .muted{color:var(--muted)}.empty{text-align:center;color:var(--muted);padding:28px}
     footer{text-align:center;color:var(--muted);font-size:12px;margin:32px 0}
     @media(max-width:680px){.grid{grid-template-columns:1fr}.nav{padding:12px 17px}.nav .links{font-size:12px}}
@@ -122,6 +128,52 @@
         </div>
       </section>
     </div>
+
+    <dialog id="editDialog" class="edit-dialog" aria-labelledby="editTitle">
+      <form id="editCouponForm">
+        <div class="dialog-heading">
+          <h2 id="editTitle">Editar cupom</h2>
+          <button id="closeEditButton" type="button" aria-label="Fechar">Fechar</button>
+        </div>
+        <p class="hint">As alterações valem para novas utilizações. Usos já resgatados e pedidos em andamento são preservados.</p>
+        <input id="editCouponId" type="hidden">
+        <div class="grid">
+          <div class="field">
+            <label for="editCouponCode">Código *</label>
+            <input id="editCouponCode" maxlength="40" minlength="3" pattern="[A-Za-z0-9_-]{3,40}" required>
+          </div>
+          <div class="field">
+            <label for="editTrialDays">Dias grátis *</label>
+            <input id="editTrialDays" type="number" min="1" max="365" step="1" required>
+          </div>
+          <div class="field">
+            <label for="editMaxRedemptions">Limite de utilizações</label>
+            <input id="editMaxRedemptions" type="number" min="1" max="100000" step="1" placeholder="Ilimitado">
+          </div>
+          <div class="field">
+            <label for="editValidUntil">Validade até</label>
+            <input id="editValidUntil" type="datetime-local">
+          </div>
+          <div class="field">
+            <label for="editBillingMode">Plano permitido</label>
+            <select id="editBillingMode">
+              <option value="all">Mensal e anual</option>
+              <option value="monthly_subscription">Somente mensal</option>
+              <option value="annual_subscription">Somente anual</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="editDescription">Descrição interna</label>
+            <input id="editDescription" maxlength="240" placeholder="Campanha promocional">
+          </div>
+        </div>
+        <p class="hint">O limite não pode ficar abaixo das utilizações já resgatadas ou reservadas.</p>
+        <div class="dialog-actions">
+          <button class="primary" id="saveEditButton" type="submit">Salvar alterações</button>
+          <button id="cancelEditButton" type="button">Cancelar</button>
+        </div>
+      </form>
+    </dialog>
     <footer>Ambiente de homologação · Paddle Sandbox · Supabase staging</footer>
   </main>
   <script>
@@ -130,6 +182,7 @@
       const notice = $("notice");
       let client = null;
       let busy = false;
+      let couponCache = [];
       const html = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({
         "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
       })[c]);
@@ -185,16 +238,35 @@
         if (!value) return "Sem vencimento";
         return new Date(value).toLocaleString("pt-BR");
       }
+      function toDateTimeLocal(value) {
+        if (!value) return "";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "";
+        const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+        return localDate.toISOString().slice(0, 16);
+      }
       function planName(value) {
         return value === "monthly_subscription" ? "Mensal" : value === "annual_subscription" ? "Anual" : "Todos";
       }
+      function openEditCoupon(coupon) {
+        $("editCouponId").value = coupon.id;
+        $("editCouponCode").value = coupon.code || "";
+        $("editTrialDays").value = coupon.trial_days ?? 15;
+        $("editMaxRedemptions").value = coupon.max_redemptions ?? "";
+        $("editValidUntil").value = toDateTimeLocal(coupon.valid_until);
+        $("editBillingMode").value = coupon.billing_mode || "all";
+        $("editDescription").value = coupon.description || "";
+        $("editDialog").showModal();
+        $("editCouponCode").focus();
+      }
       function renderCoupons(coupons) {
         const rows = $("couponRows");
-        if (!coupons?.length) {
+        couponCache = Array.isArray(coupons) ? coupons : [];
+        if (!couponCache.length) {
           rows.innerHTML = '<tr><td colspan="7" class="empty">Nenhum cupom cadastrado.</td></tr>';
           return;
         }
-        rows.innerHTML = coupons.map((coupon) => {
+        rows.innerHTML = couponCache.map((coupon) => {
           const count = Number(coupon.redeemed_count || 0);
           const pending = Number(coupon.reserved_count || 0);
           const limit = coupon.max_redemptions == null ? "Ilimitado" : String(coupon.max_redemptions);
@@ -206,9 +278,16 @@
             '<td>' + html(formatDate(coupon.valid_until)) + '</td>' +
             '<td>' + html(planName(coupon.billing_mode)) + '</td>' +
             '<td><span class="status ' + (active ? "on" : "off") + '">' + (active ? "Ativo" : "Inativo") + '</span></td>' +
-            '<td><button type="button" data-toggle="' + html(coupon.id) + '" data-active="' + String(active) + '">' + (active ? "Desativar" : "Ativar") + '</button></td>' +
+            '<td><div class="coupon-actions"><button type="button" data-edit="' + html(coupon.id) + '">Editar</button>' +
+            '<button type="button" data-toggle="' + html(coupon.id) + '" data-active="' + String(active) + '">' + (active ? "Desativar" : "Ativar") + '</button></div></td>' +
           '</tr>';
         }).join("");
+        rows.querySelectorAll("[data-edit]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const coupon = couponCache.find((item) => item.id === button.dataset.edit);
+            if (coupon) openEditCoupon(coupon);
+          });
+        });
         rows.querySelectorAll("[data-toggle]").forEach((button) => {
           button.addEventListener("click", async () => {
             button.disabled = true;
@@ -299,6 +378,50 @@
         field.value = field.value.toUpperCase().replace(/[^A-Z0-9_-]/g, "");
         field.setSelectionRange(start,start);
       });
+      $("editCouponCode").addEventListener("input", () => {
+        const field = $("editCouponCode");
+        const start = field.selectionStart;
+        field.value = field.value.toUpperCase().replace(/[^A-Z0-9_-]/g, "");
+        field.setSelectionRange(start, start);
+      });
+      function closeEditDialog() {
+        if ($("editDialog").open) $("editDialog").close();
+      }
+      $("closeEditButton").addEventListener("click", closeEditDialog);
+      $("cancelEditButton").addEventListener("click", closeEditDialog);
+      $("editCouponForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (busy) return;
+        busy = true;
+        $("saveEditButton").disabled = true;
+        try {
+          const validUntilValue = $("editValidUntil").value;
+          await invoke({
+            action: "update",
+            id: $("editCouponId").value,
+            code: $("editCouponCode").value.trim().toUpperCase(),
+            trial_days: Number($("editTrialDays").value),
+            max_redemptions: $("editMaxRedemptions").value === "" ? null : Number($("editMaxRedemptions").value),
+            valid_until: validUntilValue ? new Date(validUntilValue).toISOString() : null,
+            billing_mode: $("editBillingMode").value,
+            description: $("editDescription").value.trim()
+          });
+          closeEditDialog();
+          await loadCoupons();
+          showNotice("Cupom atualizado. As alterações valem para novas utilizações.");
+        } catch (error) {
+          const message = error.message === "coupon_code_exists" ? "Este código já está em uso."
+            : error.message === "invalid_coupon_code" ? "Use de 3 a 40 caracteres: letras, números, hífen ou sublinhado."
+            : error.message === "coupon_limit_below_usage" ? "O limite não pode ser menor que a quantidade já resgatada ou reservada."
+            : error.message === "coupon_not_found" ? "Este cupom não foi encontrado. Atualize a lista."
+            : "Não foi possível salvar as alterações: " + error.message;
+          showNotice(message, true);
+        } finally {
+          busy = false;
+          $("saveEditButton").disabled = false;
+        }
+      });
+
       $("couponForm").addEventListener("submit", async (event) => {
         event.preventDefault();
         if (busy) return;
