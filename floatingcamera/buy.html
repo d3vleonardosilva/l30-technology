@@ -547,7 +547,9 @@
               organization_name: customer === "business" ? $("companyName").value.trim() : undefined,
               country_code: undefined,
               currency_code: language === "pt" ? "BRL" : "USD",
-              coupon_code: $("couponCode").value.trim().toUpperCase() || undefined
+              coupon_code: $("couponCode").value.trim().toUpperCase() || undefined,
+              terms_accepted: $("termsAccepted").checked,
+              privacy_acknowledged: $("termsAccepted").checked
             }
           });
           if (error) {
