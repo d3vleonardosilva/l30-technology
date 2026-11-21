@@ -47,7 +47,7 @@
     .recovery-panel[hidden]{display:none}
     #message{display:none;margin-top:18px;padding:13px 15px;border:1px solid var(--line);border-radius:11px;color:var(--muted);white-space:pre-wrap}
     #message.show{display:block}#message.error{border-color:#a94e5a;color:#ffd9de}
-    .company-fields[hidden]{display:none}.divider{height:1px;background:var(--line);margin:24px 0}
+    .company-fields[hidden]{display:none}.divider{height:1px;background:var(--line);margin:24px 0}.policy-consent{margin:18px 0 8px;padding:14px;border:1px solid var(--line);border-radius:11px;background:#0c1422}.policy-consent label{display:flex;align-items:flex-start;gap:10px;font-size:13px;font-weight:500;margin:0}.policy-consent input{width:auto;flex:0 0 auto;margin:4px 0 0;accent-color:var(--cyan)}.policy-links{font-size:12px;color:var(--muted);margin:8px 0 0 28px}.policy-links a{color:var(--cyan);text-decoration:underline;text-underline-offset:3px}
     .pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0 26px}
     .pricing-card{border:1px solid var(--line);border-radius:14px;background:#0c1422;padding:16px}
     .pricing-card.featured{border-color:#42b9a9;box-shadow:0 0 0 1px #42b9a955}
@@ -161,6 +161,10 @@
         <div class="hint" id="authModeText" data-i18n="signinHint">Sign in to continue to secure payment.</div>
         <button class="switch" type="button" id="forgotPassword" data-i18n="forgotPassword">Forgot your password?</button>
 
+        <div class="policy-consent">
+          <label for="termsAccepted"><input id="termsAccepted" type="checkbox" required><span data-i18n="acceptLead">I have read and agree to the Terms and Conditions and Refund and Cancellation Policy, and acknowledge the Privacy Policy.</span></label>
+          <div class="policy-links"><a href="terms.html" target="_blank" rel="noopener" data-i18n="termsText">Terms and Conditions</a> · <a href="privacy.html" target="_blank" rel="noopener" data-i18n="privacyText">Privacy Policy</a> · <a href="refund.html" target="_blank" rel="noopener" data-i18n="refundText">Refund and Cancellation Policy</a></div>
+        </div>
         <div class="actions">
           <button class="primary" type="submit" id="submitButton" data-i18n="continue">Continue to secure checkout</button>
         </div>
@@ -186,7 +190,7 @@
     </section>
     <footer>
       <span data-i18n="footer">Payments are processed securely. Floating Camera does not upload camera video.</span><br>
-      <a href="./" data-i18n="back">Back to L30 Technology</a> · <a href="mailto:contact@l30.tec.br">contact@l30.tec.br</a>
+      <a href="./" data-i18n="back">Back to L30 Technology</a> · <a href="terms.html" data-i18n="termsText">Terms and Conditions</a> · <a href="privacy.html" data-i18n="privacyText">Privacy Policy</a> · <a href="refund.html" data-i18n="refundText">Refund and Cancellation Policy</a> · <a href="mailto:contact@l30.tec.br">contact@l30.tec.br</a>
     </footer>
   </main>
 
@@ -229,6 +233,7 @@
           checkoutWait:"Preparing your secure checkout…",signinError:"Unable to sign in. Check your email and password.",
           signupError:"Unable to create your account. Check the details and try again.",
           couponCode:"Promotional code (optional)",couponHint:"Enter a promotional code to receive a different free-trial period.",
+          acceptLead:"I have read and agree to the Terms and Conditions and Refund and Cancellation Policy, and acknowledge the Privacy Policy.",termsText:"Terms and Conditions",privacyText:"Privacy Policy",refundText:"Refund and Cancellation Policy",
           couponError:"This promotional code is invalid, expired, already used, or unavailable for this plan.",
           couponPermissionError:"The promotional trial could not be prepared. The L30 administrator must enable price read/write permissions on the Paddle Sandbox API key."
         },
@@ -268,6 +273,7 @@
           checkoutWait:"Preparando seu pagamento seguro…",signinError:"Não foi possível entrar. Confira seu e-mail e senha.",
           signupError:"Não foi possível criar sua conta. Confira os dados e tente novamente.",
           couponCode:"Código promocional (opcional)",couponHint:"Informe um código promocional para receber um período de teste diferente.",
+          acceptLead:"Li e aceito os Termos e Condições e a Política de Reembolso e Cancelamento, e declaro ciência da Política de Privacidade.",termsText:"Termos e Condições",privacyText:"Política de Privacidade",refundText:"Política de Reembolso e Cancelamento",
           couponError:"Este código promocional é inválido, expirou, já foi utilizado ou não está disponível para este plano.",
           couponPermissionError:"Não foi possível preparar o teste promocional. O administrador L30 precisa habilitar as permissões de leitura e gravação de preços na chave Paddle Sandbox."
         },
@@ -307,6 +313,7 @@
           checkoutWait:"Preparando tu pago seguro…",signinError:"No se pudo iniciar sesión. Comprueba tu correo y contraseña.",
           signupError:"No se pudo crear la cuenta. Comprueba los datos e inténtalo de nuevo.",
           couponCode:"Código promocional (opcional)",couponHint:"Introduce un código promocional para recibir un período de prueba diferente.",
+          acceptLead:"He leído y acepto los Términos y Condiciones y la Política de Reembolsos y Cancelación, y reconozco la Política de Privacidad.",termsText:"Términos y Condiciones",privacyText:"Política de Privacidad",refundText:"Política de Reembolsos y Cancelación",
           couponError:"Este código promocional no es válido, ha caducado, ya se utilizó o no está disponible para este plan.",
           couponPermissionError:"No se pudo preparar la prueba promocional. El administrador L30 debe habilitar los permisos de lectura y escritura de precios en la clave Paddle Sandbox."
         }
