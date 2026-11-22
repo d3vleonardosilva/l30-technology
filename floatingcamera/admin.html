@@ -115,7 +115,7 @@
             <button class="primary" id="createButton" type="submit">Cadastrar cupom</button>
             <button id="preparePricesButton" type="button">Testar Paddle para este prazo</button>
           </div>
-          <p class="hint">O teste verifica as permissões da chave Paddle Sandbox e prepara os preços de teste para os planos mensal e anual. Não cria cobranças. Para cupons sem cobrança, não é necessário testar a Paddle.</p>
+          <p class="hint">Esta verificação consulta a configuração Paddle do ambiente ativo e prepara preços promocionais para os planos mensal e anual. Não cria cobranças. Para licenças gratuitas sem cartão, não é necessário executar a verificação.</p>
         </form>
       </section>
 
@@ -176,7 +176,7 @@
         </div>
       </form>
     </dialog>
-    <footer>Ambiente de homologação · Paddle Sandbox · Supabase staging</footer>
+    <footer>Administração de produção · Supabase Production · Paddle Live</footer>
   </main>
   <script>
     (() => {
@@ -365,13 +365,13 @@
           const trialDays = Number($("trialDays").value);
           const result = await invoke({action:"prepare_trial_prices",trial_days:trialDays});
           const newCount = (result.prepared || []).filter((item) => item.created_now).length;
-          showNotice("Integração Paddle Sandbox aprovada para " + trialDays + " dias. " +
+          showNotice("Integração Paddle aprovada para " + trialDays + " dias. " +
             result.prepared.length + " preço(s) disponíveis; " + newCount + " criado(s) agora. Nenhuma cobrança foi feita.");
         } catch (error) {
           const message = error.message === "paddle_price_read_permission_missing"
-            ? "A chave da Paddle não tem a permissão price.read. Gere/atualize a chave Sandbox com essa permissão."
+            ? "A chave Paddle do ambiente ativo não tem permissão price.read. Atualize as permissões da chave no painel Paddle."
             : error.message === "paddle_price_write_permission_missing"
-              ? "A chave da Paddle não tem a permissão price.write. Gere/atualize a chave Sandbox com essa permissão."
+              ? "A chave Paddle do ambiente ativo não tem permissão price.write. Atualize as permissões da chave no painel Paddle."
               : "Não foi possível preparar os preços: " + error.message;
           showNotice(message, true);
         } finally {
