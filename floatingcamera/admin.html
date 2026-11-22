@@ -115,7 +115,7 @@
             <button class="primary" id="createButton" type="submit">Cadastrar cupom</button>
             <button id="preparePricesButton" type="button">Testar Paddle para este prazo</button>
           </div>
-          <p class="hint">O teste verifica as permissões da chave Paddle Sandbox e prepara os preços de teste para os planos mensal e anual. Não cria cobranças.</p>
+          <p class="hint">O teste verifica as permissões da chave Paddle Sandbox e prepara os preços de teste para os planos mensal e anual. Não cria cobranças. Para cupons sem cobrança, não é necessário testar a Paddle.</p>
         </form>
       </section>
 
@@ -276,7 +276,7 @@
           const active = coupon.is_active === true;
           return '<tr>' +
             '<td><span class="code">' + html(coupon.code) + '</span><div class="hint">' + html(coupon.description || "") + '</div></td>' +
-            '<td>' + html(coupon.trial_days) + ' dias<div class="hint">' + (coupon.grant_mode === 'complimentary_license' ? 'Sem cobrança (resgate em preparação)' : 'Assinatura Paddle') + '</div></td>' +
+            '<td>' + html(coupon.trial_days) + ' dias<div class="hint">' + (coupon.grant_mode === 'complimentary_license' ? 'Sem cartão / sem cobrança' : 'Assinatura Paddle') + '</div></td>' +
             '<td>' + count + ' / ' + html(limit) + (pending ? '<div class="hint">' + pending + ' reserva(s) em andamento</div>' : '') + '</td>' +
             '<td>' + html(formatDate(coupon.valid_until)) + '</td>' +
             '<td>' + html(planName(coupon.billing_mode)) + '</td>' +
@@ -449,7 +449,7 @@
           $("trialDays").value = 15;
           $("billingMode").value = "all";
           await loadCoupons();
-          showNotice("Cupom cadastrado. Cupons sem cobrança só poderão ser resgatados após a integração da ativação gratuita.");
+          showNotice("Cupom cadastrado. Cupons gratuitos são resgatados em redeem.html, sem checkout.");
         } catch (error) {
           const message = error.message === "coupon_code_exists" ? "Este código já existe."
             : error.message === "invalid_coupon_code" ? "Use de 3 a 40 caracteres: letras, números, hífen ou sublinhado."
