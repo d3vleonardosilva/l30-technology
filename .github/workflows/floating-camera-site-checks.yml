@@ -1,0 +1,47 @@
+name: Floating Camera site checks
+
+on:
+  push:
+    branches: ["licensing-v2"]
+  pull_request:
+    branches: ["main", "licensing-v2"]
+
+permissions:
+  contents: read
+
+jobs:
+  javascript-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check inline JavaScript syntax
+        run: |
+          node <<'NODE'
+          const fs = require("node:fs");
+          const files = [
+            "floatingcamera/index.html",
+            "floatingcamera/buy.html",
+            "floatingcamera/pay.html",
+          ];
+
+          for (const file of files) {
+            const html = fs.readFileSync(file, "utf8");
+            const inlineScripts = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi)];
+            for (const [index, match] of inlineScripts.entries()) {
+              try {
+                new Function(match[1]);
+              } catch (error) {
+                console.error(file + " inline script #" + (index + 1) + " failed:", error.message);
+                process.exitCode = 1;
+              }
+            }
+            console.log("Checked " + file + " (" + inlineScripts.length + " inline scripts)");
+          }
+          NODE

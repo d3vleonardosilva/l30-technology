@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080d17">
+  <meta name="description" content="Use Floating Camera Free forever with a watermark, or try Pro free for 7 days. Choose monthly or annual billing.">
+  <title>Floating Camera Pro · Monthly or annual plan · L30 Technology</title>
+  <style>
+    :root{--bg:#080d17;--ink:#f5f9ff;--muted:#a9b7cd;--line:#29374d;--cyan:#68e5f3;--blue:#579bff;--surface:#111b2c;--max:760px}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+    a{color:var(--cyan);text-decoration:none}.wrap{width:min(var(--max),calc(100% - 36px));margin:0 auto;padding:48px 0}
+    header{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:34px}
+    .brand{font-weight:750;letter-spacing:.02em}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:.18em}
+    .language{background:#111e31;color:#e8f3ff;border:1px solid #35445c;padding:10px 12px;border-radius:12px;font-size:12px;font-weight:800;width:auto;min-width:72px;font-family:inherit;line-height:1.35;letter-spacing:normal;cursor:pointer}
+    .site-topbar{position:sticky;top:0;z-index:50;background:#080f1ded;border-bottom:1px solid #ffffff13;backdrop-filter:blur(20px)}
+    .site-nav{width:min(1180px,calc(100% - 48px));min-height:78px;margin:0 auto;display:flex;align-items:center;gap:28px}
+    .site-brand{display:flex;align-items:center;gap:11px;flex-shrink:0;color:var(--ink);font-size:17px;font-weight:800;line-height:1.1;letter-spacing:-.035em;text-decoration:none}
+    .site-brand img{width:45px;height:45px;border-radius:13px;object-fit:cover}
+    .site-brand small{display:block;color:#8daac7;letter-spacing:.2em;font-size:9px;margin-top:6px}
+    .site-navlinks{display:flex;gap:28px;align-items:center;margin-left:auto}
+    .site-navlinks a{font-size:13px;font-weight:650;color:#c1cee0;text-decoration:none}
+    .site-navlinks a:hover{color:var(--cyan)}
+    .site-navright{display:flex;align-items:center;gap:11px}
+    .site-cta{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:10px 16px;border-radius:13px;border:1px solid transparent;background:linear-gradient(105deg,#66b6ff,#7ce9ed);color:#071321;text-decoration:none;font-weight:750;font-size:13px;line-height:1.35;white-space:nowrap;box-shadow:0 12px 35px #2b8ed02c;transition:transform .2s}
+    .site-cta:hover{transform:translateY(-2px)}
+    .site-menu{display:none;align-items:center;justify-content:center;background:#152439;border:1px solid #344861;border-radius:10px;width:42px;height:42px;padding:0;color:white;font-size:22px}
+    .card{padding:clamp(22px,5vw,38px);background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:0 20px 70px #0004}
+    .eyebrow{color:var(--cyan);font-size:12px;font-weight:750;letter-spacing:.16em;text-transform:uppercase}
+    h1{font-size:clamp(30px,6vw,44px);line-height:1.12;margin:10px 0 12px}
+    .intro{color:var(--muted);margin:0 0 26px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    label{display:block;font-size:14px;font-weight:650;margin:16px 0 7px}
+    input,select{width:100%;border:1px solid #3a4b64;border-radius:10px;background:#0c1422;color:var(--ink);padding:12px 13px;font:inherit}
+    input:focus,select:focus{outline:2px solid var(--cyan);outline-offset:1px}
+    .choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .choice{border:1px solid var(--line);border-radius:12px;padding:13px;background:#0c1422;display:flex;gap:9px;align-items:flex-start}
+    .choice input{width:auto;margin:4px 0 0;accent-color:var(--cyan)}
+    .choice span{font-size:14px}.choice strong{display:block}
+    .hint{font-size:12px;color:var(--muted);margin-top:6px}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+    button{border:1px solid var(--line);border-radius:11px;padding:12px 18px;background:#17263a;color:var(--ink);font:inherit;font-weight:750;cursor:pointer}
+    button.primary{background:linear-gradient(100deg,#2b769a,#2d63a5);border-color:transparent;flex:1}
+    button:disabled{opacity:.55;cursor:not-allowed}
+    .switch{background:none;border:0;color:var(--cyan);padding:8px 0}
+    .recovery-title{font-size:22px;line-height:1.2;margin:10px 0 12px}
+    .recovery-panel[hidden]{display:none}
+    #message{display:none;margin-top:18px;padding:13px 15px;border:1px solid var(--line);border-radius:11px;color:var(--muted);white-space:pre-wrap}
+    #message.show{display:block}#message.error{border-color:#a94e5a;color:#ffd9de}
+    .company-fields[hidden]{display:none}.divider{height:1px;background:var(--line);margin:24px 0}.policy-consent{margin:18px 0 8px;padding:14px;border:1px solid var(--line);border-radius:11px;background:#0c1422}.policy-consent label{display:flex;align-items:flex-start;gap:10px;font-size:13px;font-weight:500;margin:0}.policy-consent input{width:auto;flex:0 0 auto;margin:4px 0 0;accent-color:var(--cyan)}.policy-links{font-size:12px;color:var(--muted);margin:8px 0 0 28px}.policy-links a{color:var(--cyan);text-decoration:underline;text-underline-offset:3px}
+    .pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0 26px}
+    .pricing-card{border:1px solid var(--line);border-radius:14px;background:#0c1422;padding:16px}
+    .pricing-card.featured{border-color:#42b9a9;box-shadow:0 0 0 1px #42b9a955}
+    .pricing-card h2{font-size:16px;margin:8px 0}
+    .pricing-card .price{font-size:28px;line-height:1.2;font-weight:800;letter-spacing:-.04em}
+    .pricing-card .detail{font-size:13px;color:var(--muted);margin:5px 0}
+    .pricing-card .tag{display:inline-block;border-radius:20px;background:#163a3a;color:#91f3d7;padding:4px 9px;font-size:11px;font-weight:800}
+    .free-note{border:1px solid var(--line);background:#0c1422;color:var(--muted);padding:12px 14px;border-radius:11px;font-size:13px;margin:0 0 22px}
+    footer{text-align:center;color:var(--muted);font-size:12px;margin-top:24px}
+    @media(max-width:1020px){.site-navlinks{gap:15px}.site-nav{gap:18px}}
+    @media(max-width:800px){.site-nav{min-height:70px}.site-menu{display:flex}.site-navright{margin-left:auto}.site-navlinks{display:none;position:absolute;top:69px;left:0;right:0;background:#0d192a;border-bottom:1px solid #30445b;padding:18px 24px;flex-direction:column;align-items:stretch;gap:0}.site-navlinks.open{display:flex}.site-navlinks a{padding:12px 0}.site-cta{display:none}}
+    @media(max-width:560px){.grid,.choices,.pricing-grid{grid-template-columns:1fr}.wrap{padding:28px 0}.site-nav{width:calc(100% - 34px)}.site-brand{font-size:14px}.site-brand img{width:37px;height:37px}.site-brand small{font-size:8px}.language{padding:9px 8px}.site-navright{gap:7px}}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./supabase-config.js"></script>
+</head>
+<body>
+  <header class="site-topbar">
+    <nav class="site-nav" aria-label="Primary navigation">
+      <a class="site-brand" href="index.html#top" aria-label="Floating Camera home">
+        <img src="assets/floating-camera.png" alt="">
+        <span>Floating Camera<small>BY L30 TECHNOLOGY</small></span>
+      </a>
+      <div class="site-navlinks" id="siteNavlinks">
+        <a href="index.html#features" data-i18n="nav_features">Features</a>
+        <a href="index.html#how" data-i18n="nav_how">How it works</a>
+        <a href="index.html#licensing" data-i18n="nav_license">Licensing</a>
+        <a href="index.html#faq" data-i18n="nav_faq">FAQ</a>
+        <a href="index.html#contact" data-i18n="nav_contact">Contact</a>
+      </div>
+      <div class="site-navright">
+        <select class="language" id="language" aria-label="Language">
+          <option value="en">🇬🇧 EN</option><option value="pt">🇧🇷 PT</option><option value="es">🇪🇸 ES</option>
+        </select>
+        <a href="#purchaseForm" class="site-cta" data-i18n="nav_cta">Get started ↗</a>
+        <button class="site-menu" id="siteMenu" type="button" aria-controls="siteNavlinks" aria-expanded="false" aria-label="Open menu">☰</button>
+      </div>
+    </nav>
+  </header>
+  <main class="wrap">
+
+    <section class="card">
+      <div class="eyebrow" data-i18n="eyebrow">FLOATING CAMERA PRO</div>
+      <h1 data-i18n="title">Remove the watermark with Pro</h1>
+      <p class="intro" data-i18n="intro">Floating Camera Free is available forever with the L30 Technology watermark. Pro removes the watermark and includes a 7-day free trial.</p>
+      <div class="pricing-grid">
+        <article class="pricing-card featured">
+          <span class="tag" data-i18n="annualTag">BEST VALUE · 7-DAY FREE TRIAL</span>
+          <h2 data-i18n="annualCardTitle">Annual Pro</h2>
+          <div class="price" data-localized-price-plan="annual">US$ 14.99 / year</div>
+          <p class="detail" data-i18n="annualBilling">Billed annually after the 7-day free trial.</p>
+        </article>
+        <article class="pricing-card">
+          <span class="tag" data-i18n="monthlyTag">7-DAY FREE TRIAL</span>
+          <h2 data-i18n="monthlyCardTitle">Monthly Pro</h2>
+          <div class="price" data-localized-price-plan="monthly">US$ 2.49 / month</div>
+          <p class="detail" data-i18n="monthlyBilling">Billed monthly after the 7-day free trial.</p>
+        </article>
+      </div>
+      <p class="free-note" data-i18n="freeNote">Prefer not to subscribe? Keep using Floating Camera Free without an expiration date. Only the watermark remains.</p>
+
+      <form id="purchaseForm">
+        <div class="grid">
+          <div>
+            <label for="customerType" data-i18n="customerType">Customer type</label>
+            <select id="customerType">
+              <option value="individual" data-i18n="individual">Individual</option>
+              <option value="business" data-i18n="business">Business</option>
+            </select>
+          </div>
+          <div>
+            <label for="billingMode" data-i18n="billingMode">Billing option</label>
+            <select id="billingMode">
+              <option value="annual_subscription" selected data-i18n="annualSubscription" data-localized-price-option="annual">Annual · US$ 14.99/year · 7-day free trial</option>
+              <option value="monthly_subscription" data-i18n="monthlySubscription" data-localized-price-option="monthly">Monthly · US$ 2.49/month · 7-day free trial</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="company-fields" id="companyFields" hidden>
+          <div class="grid">
+            <div>
+              <label for="companyName" data-i18n="companyName">Legal company name</label>
+              <input id="companyName" maxlength="180" autocomplete="organization" data-i18n-placeholder="companyPlaceholder" placeholder="Company name">
+            </div>
+            <div>
+              <label for="seats" data-i18n="seats">Number of devices</label>
+              <input id="seats" type="number" min="1" max="100" step="1" value="5" inputmode="numeric">
+              <div class="hint" data-i18n="seatsHint">Each device uses one license seat. Maximum 100 per order.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="coupon-field">
+          <label for="couponCode" data-i18n="couponCode">Promotional code (optional)</label>
+          <input id="couponCode" type="text" maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="L30TESTE15">
+          <div class="hint" data-i18n="couponHint">Enter a promotional code to receive a different free-trial period.</div>
+          <div class="hint">Cupom de licença gratuita, sem cartão? <a href="redeem.html">Resgate aqui</a>. / Complimentary license coupon? <a href="redeem.html">Redeem here</a>.</div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="eyebrow" data-i18n="account">YOUR L30 ACCOUNT</div>
+        <label for="email" data-i18n="email">Email address</label>
+        <input id="email" type="email" autocomplete="email" required placeholder="name@company.com">
+        <label for="password" data-i18n="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" minlength="8" required>
+        <div class="hint" id="signupPasswordHint" data-i18n="signupPasswordHint" hidden>Use at least 8 characters, including an uppercase letter, a lowercase letter, and a special character.</div>
+        <div id="signupConfirmField" hidden>
+          <label for="signupPasswordConfirm" data-i18n="signupConfirmPassword">Confirm password</label>
+          <input id="signupPasswordConfirm" type="password" autocomplete="new-password" minlength="8">
+        </div>
+        <div class="hint" id="authModeText" data-i18n="signinHint">Sign in to continue to secure payment.</div>
+        <button class="switch" type="button" id="forgotPassword" data-i18n="forgotPassword">Forgot your password?</button>
+
+        <div class="policy-consent">
+          <label for="termsAccepted"><input id="termsAccepted" type="checkbox" required><span data-i18n="acceptLead">I have read and agree to the Terms and Conditions and Refund and Cancellation Policy, and acknowledge the Privacy Policy.</span></label>
+          <div class="policy-links"><a href="terms.html" target="_blank" rel="noopener" data-i18n="termsText">Terms and Conditions</a> · <a href="privacy.html" target="_blank" rel="noopener" data-i18n="privacyText">Privacy Policy</a> · <a href="refund.html" target="_blank" rel="noopener" data-i18n="refundText">Refund and Cancellation Policy</a></div>
+        </div>
+        <div class="actions">
+          <button class="primary" type="submit" id="submitButton" data-i18n="continue">Continue to secure checkout</button>
+        </div>
+        <button class="switch" type="button" id="toggleAuth" data-i18n="createAccount">New here? Create an account</button>
+      </form>
+
+      <form id="recoveryForm" class="recovery-panel" hidden>
+        <div class="eyebrow" data-i18n="recoveryEyebrow">ACCOUNT RECOVERY</div>
+        <h2 class="recovery-title" data-i18n="recoveryTitle">Choose a new password</h2>
+        <p class="intro" data-i18n="recoveryIntro">Enter and confirm your new password.</p>
+        <label for="newPassword" data-i18n="newPassword">New password</label>
+        <input id="newPassword" type="password" autocomplete="new-password" minlength="8" required>
+        <div class="hint" data-i18n="signupPasswordHint">Use at least 8 characters, including an uppercase letter, a lowercase letter, and a special character.</div>
+        <label for="confirmPassword" data-i18n="confirmPassword">Confirm new password</label>
+        <input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" required>
+        <div class="actions">
+          <button class="primary" type="submit" id="recoverySubmit" data-i18n="savePassword">Save new password</button>
+        </div>
+        <button class="switch" type="button" id="cancelRecovery" data-i18n="cancelRecovery">Back to sign in</button>
+      </form>
+
+      <div id="message" role="status" aria-live="polite"></div>
+    </section>
+    <footer>
+      <span data-i18n="footer">Payments are processed securely. Floating Camera does not upload camera video.</span><br>
+      <a href="./" data-i18n="back">Back to L30 Technology</a> · <a href="terms.html" data-i18n="termsText">Terms and Conditions</a> · <a href="privacy.html" data-i18n="privacyText">Privacy Policy</a> · <a href="refund.html" data-i18n="refundText">Refund and Cancellation Policy</a> · <a href="mailto:contact@l30.tec.br">contact@l30.tec.br</a>
+    </footer>
+  </main>
+
+  <script>
+    (() => {
+      const translations = {
+        en: {
+          nav_features:"Features",nav_how:"How it works",nav_license:"Licensing",nav_faq:"FAQ",nav_contact:"Contact",nav_cta:"Get started ↗",
+          eyebrow:"FLOATING CAMERA PRO",title:"Remove the watermark with Pro",
+          intro:"Floating Camera Free is available forever with the L30 Technology watermark. Pro removes the watermark and includes a 7-day free trial.",
+          annualTag:"BEST VALUE · 7-DAY FREE TRIAL",annualCardTitle:"Annual Pro",
+          perMonth:"/ month equivalent",annualBilling:"US$ 14.99 billed annually after the free trial.",
+          monthlyTag:"7-DAY FREE TRIAL",monthlyCardTitle:"Monthly Pro",perMonthActual:"/ month",
+          monthlyBilling:"Billed monthly after the free trial.",
+          freeNote:"Prefer not to subscribe? Keep using Floating Camera Free without an expiration date. Only the watermark remains.",
+          customerType:"Customer type",individual:"Individual",business:"Business",billingMode:"Billing option",
+          monthlySubscription:"Monthly · US$ 2.49/month · 7-day free trial",
+          annualSubscription:"Annual · US$ 1.25/month equivalent · US$ 14.99 billed yearly · 7-day free trial",
+          companyName:"Legal company name",companyPlaceholder:"Company name",seats:"Number of devices",
+          seatsHint:"Each device uses one license seat. Maximum 100 per order.",account:"YOUR L30 ACCOUNT",
+          email:"Email address",password:"Password",signinHint:"Sign in to continue to secure payment.",
+          signupHint:"Create your L30 account. Confirm your email before purchasing.",
+          continue:"Continue to secure checkout",signIn:"Sign in",createAccount:"New here? Create an account",
+          haveAccount:"Already have an account? Sign in",footer:"Payments are processed securely. Floating Camera does not upload camera video.",
+          back:"Back to L30 Technology",needCompany:"Enter your company name.",invalidSeats:"Enter a whole number of devices from 1 to 100.",
+          configMissing:"Online accounts are not configured yet. Please contact L30 Technology.",
+          confirmation:"If this is a new account, check your email for the confirmation link. If you already have an L30 account, sign in or use “Forgot your password?”. For security, we do not disclose whether an email address is registered.",
+          forgotPassword:"Forgot your password?",recoveryEyebrow:"ACCOUNT RECOVERY",
+          recoveryTitle:"Choose a new password",recoveryIntro:"Enter and confirm your new password.",
+          newPassword:"New password",confirmPassword:"Confirm new password",savePassword:"Save new password",
+          cancelRecovery:"Back to sign in",recoveryEmailSent:"If an account exists for this address, a password reset email has been sent.",
+          recoveryError:"Could not send the reset email. Check the address and try again.",
+          passwordMismatch:"The passwords do not match.",passwordTooShort:"Use at least 8 characters.",
+          signupConfirmPassword:"Confirm password",
+          signupPasswordHint:"Use at least 8 characters, including an uppercase letter, a lowercase letter, and a special character.",
+          passwordRequirementsError:"Use at least 8 characters, at least one uppercase letter, one lowercase letter, and one special character.",
+          passwordUpdated:"Password updated successfully. Please sign in again.",
+          passwordUpdateError:"Could not update the password. Request a new reset link and try again.",
+          checkoutError:"Could not start checkout. Please try again or contact support.",
+          checkoutWait:"Preparing your secure checkout…",signinError:"Unable to sign in. Check your email and password.",
+          signupError:"Unable to create your account. Check the details and try again.",
+          couponCode:"Promotional code (optional)",couponHint:"Enter a promotional code to receive a different free-trial period.",
+          acceptLead:"I have read and agree to the Terms and Conditions and Refund and Cancellation Policy, and acknowledge the Privacy Policy.",termsText:"Terms and Conditions",privacyText:"Privacy Policy",refundText:"Refund and Cancellation Policy",
+          couponError:"This promotional code is invalid, expired, already used, or unavailable for this plan.",
+          couponPermissionError:"The promotional trial could not be prepared. The L30 administrator must enable price read/write permissions on the Paddle API key for this environment."
+        },
+        pt: {
+          nav_features:"Recursos",nav_how:"Como funciona",nav_license:"Licenciamento",nav_faq:"Perguntas",nav_contact:"Contato",nav_cta:"Começar ↗",
+          eyebrow:"FLOATING CAMERA PRO",title:"Remova a marca-d’água com o Pro",
+          intro:"O Floating Camera Free é gratuito para sempre, com a marca-d’água L30 Technology. O Pro remove a marca e inclui 7 dias grátis.",
+          annualTag:"MELHOR CUSTO-BENEFÍCIO · 7 DIAS GRÁTIS",annualCardTitle:"Pro anual",
+          perMonth:"/ mês equivalente",annualBilling:"Cobrança anual após o teste grátis de 7 dias.",
+          monthlyTag:"7 DIAS GRÁTIS",monthlyCardTitle:"Pro mensal",perMonthActual:"/ mês",
+          monthlyBilling:"Cobrança mensal após o teste grátis de 7 dias.",
+          freeNote:"Prefere não assinar? Continue usando o Floating Camera Free sem prazo de validade. Apenas a marca-d’água permanece.",
+          customerType:"Tipo de cliente",individual:"Pessoa física",business:"Empresa",billingMode:"Modalidade de cobrança",
+          monthlySubscription:"Mensal · US$ 2,49/mês · 7 dias grátis",
+          annualSubscription:"Anual · US$ 14,99/ano · 7 dias grátis",
+          companyName:"Razão social",companyPlaceholder:"Nome da empresa",seats:"Quantidade de dispositivos",
+          seatsHint:"Cada dispositivo utiliza uma licença. Máximo de 100 por pedido.",account:"SUA CONTA L30",
+          email:"Endereço de e-mail",password:"Senha",signinHint:"Entre na sua conta para continuar ao pagamento seguro.",
+          signupHint:"Crie sua conta L30. Confirme seu e-mail antes de comprar.",
+          continue:"Continuar para o pagamento seguro",signIn:"Entrar",createAccount:"Novo por aqui? Criar uma conta",
+          haveAccount:"Já possui uma conta? Entrar",footer:"Os pagamentos são processados com segurança. O Floating Camera não envia imagens da câmera.",
+          back:"Voltar para L30 Technology",needCompany:"Informe a razão social.",invalidSeats:"Informe uma quantidade inteira de dispositivos entre 1 e 100.",
+          configMissing:"As contas online ainda não estão configuradas. Entre em contato com a L30 Technology.",
+          confirmation:"Se este for um novo cadastro, verifique seu e-mail para confirmar a conta. Se você já tem uma conta L30, entre ou use “Esqueceu sua senha?”. Por segurança, não informamos se um endereço já está cadastrado.",
+          forgotPassword:"Esqueceu sua senha?",recoveryEyebrow:"RECUPERAÇÃO DE CONTA",
+          recoveryTitle:"Defina uma nova senha",recoveryIntro:"Digite e confirme sua nova senha.",
+          newPassword:"Nova senha",confirmPassword:"Confirme a nova senha",savePassword:"Salvar nova senha",
+          cancelRecovery:"Voltar para entrar",recoveryEmailSent:"Se existir uma conta com esse endereço, enviaremos um e-mail para redefinir a senha.",
+          recoveryError:"Não foi possível enviar o e-mail. Confira o endereço e tente novamente.",
+          passwordMismatch:"As senhas não coincidem.",passwordTooShort:"Use pelo menos 8 caracteres.",
+          signupConfirmPassword:"Confirme a senha",
+          signupPasswordHint:"Use pelo menos 8 caracteres, incluindo uma letra maiúscula, uma letra minúscula e um caractere especial.",
+          passwordRequirementsError:"A senha deve ter pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula e um caractere especial.",
+          passwordUpdated:"Senha atualizada com sucesso. Entre novamente.",
+          passwordUpdateError:"Não foi possível atualizar a senha. Solicite um novo link e tente novamente.",
+          checkoutError:"Não foi possível iniciar o pagamento. Tente novamente ou fale com o suporte.",
+          checkoutWait:"Preparando seu pagamento seguro…",signinError:"Não foi possível entrar. Confira seu e-mail e senha.",
+          signupError:"Não foi possível criar sua conta. Confira os dados e tente novamente.",
+          couponCode:"Código promocional (opcional)",couponHint:"Informe um código promocional para receber um período de teste diferente.",
+          acceptLead:"Li e aceito os Termos e Condições e a Política de Reembolso e Cancelamento, e declaro ciência da Política de Privacidade.",termsText:"Termos e Condições",privacyText:"Política de Privacidade",refundText:"Política de Reembolso e Cancelamento",
+          couponError:"Este código promocional é inválido, expirou, já foi utilizado ou não está disponível para este plano.",
+          couponPermissionError:"Não foi possível preparar o teste promocional. O administrador L30 precisa habilitar as permissões de leitura e gravação de preços na chave Paddle deste ambiente."
+        },
+        es: {
+          nav_features:"Funciones",nav_how:"Cómo funciona",nav_license:"Licencias",nav_faq:"Preguntas",nav_contact:"Contacto",nav_cta:"Empezar ↗",
+          eyebrow:"FLOATING CAMERA PRO",title:"Elimina la marca de agua con Pro",
+          intro:"Floating Camera Free es gratis para siempre con la marca de agua de L30 Technology. Pro elimina la marca e incluye 7 días gratis.",
+          annualTag:"MEJOR OFERTA · 7 DÍAS GRATIS",annualCardTitle:"Pro anual",
+          perMonth:"/ mes equivalente",annualBilling:"Cobro anual después de la prueba gratuita de 7 días.",
+          monthlyTag:"7 DÍAS GRATIS",monthlyCardTitle:"Pro mensual",perMonthActual:"/ mes",
+          monthlyBilling:"Cobro mensual después de la prueba gratuita de 7 días.",
+          freeNote:"¿Prefieres no suscribirte? Sigue usando Floating Camera Free sin fecha de vencimiento. Solo permanece la marca de agua.",
+          customerType:"Tipo de cliente",individual:"Persona",business:"Empresa",billingMode:"Modalidad de pago",
+          monthlySubscription:"Mensual · US$ 2,49/mes · 7 días gratis",
+          annualSubscription:"Anual · US$ 14,99/año · 7 días gratis",
+          companyName:"Nombre legal de la empresa",companyPlaceholder:"Nombre de la empresa",seats:"Cantidad de dispositivos",
+          seatsHint:"Cada dispositivo utiliza una licencia. Máximo de 100 por pedido.",account:"TU CUENTA L30",
+          email:"Correo electrónico",password:"Contraseña",signinHint:"Inicia sesión para continuar al pago seguro.",
+          signupHint:"Crea tu cuenta L30. Confirma tu correo antes de comprar.",
+          continue:"Continuar al pago seguro",signIn:"Iniciar sesión",createAccount:"¿Nuevo aquí? Crear una cuenta",
+          haveAccount:"¿Ya tienes una cuenta? Iniciar sesión",footer:"Los pagos se procesan de forma segura. Floating Camera no carga imágenes de la cámara.",
+          back:"Volver a L30 Technology",needCompany:"Introduce el nombre legal de la empresa.",invalidSeats:"Introduce un número entero de dispositivos entre 1 y 100.",
+          configMissing:"Las cuentas en línea aún no están configuradas. Contacta con L30 Technology.",
+          confirmation:"Si es una cuenta nueva, revisa tu correo para confirmar el registro. Si ya tienes una cuenta L30, inicia sesión o usa «¿Olvidaste tu contraseña?». Por seguridad, no revelamos si una dirección de correo está registrada.",
+          forgotPassword:"¿Olvidaste tu contraseña?",recoveryEyebrow:"RECUPERACIÓN DE CUENTA",
+          recoveryTitle:"Establece una nueva contraseña",recoveryIntro:"Introduce y confirma tu nueva contraseña.",
+          newPassword:"Nueva contraseña",confirmPassword:"Confirma la nueva contraseña",savePassword:"Guardar nueva contraseña",
+          cancelRecovery:"Volver al inicio de sesión",recoveryEmailSent:"Si existe una cuenta con esta dirección, enviaremos un correo para restablecer la contraseña.",
+          recoveryError:"No se pudo enviar el correo. Comprueba la dirección e inténtalo de nuevo.",
+          passwordMismatch:"Las contraseñas no coinciden.",passwordTooShort:"Usa al menos 8 caracteres.",
+          signupConfirmPassword:"Confirma la contraseña",
+          signupPasswordHint:"Usa al menos 8 caracteres, incluyendo una letra mayúscula, una minúscula y un carácter especial.",
+          passwordRequirementsError:"La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula y un carácter especial.",
+          passwordUpdated:"Contraseña actualizada. Inicia sesión de nuevo.",
+          passwordUpdateError:"No se pudo actualizar la contraseña. Solicita un nuevo enlace e inténtalo otra vez.",
+          checkoutError:"No se pudo iniciar el pago. Inténtalo de nuevo o contacta con soporte.",
+          checkoutWait:"Preparando tu pago seguro…",signinError:"No se pudo iniciar sesión. Comprueba tu correo y contraseña.",
+          signupError:"No se pudo crear la cuenta. Comprueba los datos e inténtalo de nuevo.",
+          couponCode:"Código promocional (opcional)",couponHint:"Introduce un código promocional para recibir un período de prueba diferente.",
+          acceptLead:"He leído y acepto los Términos y Condiciones y la Política de Reembolsos y Cancelación, y reconozco la Política de Privacidad.",termsText:"Términos y Condiciones",privacyText:"Política de Privacidad",refundText:"Política de Reembolsos y Cancelación",
+          couponError:"Este código promocional no es válido, ha caducado, ya se utilizó o no está disponible para este plan.",
+          couponPermissionError:"No se pudo preparar la prueba promocional. El administrador L30 debe habilitar los permisos de lectura y escritura de precios en la clave Paddle de este entorno."
+        }
+      };
+
+      const savedLanguage = localStorage.getItem("fc-language");
+      const browserLanguage = (navigator.language || "en").toLowerCase();
+      let language = ["en", "pt", "es"].includes(savedLanguage)
+        ? savedLanguage
+        : browserLanguage.startsWith("pt") ? "pt"
+        : browserLanguage.startsWith("es") ? "es" : "en";
+      let creatingAccount = false;
+      const $ = (id) => document.getElementById(id);
+      const requestedPlan = new URLSearchParams(window.location.search).get("plan");
+      if (requestedPlan === "monthly") {
+        $("billingMode").value = "monthly_subscription";
+      } else if (requestedPlan === "annual") {
+        $("billingMode").value = "annual_subscription";
+      }
+      const form = $("purchaseForm"), message = $("message"), submit = $("submitButton");
+      const companyFields = $("companyFields"), customerType = $("customerType");
+      const recoveryForm = $("recoveryForm"), forgotPassword = $("forgotPassword");
+      let authClient = null;
+      const t = (key) => translations[language][key] || translations.en[key];
+      const SPECIAL_PASSWORD_CHARACTERS = "!@#$%^&*()_+-=[]{};':" + String.fromCharCode(34, 92) + "|<>?,./" + String.fromCharCode(96) + "~";
+      function passwordMeetsPolicy(password) {
+        return password.length >= 8 &&
+          /[A-Z]/.test(password) &&
+          /[a-z]/.test(password) &&
+          [...password].some((character) => SPECIAL_PASSWORD_CHARACTERS.includes(character));
+      }
+
+      function getClient() {
+        if (authClient) return authClient;
+        if (!window.supabase?.createClient ||
+            !window.L30_SUPABASE_URL || window.L30_SUPABASE_URL.includes("REPLACE_") ||
+            !window.L30_SUPABASE_PUBLISHABLE_KEY || window.L30_SUPABASE_PUBLISHABLE_KEY.includes("REPLACE_")) {
+          return null;
+        }
+        authClient = window.supabase.createClient(
+          window.L30_SUPABASE_URL,
+          window.L30_SUPABASE_PUBLISHABLE_KEY,
+          { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
+        );
+        authClient.auth.onAuthStateChange((event) => {
+          if (event === "PASSWORD_RECOVERY") {
+            form.hidden = true;
+            $("toggleAuth").hidden = true;
+            recoveryForm.hidden = false;
+            forgotPassword.hidden = true;
+            showMessage("");
+            $("newPassword").focus();
+          }
+        });
+        return authClient;
+      }
+
+      function showMessage(text, isError=false) {
+        message.textContent = text;
+        message.className = "show" + (isError ? " error" : "");
+      }
+      function applyLanguage() {
+        document.documentElement.lang = language;
+        $("language").value = language;
+        localStorage.setItem("fc-language", language);
+        window.dispatchEvent(new Event("fc-language-changed"));
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          const value = t(el.dataset.i18n);
+          if (el.tagName === "OPTION") el.textContent = value;
+          else el.textContent = value;
+        });
+        document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+          el.placeholder = t(el.dataset.i18nPlaceholder);
+        });
+        $("authModeText").textContent = t(creatingAccount ? "signupHint" : "signinHint");
+        $("toggleAuth").textContent = t(creatingAccount ? "haveAccount" : "createAccount");
+        $("signupPasswordHint").hidden = !creatingAccount;
+        $("signupConfirmField").hidden = !creatingAccount;
+        $("signupPasswordConfirm").required = creatingAccount;
+        $("signupPasswordConfirm").autocomplete = "new-password";
+        $("password").autocomplete = creatingAccount ? "new-password" : "current-password";
+        forgotPassword.hidden = creatingAccount;
+        submit.textContent = t(creatingAccount ? "createAccount" : "continue");
+      }
+      $("language").addEventListener("change", (event) => {
+        language = event.target.value; applyLanguage();
+      });
+      customerType.addEventListener("change", () => {
+        companyFields.hidden = customerType.value !== "business";
+      });
+      $("couponCode").addEventListener("input", () => {
+        const field = $("couponCode");
+        const start = field.selectionStart;
+        field.value = field.value.toUpperCase().replace(/[^A-Z0-9_-]/g, "");
+        field.setSelectionRange(start, start);
+      });
+      $("toggleAuth").addEventListener("click", () => {
+        creatingAccount = !creatingAccount;
+        if (!creatingAccount) $("signupPasswordConfirm").value = "";
+        applyLanguage();
+        showMessage("");
+      });
+
+      forgotPassword.addEventListener("click", async () => {
+        const emailInput = $("email");
+        if (!emailInput.value.trim() || !emailInput.checkValidity()) {
+          emailInput.reportValidity();
+          return;
+        }
+        const client = getClient();
+        if (!client) { showMessage(t("configMissing"), true); return; }
+        forgotPassword.disabled = true;
+        try {
+          const { error } = await client.auth.resetPasswordForEmail(emailInput.value.trim(), {
+            redirectTo: window.location.origin + window.location.pathname
+          });
+          if (error) throw error;
+          showMessage(t("recoveryEmailSent"));
+        } catch (error) {
+          console.error("L30 password reset request failed", error);
+          showMessage(t("recoveryError"), true);
+        } finally {
+          forgotPassword.disabled = false;
+        }
+      });
+
+      $("cancelRecovery").addEventListener("click", async () => {
+        const client = getClient();
+        if (client) await client.auth.signOut();
+        recoveryForm.hidden = true;
+        form.hidden = false;
+        $("toggleAuth").hidden = false;
+        creatingAccount = false;
+        $("newPassword").value = "";
+        $("confirmPassword").value = "";
+        applyLanguage();
+        showMessage("");
+      });
+
+      recoveryForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const password = $("newPassword").value;
+        const confirmation = $("confirmPassword").value;
+        if (!passwordMeetsPolicy(password)) { showMessage(t("passwordRequirementsError"), true); $("newPassword").focus(); return; }
+        if (password !== confirmation) { showMessage(t("passwordMismatch"), true); return; }
+        const client = getClient();
+        if (!client) { showMessage(t("configMissing"), true); return; }
+        $("recoverySubmit").disabled = true;
+        try {
+          const { error } = await client.auth.updateUser({ password });
+          if (error) throw error;
+          await client.auth.signOut();
+          recoveryForm.hidden = true;
+          form.hidden = false;
+          $("toggleAuth").hidden = false;
+          creatingAccount = false;
+          $("newPassword").value = "";
+          $("confirmPassword").value = "";
+          applyLanguage();
+          showMessage(t("passwordUpdated"));
+        } catch (error) {
+          console.error("L30 password update failed", error);
+          showMessage(t("passwordUpdateError"), true);
+        } finally {
+          $("recoverySubmit").disabled = false;
+        }
+      });
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (!window.supabase?.createClient ||
+            !window.L30_SUPABASE_URL || window.L30_SUPABASE_URL.includes("REPLACE_") ||
+            !window.L30_SUPABASE_PUBLISHABLE_KEY || window.L30_SUPABASE_PUBLISHABLE_KEY.includes("REPLACE_")) {
+          showMessage(t("configMissing"), true); return;
+        }
+
+        const customer = customerType.value;
+        const seats = customer === "business" ? Number($("seats").value) : 1;
+        if (customer === "business" && !$("companyName").value.trim()) {
+          showMessage(t("needCompany"), true); $("companyName").focus(); return;
+        }
+        if (!Number.isInteger(seats) || seats < 1 || seats > 100) {
+          showMessage(t("invalidSeats"), true); $("seats").focus(); return;
+        }
+
+        submit.disabled = true;
+        showMessage(creatingAccount ? t("signupHint") : t("checkoutWait"));
+        try {
+          const client = getClient();
+          if (!client) { showMessage(t("configMissing"), true); return; }
+          const email = $("email").value.trim();
+          const password = $("password").value;
+
+          if (creatingAccount) {
+            const passwordConfirmation = $("signupPasswordConfirm").value;
+            if (!passwordMeetsPolicy(password)) {
+              showMessage(t("passwordRequirementsError"), true);
+              $("password").focus();
+              return;
+            }
+            if (password !== passwordConfirmation) {
+              showMessage(t("passwordMismatch"), true);
+              $("signupPasswordConfirm").focus();
+              return;
+            }
+          }
+
+          if (creatingAccount) {
+            const { data, error } = await client.auth.signUp({
+              email, password,
+              options: {
+                emailRedirectTo: window.location.origin + window.location.pathname,
+                data: { language: $("language").value }
+              }
+            });
+            if (error) throw Object.assign(new Error(error.message), { kind: "signup" });
+            if (!data.session) {
+              showMessage(t("confirmation"));
+              return;
+            }
+          } else {
+            const { error } = await client.auth.signInWithPassword({ email, password });
+            if (error) throw Object.assign(new Error(error.message), { kind: "signin" });
+          }
+
+          const { data, error } = await client.functions.invoke("create-checkout", {
+            body: {
+              billing_mode: $("billingMode").value,
+              customer_type: customer,
+              seats,
+              organization_name: customer === "business" ? $("companyName").value.trim() : undefined,
+              country_code: undefined,
+              currency_code: language === "pt" ? "BRL" : "USD",
+              coupon_code: $("couponCode").value.trim().toUpperCase() || undefined,
+              terms_accepted: $("termsAccepted").checked,
+              privacy_acknowledged: $("termsAccepted").checked
+            }
+          });
+          if (error) {
+            let serverError = null;
+            try {
+              const response = error.context?.clone ? error.context.clone() : error.context;
+              const payload = response?.json ? await response.json() : null;
+              serverError = payload?.error ?? null;
+            } catch {}
+            throw Object.assign(new Error(serverError || error.message || "checkout_failed"), {
+              kind: "checkout",
+              code: serverError
+            });
+          }
+          if (!data?.checkout_url) throw Object.assign(new Error("missing_checkout_url"), { kind: "checkout" });
+
+          const paddleCheckoutUrl = new URL(data.checkout_url);
+          if (paddleCheckoutUrl.protocol !== "https:" ||
+              !paddleCheckoutUrl.searchParams.has("_ptxn")) {
+            throw Object.assign(new Error("invalid_paddle_checkout_url"), { kind: "checkout" });
+          }
+
+          // Keep the Paddle transaction ID, but open the pay page on this same
+          // deployment (GitHub/Cloudflare preview or the eventual production site).
+          const checkoutDestination = new URL("./pay.html", window.location.href);
+          checkoutDestination.search = paddleCheckoutUrl.search;
+          if (typeof data.customer_email === "string" && data.customer_email.includes("@")) {
+            sessionStorage.setItem("fc-checkout-customer-email", data.customer_email);
+          } else {
+            sessionStorage.removeItem("fc-checkout-customer-email");
+          }
+          window.location.assign(checkoutDestination.toString());
+        } catch (error) {
+          console.error("L30 purchase flow failed", error);
+          const code = error?.code || "";
+          const messageText = code.startsWith("coupon_") ? t("couponError")
+            : (code === "paddle_price_read_permission_missing" || code === "paddle_price_write_permission_missing")
+              ? t("couponPermissionError")
+              : t(error?.kind === "signup" ? "signupError" : error?.kind === "signin" ? "signinError" : "checkoutError");
+          showMessage(messageText, true);
+        } finally {
+          submit.disabled = false;
+        }
+      });
+      const siteMenu = $("siteMenu");
+      const siteNavlinks = $("siteNavlinks");
+      siteMenu.addEventListener("click", () => {
+        const open = siteNavlinks.classList.toggle("open");
+        siteMenu.setAttribute("aria-expanded", String(open));
+        siteMenu.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+        siteMenu.textContent = open ? "✕" : "☰";
+      });
+      siteNavlinks.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => {
+        siteNavlinks.classList.remove("open");
+        siteMenu.setAttribute("aria-expanded", "false");
+        siteMenu.textContent = "☰";
+      }));
+      applyLanguage();
+      getClient();
+    })();
+  </script>
+  <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+  <script src="./paddle-config.js"></script>
+  <script src="./localized-pricing.js"></script>
+</body>
+</html>
