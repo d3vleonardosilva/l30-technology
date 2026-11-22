@@ -85,6 +85,7 @@
               <label for="couponCode">Código *</label>
               <input id="couponCode" maxlength="40" minlength="3" pattern="[A-Za-z0-9_-]{3,40}" placeholder="L30TESTE15" required>
             </div>
+            <div class="field"><label for="grantMode">Modalidade de gratuidade</label><select id="grantMode"><option value="subscription_trial">Promocional com assinatura Paddle</option><option value="complimentary_license">Licença gratuita, sem cartão e sem cobrança</option></select></div>
             <div class="field">
               <label for="trialDays">Dias grátis *</label>
               <input id="trialDays" type="number" min="1" max="365" step="1" value="15" required>
@@ -142,6 +143,7 @@
             <label for="editCouponCode">Código *</label>
             <input id="editCouponCode" maxlength="40" minlength="3" pattern="[A-Za-z0-9_-]{3,40}" required>
           </div>
+          <div class="field"><label for="editGrantMode">Modalidade de gratuidade</label><select id="editGrantMode"><option value="subscription_trial">Promocional com assinatura Paddle</option><option value="complimentary_license">Licença gratuita, sem cartão e sem cobrança</option></select></div>
           <div class="field">
             <label for="editTrialDays">Dias grátis *</label>
             <input id="editTrialDays" type="number" min="1" max="365" step="1" required>
@@ -252,6 +254,7 @@
         $("editCouponId").value = coupon.id;
         $("editCouponCode").value = coupon.code || "";
         $("editTrialDays").value = coupon.trial_days ?? 15;
+        $("editGrantMode").value = coupon.grant_mode || "subscription_trial";
         $("editMaxRedemptions").value = coupon.max_redemptions ?? "";
         $("editValidUntil").value = toDateTimeLocal(coupon.valid_until);
         $("editBillingMode").value = coupon.billing_mode || "all";
@@ -273,7 +276,7 @@
           const active = coupon.is_active === true;
           return '<tr>' +
             '<td><span class="code">' + html(coupon.code) + '</span><div class="hint">' + html(coupon.description || "") + '</div></td>' +
-            '<td>' + html(coupon.trial_days) + ' dias</td>' +
+            '<td>' + html(coupon.trial_days) + ' dias<div class="hint">' + (coupon.grant_mode === 'complimentary_license' ? 'Sem cobrança (resgate em preparação)' : 'Assinatura Paddle') + '</div></td>' +
             '<td>' + count + ' / ' + html(limit) + (pending ? '<div class="hint">' + pending + ' reserva(s) em andamento</div>' : '') + '</td>' +
             '<td>' + html(formatDate(coupon.valid_until)) + '</td>' +
             '<td>' + html(planName(coupon.billing_mode)) + '</td>' +
@@ -404,6 +407,7 @@
             id: $("editCouponId").value,
             code: $("editCouponCode").value.trim().toUpperCase(),
             trial_days: Number($("editTrialDays").value),
+            grant_mode: $("editGrantMode").value,
             max_redemptions: $("editMaxRedemptions").value === "" ? null : Number($("editMaxRedemptions").value),
             valid_until: validUntilValue ? new Date(validUntilValue).toISOString() : null,
             billing_mode: $("editBillingMode").value,
@@ -435,6 +439,7 @@
             action:"create",
             code:$("couponCode").value.trim().toUpperCase(),
             trial_days:Number($("trialDays").value),
+            grant_mode:$("grantMode").value,
             max_redemptions:$("maxRedemptions").value === "" ? null : Number($("maxRedemptions").value),
             valid_until:validUntilValue ? new Date(validUntilValue).toISOString() : null,
             billing_mode:$("billingMode").value,
@@ -444,7 +449,7 @@
           $("trialDays").value = 15;
           $("billingMode").value = "all";
           await loadCoupons();
-          showNotice("Cupom criado. Ele já pode ser usado na página de compra.");
+          showNotice("Cupom cadastrado. Cupons sem cobrança só poderão ser resgatados após a integração da ativação gratuita.");
         } catch (error) {
           const message = error.message === "coupon_code_exists" ? "Este código já existe."
             : error.message === "invalid_coupon_code" ? "Use de 3 a 40 caracteres: letras, números, hífen ou sublinhado."
