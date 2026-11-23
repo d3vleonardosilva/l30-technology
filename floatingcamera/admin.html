@@ -55,12 +55,12 @@
   <main>
     <div class="eyebrow">PAINEL ADMINISTRATIVO</div>
     <h1>Cupons promocionais</h1>
-    <p class="sub">Cadastre períodos de teste gratuitos, acompanhe utilizações e controle a validade de cada código.</p>
+    <p class="sub">Gerencie clientes, licenças e códigos promocionais. Cupons vinculados a clientes podem ser criados diretamente na respectiva linha.</p>
     <div id="notice" role="status" aria-live="polite"></div>
 
     <section class="card" id="loginCard" hidden>
       <h2>Entrar como administrador</h2>
-      <p class="sub">Use sua conta administrativa L30 já cadastrada no ambiente de testes.</p>
+      <p class="sub">Entre com sua conta L30 autorizada para administrar clientes e cupons no ambiente de produção.</p>
       <form id="loginForm">
         <label for="loginEmail">E-mail</label>
         <input id="loginEmail" type="email" autocomplete="username" required>
@@ -125,6 +125,17 @@
           <table>
             <thead><tr><th>Código</th><th>Teste</th><th>Utilizações</th><th>Validade</th><th>Plano</th><th>Status</th><th>Ação</th></tr></thead>
             <tbody id="couponRows"><tr><td colspan="7" class="empty">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+      <section class="card" id="customerSection">
+        <div class="row"><div><h2>Contas dos clientes</h2><p class="hint">Contas cadastradas, confirmação de e-mail, dados pessoais, licenças e cupons individuais. Cada cupom pertence apenas à conta selecionada.</p></div>
+        <button id="refreshCustomers" type="button">Atualizar clientes</button></div>
+        <p class="hint">Conta corporativa: <strong>contact@l30.tec.br</strong>. Após criar e confirmar essa conta, ela receberá permissão administrativa automaticamente.</p>
+        <div class="table-wrap">
+          <table style="min-width:1150px">
+            <thead><tr><th>Cliente / e-mail</th><th>Cadastro</th><th>Licença</th><th>Cupons vinculados</th><th>Criar cupom exclusivo para este cliente</th></tr></thead>
+            <tbody id="customerRows"><tr><td colspan="5" class="empty">Carregando clientes...</td></tr></tbody>
           </table>
         </div>
       </section>
@@ -236,6 +247,69 @@
         }
         return data;
       }
+      async function invokeCustomers(body) {
+        const client = getClient();
+        if (!client) throw Error("supabase_not_configured");
+        const {data:sessionData}=await client.auth.getSession();
+        const token=sessionData?.session?.access_token;
+        if (!token) throw Error("authentication_required");
+        const {data,error}=await client.functions.invoke("customer-management", {
+          body,headers:{Authorization:"Bearer "+token}
+        });
+        if(error) {
+          let reason=error.message;
+          try{const response=error.context?.clone?error.context.clone():error.context;
+              const payload=response?.json?await response.json():null;reason=payload?.error||reason}catch{}
+          throw Error(reason||"customer_request_failed");
+        }
+        return data;
+      }
+      function customerLicenseStatus(licenseRows) {
+        const rows=Array.isArray(licenseRows)?licenseRows:[];
+        const active=rows.find(item=>item.status==="active"&&new Date(item.ends_at).getTime()>Date.now());
+        return active ? "Pro ativo até "+formatDate(active.ends_at) : rows.length ? "Sem Pro ativo" : "Nenhuma licença";
+      }
+      async function loadCustomers() {
+        const rows=$("customerRows");$("refreshCustomers").disabled=true;
+        try {
+          const result=await invokeCustomers({action:"list_customers"});
+          const customers=result.customers||[];
+          rows.innerHTML=customers.length ? customers.map(customer=>{
+            const id=html(customer.user_id);
+            const identity=html(customer.display_name||"Nome não informado");
+            const email=html(customer.email||"");
+            const state=customer.email_confirmed?(customer.registration_completed_at?"Cadastro completo":"E-mail confirmado · dados pendentes"):"E-mail não confirmado";
+            const coupons=(customer.assigned_coupons||[]).map(c=>html(c.code)+" ("+html(c.trial_days)+" dias)").join("<br>")||"Nenhum";
+            const disabled=!customer.email_confirmed||!customer.registration_completed_at?"disabled":"";
+            return '<tr><td><strong>'+identity+'</strong><div class="hint">'+email+'</div><div class="hint">'+html(customer.phone||"")+'</div></td>'+
+              '<td>'+html(state)+'<div class="hint">'+html(customer.customer_type||"")+'</div></td>'+
+              '<td>'+html(customerLicenseStatus(customer.license_status))+'</td>'+
+              '<td>'+coupons+'</td>'+
+              '<td><div class="coupon-actions"><input aria-label="Código em letras maiúsculas" placeholder="NOMEESCOLHIDO" maxlength="40" data-code-for="'+id+'" style="width:175px;text-transform:uppercase" '+disabled+'>'+
+              '<input type="number" aria-label="Dias de licença" placeholder="Dias" min="1" max="365" value="180" data-days-for="'+id+'" style="width:80px" '+disabled+'>'+
+              '<button type="button" data-create-for="'+id+'" '+disabled+'>Criar cupom</button></div>'+
+              '<div class="hint">1 resgate · gratuito · sem cartão · até 365 dias</div></td></tr>'
+          }).join(""):'<tr><td colspan="5" class="empty">Nenhuma conta encontrada.</td></tr>';
+          rows.querySelectorAll("[data-code-for]").forEach(input=>input.addEventListener("input",()=>{
+             const pos=input.selectionStart;input.value=input.value.toUpperCase().replace(/[^A-Z0-9_-]/g,"");input.setSelectionRange(pos,pos)
+          }));
+          rows.querySelectorAll("[data-create-for]").forEach(button=>button.addEventListener("click",async()=>{
+             const id=button.dataset.createFor;
+             const code=rows.querySelector('[data-code-for="'+id+'"]').value.trim().toUpperCase();
+             const days=Number(rows.querySelector('[data-days-for="'+id+'"]').value);
+             if(!/^[A-Z0-9_-]{3,40}$/.test(code)||!Number.isInteger(days)||days<1||days>365){
+               showNotice("Informe o código em caixa alta (3 a 40 caracteres) e o prazo de 1 a 365 dias.",true);return;
+             }
+             button.disabled=true;
+             try{
+               await invokeCustomers({action:"create_customer_coupon",customer_id:id,code,days});
+               await loadCustomers();await loadCoupons();
+               showNotice("Cupom individual criado para a conta selecionada. Não pode ser utilizado por outro cliente.");
+             }catch(e){showNotice("Não foi possível criar cupom: "+e.message,true);button.disabled=false}
+          }));
+        } catch(e){showNotice("Não foi possível carregar os clientes: "+e.message,true);rows.innerHTML='<tr><td colspan="5" class="empty">Falha ao carregar.</td></tr>'}
+        finally{$("refreshCustomers").disabled=false}
+      }
       function formatDate(value) {
         if (!value) return "Sem vencimento";
         return new Date(value).toLocaleString("pt-BR");
@@ -332,6 +406,7 @@
         if (session) {
           $("signedInAs").textContent = "Conectado: " + (session.user.email || "conta L30");
           await loadCoupons();
+          await loadCustomers();
         }
       }
       $("loginForm").addEventListener("submit", async (event) => {
@@ -358,6 +433,7 @@
         showNotice("Sessão encerrada.");
       });
       $("refreshButton").addEventListener("click", loadCoupons);
+      $("refreshCustomers").addEventListener("click", loadCustomers);
       $("preparePricesButton").addEventListener("click", async () => {
         const button = $("preparePricesButton");
         button.disabled = true;
