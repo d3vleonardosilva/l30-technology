@@ -1,33 +1,23 @@
+# L30 Technology — Official Website
 
-# L30 Technology — Professional Portfolio
+Official public website for **L30 TECHNOLOGY INOVA SIMPLES (I.S.)**, a Brazilian software developer and publisher.
 
-Static website for Leonardo Silva / L30 Technology.
+## Public routes
+- `/` — institutional company homepage; Floating Camera product, company, contact and policy links.
+- `/floatingcamera/` — downloadable Windows application and its free/Pro licensing information.
+- `/floatingcamera/buy.html` — account and pricing/checkout flow.
+- `/floatingcamera/terms.html` — Terms of Service.
+- `/floatingcamera/privacy.html` — Privacy Policy.
+- `/floatingcamera/refund.html` — Refund Policy.
+- `/portfolio/` — Leonardo Silva professional portfolio (preserved from the former homepage).
+- `/curriculo/`, `/telemetria/`, `/pcp/` — existing portfolio subpages.
 
-## Main sections
-- Home / hero
-- About and expertise
-- Portfolio projects
-- Technical labs & professional capabilities
-- Contact section
+## Publisher verification
+The homepage represents L30 Technology as a software business. The founder's separate professional portfolio is retained under `/portfolio/` so buyers and merchant-of-record reviewers can distinguish the **Floating Camera software product** from the founder's work history. Terms, privacy, refund and official customer support are linked from the homepage.
 
-## Included project pages
-- `/floatingcamera/`
-- `/telemetria/`
-- `/curriculo/`
+Pricing published on the Floating Camera product page must agree with the Paddle Live catalog before Paddle re-review. Paddle Live checkout remains subject to the payment provider's merchant verification and approval.
 
-## Technical competencies
-Six static icon cards on the home page (no separate pages or links).
+## Deployment
+GitHub Actions deploys the `main` branch to GitHub Pages for the official custom domain. The site is static HTML/CSS/JavaScript. Preserve the existing company and product URLs during future changes.
 
-## Assets added in this version
-- Shared stylesheet: `/assets/site.css`
-- Custom SVG illustrations for each technical capability card
-
-## Notes
-- Main portfolio page and capability pages support English, Portuguese and Spanish through the language toggle.
-- This project is fully static and can be opened directly via `index.html` or hosted on any static hosting platform.
-
-## PCP Control Center — novo case demonstrativo
-
-Abra `pcp/index.html` no navegador ou acesse `/pcp/` após publicar.
-O simulador de Planejamento e Controle da Produção usa dados 100% fictícios, calcula capacidade e disponibilidade de materiais localmente no JavaScript e exporta CSV do cenário.
-Não há integração efetiva com TOTVS Protheus nem alegação de implantação real em cliente.
+The `/portfolio/` page uses `../`-relative links to preserve original root-level assets and portfolio demonstration pages.
