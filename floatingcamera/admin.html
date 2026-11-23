@@ -31,6 +31,7 @@
     .code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:#9deefa;font-weight:800;letter-spacing:.04em}
     .status{display:inline-block;padding:4px 9px;border-radius:20px;font-size:11px;font-weight:800}.on{background:#123b34;color:#8ceac6}.off{background:#44212a;color:#ffadb7}
     .coupon-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+    .delete-coupon{border-color:#914657;color:#ffabb9;background:#301b27}.delete-coupon:hover{background:#552632}
     #customerSection{min-width:0}
     .customer-list{width:100%;min-width:0;margin-top:16px}
     .customer-list-heading,.customer-list-row{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,.8fr) minmax(0,2fr);gap:12px;align-items:center}
@@ -451,7 +452,8 @@
             '<td data-label="Plano">' + html(planName(coupon.billing_mode)) + '</td>' +
             '<td data-label="Status"><span class="status ' + (active ? "on" : "off") + '">' + (active ? "Ativo" : "Inativo") + '</span></td>' +
             '<td data-label="Ações"><div class="coupon-actions"><button type="button" data-edit="' + html(coupon.id) + '">Editar</button>' +
-            '<button type="button" data-toggle="' + html(coupon.id) + '" data-active="' + String(active) + '">' + (active ? "Desativar" : "Ativar") + '</button></div></td>' +
+            '<button type="button" data-toggle="' + html(coupon.id) + '" data-active="' + String(active) + '">' + (active ? "Desativar" : "Ativar") + '</button>' +
+            '<button type="button" data-delete="' + html(coupon.id) + '" class="delete-coupon" aria-label="Excluir cupom ' + html(coupon.code) + '">Excluir</button></div></td>' +
           '</tr>';
         }).join("");
         rows.querySelectorAll("[data-edit]").forEach((button) => {
@@ -477,6 +479,26 @@
             }
           });
         });
+        rows.querySelectorAll("[data-delete]").forEach(button=>button.addEventListener("click",async()=>{
+          const coupon=couponCache.find(c=>c.id===button.dataset.delete);
+          if(!coupon)return;
+          const used=Number(coupon.redeemed_count||0);
+          const message="Excluir o cupom "+coupon.code+"?\n\n"+
+            "Ele desaparecerá das listas e não poderá ser usado novamente. "+
+            (used>0?"Existem "+used+" utilização(ões) registrada(s). As licenças já concedidas e o histórico serão preservados.":"Nenhuma utilização concluída será afetada.")+
+            "\n\nEsta ação não pode ser desfeita pelo painel.";
+          if(!window.confirm(message))return;
+          button.disabled=true;
+          try{
+            await invoke({action:"delete",id:coupon.id});
+            await loadCoupons();
+            await loadCustomers();
+            showNotice("Cupom "+coupon.code+" excluído das listas. Histórico e licenças concedidas foram preservados.");
+          }catch(error){
+            showNotice("Não foi possível excluir o cupom: "+error.message,true);
+            button.disabled=false;
+          }
+        }));
       }
       async function loadCoupons() {
         $("refreshButton").disabled = true;
