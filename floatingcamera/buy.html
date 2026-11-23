@@ -52,7 +52,7 @@
     .pricing-card{border:1px solid var(--line);border-radius:14px;background:#0c1422;padding:16px}
     .pricing-card.featured{border-color:#42b9a9;box-shadow:0 0 0 1px #42b9a955}
     .pricing-card h2{font-size:16px;margin:8px 0}
-    .pricing-card .price{font-size:28px;line-height:1.2;font-weight:800;letter-spacing:-.04em}
+    .pricing-card .price{font-size:32px;line-height:1.2;font-weight:800;letter-spacing:-.04em}.pricing-card .annual-total{font-size:15px;color:#e0ebf8;font-weight:750;margin:7px 0 4px}
     .pricing-card .detail{font-size:13px;color:var(--muted);margin:5px 0}
     .pricing-card .tag{display:inline-block;border-radius:20px;background:#163a3a;color:#91f3d7;padding:4px 9px;font-size:11px;font-weight:800}
     .free-note{border:1px solid var(--line);background:#0c1422;color:var(--muted);padding:12px 14px;border-radius:11px;font-size:13px;margin:0 0 22px}
@@ -97,8 +97,9 @@
         <article class="pricing-card featured">
           <span class="tag" data-i18n="annualTag">BEST VALUE · 7-DAY FREE TRIAL</span>
           <h2 data-i18n="annualCardTitle">Annual Pro</h2>
-          <div class="price" data-localized-price-plan="annual">US$ 19.99 / year</div>
-          <p class="detail" data-i18n="annualBilling">Billed annually after the 7-day free trial.</p>
+          <div class="price" data-i18n="annualMonthlyEquivalent" data-annual-monthly-equivalent>US$ 1.67 / month</div>
+          <div class="annual-total" data-localized-price-plan="annual">US$ 19.99 billed yearly</div>
+          <p class="detail" data-i18n="annualBilling">Monthly equivalent. One annual payment after the 7-day free trial.</p>
         </article>
         <article class="pricing-card">
           <span class="tag" data-i18n="monthlyTag">7-DAY FREE TRIAL</span>
@@ -203,7 +204,7 @@
           eyebrow:"FLOATING CAMERA PRO",title:"Remove the watermark with Pro",
           intro:"Floating Camera Free is available forever with the L30 Technology watermark. Pro removes the watermark and includes a 7-day free trial.",
           annualTag:"BEST VALUE · 7-DAY FREE TRIAL",annualCardTitle:"Annual Pro",
-          perMonth:"/ month equivalent",annualBilling:"US$ 19.99 billed annually after the free trial.",
+          perMonth:"/ month equivalent",annualMonthlyEquivalent:"US$ 1.67 / month",annualBilling:"Monthly equivalent. One annual payment after the 7-day free trial.",
           monthlyTag:"7-DAY FREE TRIAL",monthlyCardTitle:"Monthly Pro",perMonthActual:"/ month",
           monthlyBilling:"Billed monthly after the free trial.",
           freeNote:"Prefer not to subscribe? Keep using Floating Camera Free without an expiration date. Only the watermark remains.",
@@ -243,13 +244,13 @@
           eyebrow:"FLOATING CAMERA PRO",title:"Remova a marca-d’água com o Pro",
           intro:"O Floating Camera Free é gratuito para sempre, com a marca-d’água L30 Technology. O Pro remove a marca e inclui 7 dias grátis.",
           annualTag:"MELHOR CUSTO-BENEFÍCIO · 7 DIAS GRÁTIS",annualCardTitle:"Pro anual",
-          perMonth:"/ mês equivalente",annualBilling:"Cobrança anual após o teste grátis de 7 dias.",
+          perMonth:"/ mês equivalente",annualMonthlyEquivalent:"US$ 1,67 / mês",annualBilling:"Equivalente mensal. Cobrança anual após o teste grátis de 7 dias.",
           monthlyTag:"7 DIAS GRÁTIS",monthlyCardTitle:"Pro mensal",perMonthActual:"/ mês",
           monthlyBilling:"Cobrança mensal após o teste grátis de 7 dias.",
           freeNote:"Prefere não assinar? Continue usando o Floating Camera Free sem prazo de validade. Apenas a marca-d’água permanece.",
           customerType:"Tipo de cliente",individual:"Pessoa física",business:"Empresa",billingMode:"Modalidade de cobrança",
           monthlySubscription:"Mensal · US$ 2,49/mês · 7 dias grátis",
-          annualSubscription:"Anual · US$ 19,99/ano · 7 dias grátis",
+          annualSubscription:"Anual · equivalente a US$ 1,67/mês · US$ 19,99 cobrados por ano · 7 dias grátis",
           companyName:"Razão social",companyPlaceholder:"Nome da empresa",seats:"Quantidade de dispositivos",
           seatsHint:"Cada dispositivo utiliza uma licença. Máximo de 100 por pedido.",account:"SUA CONTA L30",
           email:"Endereço de e-mail",password:"Senha",signinHint:"Entre na sua conta para continuar ao pagamento seguro.",
@@ -283,13 +284,13 @@
           eyebrow:"FLOATING CAMERA PRO",title:"Elimina la marca de agua con Pro",
           intro:"Floating Camera Free es gratis para siempre con la marca de agua de L30 Technology. Pro elimina la marca e incluye 7 días gratis.",
           annualTag:"MEJOR OFERTA · 7 DÍAS GRATIS",annualCardTitle:"Pro anual",
-          perMonth:"/ mes equivalente",annualBilling:"Cobro anual después de la prueba gratuita de 7 días.",
+          perMonth:"/ mes equivalente",annualMonthlyEquivalent:"US$ 1,67 / mes",annualBilling:"Equivalente mensual. Cobro anual después de la prueba gratuita de 7 días.",
           monthlyTag:"7 DÍAS GRATIS",monthlyCardTitle:"Pro mensual",perMonthActual:"/ mes",
           monthlyBilling:"Cobro mensual después de la prueba gratuita de 7 días.",
           freeNote:"¿Prefieres no suscribirte? Sigue usando Floating Camera Free sin fecha de vencimiento. Solo permanece la marca de agua.",
           customerType:"Tipo de cliente",individual:"Persona",business:"Empresa",billingMode:"Modalidad de pago",
           monthlySubscription:"Mensual · US$ 2,49/mes · 7 días gratis",
-          annualSubscription:"Anual · US$ 19,99/año · 7 días gratis",
+          annualSubscription:"Anual · equivalente a US$ 1,67/mes · US$ 19,99 cobrados al año · 7 días gratis",
           companyName:"Nombre legal de la empresa",companyPlaceholder:"Nombre de la empresa",seats:"Cantidad de dispositivos",
           seatsHint:"Cada dispositivo utiliza una licencia. Máximo de 100 por pedido.",account:"TU CUENTA L30",
           email:"Correo electrónico",password:"Contraseña",signinHint:"Inicia sesión para continuar al pago seguro.",
