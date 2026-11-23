@@ -1,6 +1,7 @@
 (function () {
   "use strict";
   const prices = { annual: null, monthly: null };
+  let annualAmountMinor = null;
   let generation = 0;
 
   function language() {
@@ -12,23 +13,53 @@
     return language() === "pt" ? "BRL" : "USD";
   }
 
+  function formatMonthlyEquivalent(minorUnits, lang) {
+    // USD and BRL both use two decimal places. The amount comes from Paddle,
+    // so the monthly equivalent follows the selected currency's annual price.
+    if (!Number.isFinite(minorUnits)) return null;
+    const locale = lang === "pt" ? "pt-BR" : lang === "es" ? "es-ES" : "en-US";
+    const formatted = new Intl.NumberFormat(locale, {
+      style: "currency", currency: currencyCode(),
+      minimumFractionDigits: 2, maximumFractionDigits: 2
+    }).format(minorUnits / 1200);
+    const suffix = { en: " / month", pt: " / mês", es: " / mes" }[lang];
+    return formatted + suffix;
+  }
+
   function renderLocalizedPrices() {
     const lang = language();
     const suffix = {
-      en: { annual: "/ year", monthly: "/ month" },
-      pt: { annual: "/ ano", monthly: "/ mês" },
-      es: { annual: "/ año", monthly: "/ mes" }
+      en: { monthly: "/ month", billed: "billed yearly" },
+      pt: { monthly: "/ mês", billed: "cobrados por ano" },
+      es: { monthly: "/ mes", billed: "cobrados al año" }
     }[lang];
+    const equivalent = formatMonthlyEquivalent(annualAmountMinor, lang);
+
+    document.querySelectorAll("[data-annual-monthly-equivalent]").forEach((element) => {
+      if (equivalent) element.textContent = equivalent;
+    });
 
     document.querySelectorAll("[data-localized-price-plan]").forEach((element) => {
       const plan = element.dataset.localizedPricePlan;
-      if (prices[plan]) element.textContent = prices[plan] + " " + suffix[plan];
+      if (!prices[plan]) return;
+      element.textContent = plan === "annual"
+        ? prices.annual + " " + suffix.billed
+        : prices.monthly + " " + suffix.monthly;
     });
 
     const optionLabels = {
-      en: { annual: (value) => "Annual · " + value + "/year · 7-day free trial", monthly: (value) => "Monthly · " + value + "/month · 7-day free trial" },
-      pt: { annual: (value) => "Anual · " + value + "/ano · 7 dias grátis", monthly: (value) => "Mensal · " + value + "/mês · 7 dias grátis" },
-      es: { annual: (value) => "Anual · " + value + "/año · 7 días gratis", monthly: (value) => "Mensual · " + value + "/mes · 7 días gratis" }
+      en: {
+        annual: (value) => "Annual · " + (equivalent || "monthly equivalent") + " equivalent · " + value + " billed yearly · 7-day free trial",
+        monthly: (value) => "Monthly · " + value + "/month · 7-day free trial"
+      },
+      pt: {
+        annual: (value) => "Anual · " + (equivalent || "equivalente mensal") + " (equivalente) · " + value + " cobrados por ano · 7 dias grátis",
+        monthly: (value) => "Mensal · " + value + "/mês · 7 dias grátis"
+      },
+      es: {
+        annual: (value) => "Anual · " + (equivalent || "equivalente mensual") + " (equivalente) · " + value + " cobrados al año · 7 días gratis",
+        monthly: (value) => "Mensual · " + value + "/mes · 7 días gratis"
+      }
     }[lang];
 
     document.querySelectorAll("[data-localized-price-option]").forEach((option) => {
@@ -80,7 +111,11 @@
     for (const item of lineItems) {
       const id = item && item.price ? item.price.id : null;
       const displayValue = item && item.formattedTotals ? item.formattedTotals.subtotal : null;
-      if (id === catalog.annualPriceId && displayValue) prices.annual = displayValue;
+      if (id === catalog.annualPriceId && displayValue) {
+        prices.annual = displayValue;
+        const minor = Number(item && item.totals ? item.totals.subtotal : NaN);
+        annualAmountMinor = Number.isFinite(minor) ? minor : null;
+      }
       if (id === catalog.monthlyPriceId && displayValue) prices.monthly = displayValue;
     }
 
