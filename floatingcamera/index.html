@@ -1,6 +1,27 @@
 <!doctype html>
 <html lang="en">
 <head>
+<script>
+/* Keep the public site address clean, regardless of incoming tracking links. */
+(function () {
+  try {
+    var url = new URL(window.location.href);
+    var changed = false;
+    ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
+     'utm_id', 'gclid', 'fbclid', 'msclkid'].forEach(function (key) {
+      if (url.searchParams.has(key)) {
+        url.searchParams.delete(key);
+        changed = true;
+      }
+    });
+    if (changed) {
+      window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
+    }
+  } catch (error) {
+    /* Never block page loading if browser history is restricted. */
+  }
+})();
+</script>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#080d17"><meta name="color-scheme" content="dark">
 <meta name="description" content="Floating Camera by L30 Technology. Keep your webcam visible over any Windows app with customizable shapes, backgrounds, and camera switching.">
