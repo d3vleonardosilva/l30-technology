@@ -188,7 +188,7 @@
         <button type="button" id="closeCouponHistory">Fechar</button>
       </div>
       <p class="hint" id="couponHistoryCustomer"></p>
-      <p class="hint">Registro dos cupons resgatados por esta conta. A licença ativa pode ser a de maior validade, não necessariamente o último cupom.</p>
+      <p class="hint">O cupom de cortesia mais recente substitui os anteriores, inclusive quando tiver menor prazo. As aplicações anteriores permanecem neste histórico. Assinaturas pagas são independentes.</p>
       <div class="table-wrap">
         <table style="min-width:0"><thead><tr><th>Código</th><th>Prazo</th><th>Aplicado em</th></tr></thead><tbody id="couponHistoryBody"></tbody></table>
       </div>
@@ -414,7 +414,7 @@
               const coupon=couponCache.find(c=>c.id===select.value);
               if(!coupon||coupon.grant_mode!=="complimentary_license")return;
               const email=select.dataset.customerEmail;
-              if(!window.confirm("Aplicar o cupom "+coupon.code+" ("+coupon.trial_days+" dias) à conta "+email+"?\n\nA licença Pro será ativada imediatamente, consumindo uma utilização do cupom. Esta ação não efetua cobrança."))return;
+              if(!window.confirm("Aplicar o cupom "+coupon.code+" ("+coupon.trial_days+" dias) à conta "+email+"?\n\nO cupom será aplicado imediatamente e substituirá TODAS as licenças de cortesia anteriores desta conta, mesmo que a validade fique MENOR. O período começará agora e não será somado. Assinaturas pagas não serão alteradas. Esta ação não efetua cobrança."))return;
               applyButton.disabled=true;
               try{
                 const result=await invokeCustomers({action:"apply_customer_coupon",customer_id:select.dataset.customerId,coupon_id:coupon.id});
