@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080d17">
+<title>Complete seu cadastro | Floating Camera · L30 Technology</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#f5f9ff;background:#080d17}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0,#173a58,#080d17 55%);padding:36px 16px;line-height:1.55}
+main{width:min(560px,100%);margin:32px auto;background:#121e30;border:1px solid #30435a;border-radius:20px;padding:clamp(22px,5vw,38px)}
+header{max-width:560px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:12px}
+a{color:#7ae7ed}header a{text-decoration:none;font-weight:700}label{display:block;margin:18px 0 6px;font-size:14px;font-weight:700}
+input,select{width:100%;padding:13px;border:1px solid #425775;border-radius:10px;background:#0a1524;color:#f5f9ff;font:inherit}
+button{border:0;border-radius:10px;background:linear-gradient(105deg,#63baff,#82e6df);color:#071321;padding:14px 22px;font:inherit;font-weight:800;cursor:pointer;margin-top:23px;width:100%}
+button:disabled{opacity:.55}p{color:#aebfd3}h1{font-size:clamp(25px,5vw,33px);margin:11px 0}.tag{color:#7ae7ed;font-size:12px;letter-spacing:.13em;font-weight:800}
+#notice{white-space:pre-wrap;min-height:22px;color:#f6c1c6;margin:16px 0}#businessBlock[hidden],#registrationForm[hidden]{display:none}
+.hint{font-size:12px}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="./supabase-config.js"></script>
+</head>
+<body>
+<header><a href="./">Floating Camera · L30 Technology</a><select id="lang" style="width:105px" aria-label="Language"><option value="pt">PT</option><option value="en">EN</option><option value="es">ES</option></select></header>
+<main>
+<span class="tag" id="tag">CADASTRO CONFIRMADO</span>
+<h1 id="heading">Complete seu cadastro</h1>
+<p id="subtitle">Antes de prosseguir ao pagamento, confirme seus dados e clique em Salvar cadastro.</p>
+<p id="notice" role="status"></p>
+<form id="registrationForm" hidden>
+  <label for="email" id="emailLabel">E-mail confirmado</label>
+  <input id="email" type="email" readonly>
+  <label for="fullName" id="nameLabel">Nome completo *</label>
+  <input id="fullName" maxlength="120" minlength="3" autocomplete="name" required>
+  <label for="phone" id="phoneLabel">Telefone com DDD *</label>
+  <input id="phone" type="tel" minlength="8" maxlength="30" autocomplete="tel" placeholder="+55 11 99999-9999" required>
+  <label for="customerType" id="typeLabel">Tipo de cadastro *</label>
+  <select id="customerType"><option value="individual" id="individual">Pessoa física</option><option value="business" id="business">Empresa</option></select>
+  <div id="businessBlock" hidden><label for="company" id="companyLabel">Razão social *</label><input id="company" maxlength="180" autocomplete="organization"></div>
+  <p class="hint" id="privacy">Seus dados serão utilizados para identificar sua conta, prestar suporte e administrar suas licenças. Consulte nossa <a href="privacy.html">Política de Privacidade</a>.</p>
+  <button type="submit" id="save">Salvar cadastro e continuar</button>
+</form>
+<p class="hint"><a href="buy.html" id="back">Voltar aos planos</a></p>
+</main>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const copy={
+pt:{tag:"E-MAIL CONFIRMADO",heading:"Complete seu cadastro",subtitle:"Antes de prosseguir ao pagamento, preencha seus dados e clique em Salvar cadastro.",emailLabel:"E-mail confirmado",nameLabel:"Nome completo *",phoneLabel:"Telefone com DDD *",typeLabel:"Tipo de cadastro *",individual:"Pessoa física",business:"Empresa",companyLabel:"Razão social *",save:"Salvar cadastro e continuar",back:"Voltar aos planos",privacy:'Seus dados serão usados para sua conta, suporte e licenças. Consulte a <a href="privacy.html">Política de Privacidade</a>.',login:"Abra seu e-mail, confirme a conta e acesse novamente este endereço. Se necessário, entre primeiro pela página de compra.",saving:"Salvando cadastro...",error:"Não foi possível salvar o cadastro. Confira os dados e tente novamente.",completed:"Cadastro salvo. Redirecionando aos planos..."},
+en:{tag:"EMAIL VERIFIED",heading:"Complete your registration",subtitle:"Before payment, fill in your details and save your registration.",emailLabel:"Verified email",nameLabel:"Full name *",phoneLabel:"Phone number *",typeLabel:"Customer type *",individual:"Individual",business:"Business",companyLabel:"Legal business name *",save:"Save registration and continue",back:"Back to plans",privacy:'Your details help manage your account, support and licenses. Read the <a href="privacy.html">Privacy Policy</a>.',login:"Verify your email and sign in through the purchase page if needed.",saving:"Saving registration...",error:"Registration could not be saved. Please check your details.",completed:"Saved. Redirecting to plans..."},
+es:{tag:"CORREO VERIFICADO",heading:"Completa tu registro",subtitle:"Antes de pagar, completa tus datos y guarda tu registro.",emailLabel:"Correo confirmado",nameLabel:"Nombre completo *",phoneLabel:"Teléfono *",typeLabel:"Tipo de cliente *",individual:"Persona",business:"Empresa",companyLabel:"Razón social *",save:"Guardar registro y continuar",back:"Volver a planes",privacy:'Tus datos sirven para administrar tu cuenta, soporte y licencias. Consulta la <a href="privacy.html">Política de privacidad</a>.',login:"Confirma tu correo e inicia sesión desde la página de compra si es necesario.",saving:"Guardando...",error:"No fue posible guardar el registro. Revisa los datos.",completed:"Registro guardado. Volviendo a los planes..."}
+};
+let lang=localStorage.getItem("fc-language")||"pt";if(!copy[lang])lang="pt";
+function translate(){document.documentElement.lang=lang;for(const [key,value] of Object.entries(copy[lang]))if($(key)&&!["privacy"].includes(key))$(key).textContent=value;$("privacy").innerHTML=copy[lang].privacy;$("lang").value=lang}
+$("lang").addEventListener("change",e=>{lang=e.target.value;localStorage.setItem("fc-language",lang);translate()});translate();
+const supabase=window.supabase.createClient(window.L30_SUPABASE_URL,window.L30_SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+$("customerType").addEventListener("change",()=>{$("businessBlock").hidden=$("customerType").value!=="business";$("company").required=$("customerType").value==="business"});
+let currentUser=null;
+async function initialize(){
+  let session=null;
+  for(let i=0;i<5;i++){
+    const value=await supabase.auth.getSession();session=value.data.session;
+    if(session)break;
+    await new Promise(r=>setTimeout(r,250));
+  }
+  if(!session){$("notice").textContent=copy[lang].login;return}
+  const {data,error}=await supabase.auth.getUser();
+  if(error||!data.user?.email_confirmed_at){$("notice").textContent=copy[lang].login;return}
+  currentUser=data.user;$("email").value=currentUser.email||"";$("registrationForm").hidden=false;
+  const {data:profile}=await supabase.from("customer_profiles").select("display_name,customer_type").eq("user_id",currentUser.id).maybeSingle();
+  if(profile?.display_name)$("fullName").value=profile.display_name;
+  if(profile?.customer_type){$("customerType").value=profile.customer_type;$("customerType").dispatchEvent(new Event("change"))}
+}
+$("registrationForm").addEventListener("submit",async e=>{
+ e.preventDefault();if(!currentUser)return;
+ const button=$("save");button.disabled=true;$("notice").textContent=copy[lang].saving;
+ try{
+  const {data,error}=await supabase.functions.invoke("customer-management",{body:{action:"save_profile",full_name:$("fullName").value,phone:$("phone").value,customer_type:$("customerType").value,organization_name:$("company").value}});
+  if(error||!data?.ok)throw Error(data?.error||error?.message||"save_failed");
+  $("notice").textContent=copy[lang].completed;
+  const params=new URLSearchParams(window.location.search);const plan=params.get("plan");
+  const dest=new URL("buy.html",window.location.href);if(plan==="monthly"||plan==="annual")dest.searchParams.set("plan",plan);
+  dest.searchParams.set("registered","1");window.location.assign(dest.toString());
+ }catch(err){console.error("Registration error",err);$("notice").textContent=copy[lang].error;button.disabled=false}
+});
+initialize().catch(e=>{$("notice").textContent=copy[lang].login;console.error(e)});
+})();
+</script>
+</body>
+</html>
