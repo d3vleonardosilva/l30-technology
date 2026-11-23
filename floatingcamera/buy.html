@@ -143,13 +143,6 @@
           </div>
         </div>
 
-        <div class="coupon-field">
-          <label for="couponCode" data-i18n="couponCode">Promotional code (optional)</label>
-          <input id="couponCode" type="text" maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="L30TESTE15">
-          <div class="hint" data-i18n="couponHint">Enter a promotional code to receive a different free-trial period.</div>
-          <div class="hint">Cupom de licença gratuita, sem cartão? <a href="redeem.html">Resgate aqui</a>. / Complimentary license coupon? <a href="redeem.html">Redeem here</a>.</div>
-        </div>
-
         <div class="divider"></div>
         <div class="eyebrow" data-i18n="account">YOUR L30 ACCOUNT</div>
         <label for="email" data-i18n="email">Email address</label>
@@ -419,12 +412,6 @@
       customerType.addEventListener("change", () => {
         companyFields.hidden = customerType.value !== "business";
       });
-      $("couponCode").addEventListener("input", () => {
-        const field = $("couponCode");
-        const start = field.selectionStart;
-        field.value = field.value.toUpperCase().replace(/[^A-Z0-9_-]/g, "");
-        field.setSelectionRange(start, start);
-      });
       $("toggleAuth").addEventListener("click", () => {
         creatingAccount = !creatingAccount;
         if (!creatingAccount) $("signupPasswordConfirm").value = "";
@@ -574,7 +561,6 @@
               organization_name: customer === "business" ? $("companyName").value.trim() : undefined,
               country_code: undefined,
               currency_code: language === "pt" ? "BRL" : "USD",
-              coupon_code: $("couponCode").value.trim().toUpperCase() || undefined,
               terms_accepted: $("termsAccepted").checked,
               privacy_acknowledged: $("termsAccepted").checked
             }
