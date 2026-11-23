@@ -435,12 +435,12 @@
           const active = coupon.is_active === true;
           return '<tr>' +
             '<td data-label="Código"><span class="code">' + html(coupon.code) + '</span><div class="hint">' + html(coupon.description || "") + '</div></td>' +
-            '<td data-label="Código">' + html(coupon.trial_days) + ' dias<div class="hint">' + (coupon.grant_mode === 'complimentary_license' ? 'Sem cartão / sem cobrança' : 'Assinatura Paddle') + '</div></td>' +
-            '<td data-label="Código">' + count + ' / ' + html(limit) + (pending ? '<div class="hint">' + pending + ' reserva(s) em andamento</div>' : '') + '</td>' +
-            '<td data-label="Código">' + html(formatDate(coupon.valid_until)) + '</td>' +
-            '<td data-label="Código">' + html(planName(coupon.billing_mode)) + '</td>' +
-            '<td data-label="Código"><span class="status ' + (active ? "on" : "off") + '">' + (active ? "Ativo" : "Inativo") + '</span></td>' +
-            '<td data-label="Código"><div class="coupon-actions"><button type="button" data-edit="' + html(coupon.id) + '">Editar</button>' +
+            '<td data-label="Prazo">' + html(coupon.trial_days) + ' dias<div class="hint">' + (coupon.grant_mode === 'complimentary_license' ? 'Sem cartão / sem cobrança' : 'Assinatura Paddle') + '</div></td>' +
+            '<td data-label="Utilizações">' + count + ' / ' + html(limit) + (pending ? '<div class="hint">' + pending + ' reserva(s) em andamento</div>' : '') + '</td>' +
+            '<td data-label="Validade">' + html(formatDate(coupon.valid_until)) + '</td>' +
+            '<td data-label="Plano">' + html(planName(coupon.billing_mode)) + '</td>' +
+            '<td data-label="Status"><span class="status ' + (active ? "on" : "off") + '">' + (active ? "Ativo" : "Inativo") + '</span></td>' +
+            '<td data-label="Ações"><div class="coupon-actions"><button type="button" data-edit="' + html(coupon.id) + '">Editar</button>' +
             '<button type="button" data-toggle="' + html(coupon.id) + '" data-active="' + String(active) + '">' + (active ? "Desativar" : "Ativar") + '</button></div></td>' +
           '</tr>';
         }).join("");
