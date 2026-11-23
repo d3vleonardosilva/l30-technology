@@ -319,7 +319,8 @@
       }
       function customerLicenseStatus(licenseRows) {
         const rows=Array.isArray(licenseRows)?licenseRows:[];
-        const active=rows.find(item=>item.status==="active"&&new Date(item.ends_at).getTime()>Date.now());
+        const active=rows.filter(item=>item.status==="active"&&new Date(item.ends_at).getTime()>Date.now())
+          .sort((a,b)=>new Date(b.ends_at).getTime()-new Date(a.ends_at).getTime())[0];
         return active ? "Pro ativo até "+formatDate(active.ends_at) : rows.length ? "Sem Pro ativo" : "Nenhuma licença";
       }
       async function loadCustomers() {
