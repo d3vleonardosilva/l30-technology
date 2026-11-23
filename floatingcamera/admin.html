@@ -343,9 +343,17 @@
               ? (customer.registration_completed_at?"Cadastro completo":"E-mail confirmado · dados pendentes")
               : "E-mail não confirmado";
             const history=customer.applied_coupons||[];
-            const linked=history.length
-              ? '<button type="button" class="history-link" data-coupon-history="'+html(customer.user_id)+'">Histórico de cupons ('+history.length+')</button>'
-              : '<span class="muted">Nenhum cupom utilizado</span>';
+            const activeLicenses=(customer.license_status||[]).filter(item=>
+              item.status==="active"&&new Date(item.ends_at).getTime()>Date.now()
+            ).sort((a,b)=>new Date(b.ends_at).getTime()-new Date(a.ends_at).getTime());
+            const currentLicense=activeLicenses[0];
+            const currentCoupon=currentLicense?history.find(item=>item.order_id===currentLicense.order_id):null;
+            const currentCouponLabel=currentCoupon
+              ? '<strong class="code">'+html(currentCoupon.code)+'</strong>'
+              : (currentLicense?'<span class="muted">Licença Pro sem cupom</span>':'<span class="muted">Nenhum cupom ativo</span>');
+            const linked=currentCouponLabel+(history.length>1
+              ? '<div><button type="button" class="history-link" data-coupon-history="'+html(customer.user_id)+'">Histórico de cupons ('+history.length+')</button></div>'
+              : '');
             return '<div class="customer-list-row" role="row">'+
               '<div class="customer-cell" role="cell" data-label="Cliente / cadastro"><div class="customer-name">'+identity+'</div>'+
               '<div class="hint">'+email+'</div><div class="hint">'+html(customer.phone||"Telefone não informado")+'</div>'+
