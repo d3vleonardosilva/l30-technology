@@ -313,7 +313,8 @@
         try {
           const result=await invokeCustomers({action:"list_customers"});
           const customers=result.customers||[];
-          const options=couponCache.map(coupon=>{
+          const activeCoupons=couponCache.filter(coupon=>coupon.is_active===true);
+          const options=activeCoupons.map(coupon=>{
             const label=coupon.code+" · "+coupon.trial_days+" dias · "+
               (coupon.grant_mode==="complimentary_license"?"Gratuito":"Paddle")+
               (coupon.is_active?"":" · Inativo");
@@ -333,8 +334,8 @@
               '<div class="customer-cell" role="cell" data-label="Licença">'+html(customerLicenseStatus(customer.license_status))+'</div>'+
               '<div class="customer-cell" role="cell" data-label="Cupons vinculados">'+linked+'</div>'+
               '<div class="customer-cell" role="cell" data-label="Aplicar cupom">'+
-                '<div class="customer-coupon-control"><select class="customer-coupon-list" data-customer-id="'+html(customer.user_id)+'" data-customer-email="'+email+'" aria-label="Selecionar cupom para '+identity+'" '+(couponCache.length?"":"disabled")+'>'+
-                  '<option value="">'+(couponCache.length?"Selecione um cupom":"Nenhum cupom cadastrado")+'</option>'+options+'</select>'+
+                '<div class="customer-coupon-control"><select class="customer-coupon-list" data-customer-id="'+html(customer.user_id)+'" data-customer-email="'+email+'" aria-label="Selecionar cupom para '+identity+'" '+(activeCoupons.length?"":"disabled")+'>'+
+                  '<option value="">'+(activeCoupons.length?"Selecione um cupom":"Nenhum cupom ativo")+'</option>'+options+'</select>'+
                   '<button type="button" data-apply-coupon disabled>Aplicar</button></div>'+
                 '<div class="hint customer-coupon-detail" aria-live="polite">Selecione uma licença gratuita para conceder ao cliente.</div>'+
               '</div></div>';
