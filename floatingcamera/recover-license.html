@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recuperar licença · Floating Camera · L30 Technology</title>
+<style>
+:root{color-scheme:dark;--bg:#080d17;--surface:#111b2c;--line:#29374d;--ink:#f5f9ff;--muted:#a9b7cd;--cyan:#68e5f3}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:680px;margin:5vh auto;padding:clamp(18px,4vw,32px);background:var(--surface);border:1px solid var(--line);border-radius:18px}
+h1{font-size:clamp(24px,5vw,34px);margin:7px 0}p{color:var(--muted)}
+a{color:var(--cyan)}label{display:block;font-weight:750;margin:15px 0 6px}
+input{width:100%;padding:12px;border:1px solid #42536b;border-radius:9px;background:#080d17;color:white;font:inherit}
+button{border:1px solid #405671;border-radius:9px;background:#1b3048;color:white;padding:11px 15px;font:inherit;font-weight:750;cursor:pointer}
+button.primary{border:0;background:linear-gradient(110deg,#66b6ff,#7ce9ed);color:#071321}
+button:disabled{opacity:.55;cursor:not-allowed}.actions{display:flex;flex-wrap:wrap;gap:9px;margin:18px 0}
+#notice{white-space:pre-wrap;color:var(--cyan);margin:14px 0}#notice.error{color:#ffadb7}
+[hidden]{display:none!important}small{color:var(--muted)}.box{background:#0c1422;border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:14px}
+</style>
+</head>
+<body>
+<main>
+<p><a href="./">← Floating Camera</a></p>
+<h1>Recuperar minha licença</h1>
+<p>Formatou ou reinstalou o Windows? Entre com a <strong>mesma conta</strong> utilizada na compra ou concessão da licença. Não será necessário resgatar o cupom novamente. A validade original será preservada.</p>
+<form id="login">
+<label for="email">E-mail cadastrado</label>
+<input id="email" type="email" autocomplete="username" required>
+<label for="password">Senha</label>
+<input id="password" type="password" autocomplete="current-password" required>
+<div class="actions"><button class="primary" type="submit" id="signin">Entrar na conta</button></div>
+</form>
+<section id="recover" hidden>
+<div class="box">
+<strong id="signedAs"></strong>
+<p>Abra o Floating Camera neste Windows, clique em <strong>Ativar licença</strong> e copie o identificador exibido. Informe-o abaixo para gerar o arquivo de recuperação.</p>
+<label for="device">Identificador do dispositivo (Device ID)</label>
+<input id="device" maxlength="64" pattern="[A-Fa-f0-9]{16,64}" autocomplete="off" spellcheck="false" placeholder="Ex.: A1B2C3D4E5F60789" required>
+<label for="label">Nome do computador (opcional)</label>
+<input id="label" maxlength="120" autocomplete="off" placeholder="Notebook pessoal">
+<div class="actions"><button class="primary" id="activate" type="button">Recuperar licença</button><button id="logout" type="button">Sair da conta</button></div>
+</div>
+<div id="downloadArea" class="box" hidden>
+<strong>Licença recuperada</strong><p id="expiry"></p>
+<div class="actions"><button type="button" class="primary" id="download">Baixar licença JSON</button><button type="button" id="copy">Copiar licença</button></div>
+<small>No aplicativo, utilize a opção de importar licença JSON ou cole o conteúdo no campo de ativação. O arquivo contém uma licença assinada; não compartilhe com terceiros.</small>
+</div>
+</section>
+<p id="notice" role="status" aria-live="polite"></p>
+<small>Se o dispositivo mudou, a transferência exige confirmação explícita e só pode ocorrer uma vez a cada 30 dias. Transferências excepcionais: <a href="mailto:contact@l30.tec.br">contact@l30.tec.br</a>. Sua licença continua vinculada à conta, com a mesma data de vencimento.</small>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase-config.js"></script>
+<script>
+(()=>{"use strict";
+const $=id=>document.getElementById(id);let client=null,license=null;
+function notice(message,error=false){$("notice").textContent=message;$("notice").classList.toggle("error",error);}
+function setSignedIn(email){$("login").hidden=true;$("recover").hidden=false;$("signedAs").textContent="Conta: "+email;notice("");}
+async function getClient(){
+if(!window.supabase?.createClient||!window.L30_SUPABASE_URL||!window.L30_SUPABASE_PUBLISHABLE_KEY)throw Error("Serviço indisponível.");
+if(!client)client=window.supabase.createClient(window.L30_SUPABASE_URL,window.L30_SUPABASE_PUBLISHABLE_KEY);
+return client;
+}
+$("login").addEventListener("submit",async e=>{
+e.preventDefault();$("signin").disabled=true;notice("Autenticando...");
+try{const api=await getClient();const {data,error}=await api.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});if(error||!data?.user?.email_confirmed_at)throw Error("Confira o e-mail, a senha e a confirmação da conta.");setSignedIn(data.user.email);}
+catch(err){notice(err.message,true)}finally{$("signin").disabled=false}
+});
+async function requestActivation(transfer=false){
+const api=await getClient();
+const input={device_id:$("device").value.trim().toUpperCase(),device_label:$("label").value.trim()||"Windows PC",transfer_device:transfer};
+if(!/^[A-F0-9]{16,64}$/.test(input.device_id))throw Error("Informe o identificador hexadecimal do dispositivo (16 a 64 caracteres).");
+const {data,error}=await api.functions.invoke("activate-device",{body:input});
+if(error){
+let detail=null;try{detail=await error.context?.json()}catch{}
+const code=detail?.error||"activation_unavailable";
+if(code==="device_limit_reached"&&!transfer){
+const confirmed=window.confirm("Esta licença já está associada a outro identificador de dispositivo.\n\nDeseja transferi-la para este Windows? A ativação anterior será revogada no servidor. Transferências só podem ocorrer uma vez a cada 30 dias. Não altera a validade nem consome cupons.");
+if(!confirmed)throw Error("Transferência cancelada. Sua licença original permanece ativa.");
+return requestActivation(true);
+}
+const descriptions={transfer_cooldown:"Uma transferência já foi realizada nos últimos 30 dias. Contate o suporte para uma exceção.",transfer_requires_support:"Não foi possível fazer uma transferência automática. Contate o suporte.",no_available_license_or_device_slots:"Nenhuma licença Pro válida foi encontrada para esta conta.",invalid_session:"Sessão expirada. Entre novamente."};
+throw Error(descriptions[code]||code);
+}
+if(!data?.license?.payload||!data?.license?.signature)throw Error("O servidor não retornou uma licença válida.");
+license=data.license;$("downloadArea").hidden=false;
+$("expiry").textContent="Válida até: "+new Date(data.license.payload.expires_at).toLocaleString("pt-BR")+". O prazo original foi mantido.";
+notice("Licença recuperada com sucesso. Baixe e importe o arquivo no Floating Camera.");
+}
+$("activate").addEventListener("click",async()=>{$("activate").disabled=true;$("downloadArea").hidden=true;license=null;notice("Consultando licença...");
+try{await requestActivation()}catch(e){notice(e.message,true)}finally{$("activate").disabled=false}});
+$("download").addEventListener("click",()=>{
+if(!license)return;const json=JSON.stringify(license,null,2);const blob=new Blob([json],{type:"application/json"});
+const link=document.createElement("a");const url=URL.createObjectURL(blob);link.href=url;link.download="FloatingCamera-License.json";document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+$("copy").addEventListener("click",async()=>{if(!license)return;try{await navigator.clipboard.writeText(JSON.stringify(license,null,2));notice("Licença copiada. Cole no campo de ativação do aplicativo.")}catch{notice("Não foi possível copiar automaticamente. Utilize o download do arquivo.",true)}});
+$("logout").addEventListener("click",async()=>{try{await client?.auth.signOut()}catch{}$("recover").hidden=true;$("login").hidden=false;$("downloadArea").hidden=true;license=null;notice("")});
+getClient().then(async api=>{const {data}=await api.auth.getUser();if(data?.user?.email_confirmed_at)setSignedIn(data.user.email)}).catch(()=>{});
+})();
+</script>
+</body></html>
