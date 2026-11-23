@@ -30,6 +30,41 @@
     .code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:#9deefa;font-weight:800;letter-spacing:.04em}
     .status{display:inline-block;padding:4px 9px;border-radius:20px;font-size:11px;font-weight:800}.on{background:#123b34;color:#8ceac6}.off{background:#44212a;color:#ffadb7}
     .coupon-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+    /* Customer accounts use responsive cards: no horizontal scrolling. */
+    #customerSection{min-width:0}
+    .customer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,410px),1fr));gap:14px;margin-top:18px}
+    .customer-card{min-width:0;background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:18px;overflow-wrap:anywhere}
+    .customer-card header{display:flex;justify-content:space-between;gap:12px;align-items:start;flex-wrap:wrap}
+    .customer-card h3{font-size:17px;margin:0;line-height:1.25}
+    .customer-card p{margin:4px 0}
+    .customer-card .customer-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0}
+    .customer-card .customer-label{font-size:11px;font-weight:800;letter-spacing:.07em;color:var(--muted);text-transform:uppercase}
+    .customer-card .customer-value{font-size:13px;margin-top:3px}
+    .customer-card .customer-coupon-control{display:flex;gap:9px;align-items:stretch;margin-top:9px;min-width:0}
+    .customer-card .customer-coupon-list{flex:1;min-width:0;width:0}
+    .customer-card [data-apply-coupon]{flex:0 0 auto;padding:9px 16px;background:#1c4355;border-color:#478c9a}
+    .customer-card [data-apply-coupon]:not(:disabled){background:linear-gradient(110deg,#66b6ff,#7ce9ed);color:#071321}
+    .customer-card .customer-coupon-detail{overflow-wrap:anywhere}
+    .table-wrap{max-width:100%;overflow-x:visible}
+    table{min-width:0;table-layout:fixed}
+    td,th{overflow-wrap:anywhere}
+    .coupon-actions{min-width:0}
+    @media(max-width:860px){
+      #customerSection .row{align-items:flex-start}
+      #couponRows tr{display:block;padding:10px 0;border-bottom:1px solid var(--line)}
+      #couponRows td{display:block;width:100%;padding:6px 8px;border:0}
+      #couponRows td::before{content:attr(data-label);display:block;font-size:10px;font-weight:800;text-transform:uppercase;color:var(--muted);letter-spacing:.06em}
+      #couponRows td:first-child{padding-top:12px}
+      #couponRows td:last-child{padding-bottom:12px}
+      #couponRows~*{min-width:0}
+      #adminPanel .table-wrap table thead{display:none}
+    }
+    @media(max-width:480px){
+      .customer-card{padding:13px}
+      .customer-card .customer-meta{grid-template-columns:1fr}
+      .customer-card .customer-coupon-control{gap:6px}
+      .customer-card [data-apply-coupon]{padding:9px 11px}
+    }
     dialog.edit-dialog{width:min(720px,calc(100% - 24px));max-height:calc(100% - 32px);overflow:auto;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:18px;padding:clamp(18px,4vw,28px);box-shadow:0 24px 80px #0009}
     dialog.edit-dialog::backdrop{background:#020611c9;backdrop-filter:blur(3px)}
     dialog.edit-dialog h2{margin:0}
@@ -132,11 +167,8 @@
         <div class="row"><div><h2>Contas dos clientes</h2><p class="hint">Contas cadastradas, confirmação de e-mail, dados pessoais e licenças. Selecione um cupom da área superior e clique em Aplicar para conceder uma licença gratuita diretamente ao cliente.</p></div>
         <button id="refreshCustomers" type="button">Atualizar clientes</button></div>
         <p class="hint">Conta corporativa: <strong>contact@l30.tec.br</strong> — acesso administrativo confirmado. Selecione um cupom gratuito e clique em Aplicar para conceder a licença ao cliente. Cupons vinculados ao Paddle exigem checkout.</p>
-        <div class="table-wrap">
-          <table style="min-width:1150px">
-            <thead><tr><th>Cliente / e-mail</th><th>Cadastro</th><th>Licença</th><th>Cupons vinculados</th><th>Lista de cupons cadastrados</th></tr></thead>
-            <tbody id="customerRows"><tr><td colspan="5" class="empty">Carregando clientes...</td></tr></tbody>
-          </table>
+        <div id="customerRows" class="customer-grid" aria-live="polite">
+          <p class="empty">Carregando clientes...</p>
         </div>
       </section>
     </div>
@@ -288,18 +320,22 @@
               ? (customer.registration_completed_at?"Cadastro completo":"E-mail confirmado · dados pendentes")
               : "E-mail não confirmado";
             const linked=(customer.assigned_coupons||[]).map(c=>html(c.code)+" ("+html(c.trial_days)+" dias)").join("<br>")||"Nenhum";
-            return '<tr>'+
-              '<td><strong>'+identity+'</strong><div class="hint">'+email+'</div><div class="hint">'+html(customer.phone||"")+'</div></td>'+
-              '<td>'+html(state)+'<div class="hint">'+html(customer.customer_type||"")+'</div></td>'+
-              '<td>'+html(customerLicenseStatus(customer.license_status))+'</td>'+
-              '<td>'+linked+'</td>'+
-              '<td><div class="coupon-actions"><select class="customer-coupon-list" data-customer-id="'+html(customer.user_id)+'" data-customer-email="'+email+'" aria-label="Selecionar cupom para '+identity+'" style="min-width:195px;flex:1" '+(couponCache.length?"":"disabled")+'>'+
+            return '<article class="customer-card">'+
+              '<header><div><h3>'+identity+'</h3><p class="hint">'+email+'</p><p class="hint">'+html(customer.phone||"Telefone não informado")+'</p></div>'+
+              '<span class="status '+(customer.registration_completed_at?"on":"off")+'">'+html(state)+'</span></header>'+
+              '<div class="customer-meta">'+
+              '<div><div class="customer-label">Tipo de conta</div><div class="customer-value">'+html(customer.customer_type||"Não informado")+'</div></div>'+
+              '<div><div class="customer-label">Licença</div><div class="customer-value">'+html(customerLicenseStatus(customer.license_status))+'</div></div>'+
+              '<div style="grid-column:1/-1"><div class="customer-label">Cupons vinculados</div><div class="customer-value">'+linked+'</div></div>'+
+              '</div>'+
+              '<div class="customer-label">Selecionar cupom para aplicar</div>'+
+              '<div class="customer-coupon-control"><select class="customer-coupon-list" data-customer-id="'+html(customer.user_id)+'" data-customer-email="'+email+'" aria-label="Selecionar cupom para '+identity+'" '+(couponCache.length?"":"disabled")+'>'+
                 '<option value="">'+(couponCache.length?"Selecione um cupom":"Nenhum cupom cadastrado")+'</option>'+
                 options+'</select>'+
                 '<button type="button" data-apply-coupon disabled>Aplicar</button></div>'+
                 '<div class="hint customer-coupon-detail" aria-live="polite">Selecione uma licença gratuita para conceder ao cliente.</div>'+
-              '</td></tr>';
-          }).join(""):'<tr><td colspan="5" class="empty">Nenhuma conta encontrada.</td></tr>';
+              '</article>';
+          }).join(""):'<p class="empty">Nenhuma conta encontrada.</p>';
           rows.querySelectorAll(".customer-coupon-list").forEach(select=>{
             const applyButton=select.parentElement.querySelector("[data-apply-coupon]");
             const info=select.parentElement.nextElementSibling;
@@ -356,7 +392,7 @@
           });
         }catch(e){
           showNotice("Não foi possível carregar os clientes: "+e.message,true);
-          rows.innerHTML='<tr><td colspan="5" class="empty">Falha ao carregar.</td></tr>';
+          rows.innerHTML='<p class="empty">Falha ao carregar.</p>';
         }finally{$("refreshCustomers").disabled=false}
       }
       function formatDate(value) {
@@ -398,13 +434,13 @@
           const limit = coupon.max_redemptions == null ? "Ilimitado" : String(coupon.max_redemptions);
           const active = coupon.is_active === true;
           return '<tr>' +
-            '<td><span class="code">' + html(coupon.code) + '</span><div class="hint">' + html(coupon.description || "") + '</div></td>' +
-            '<td>' + html(coupon.trial_days) + ' dias<div class="hint">' + (coupon.grant_mode === 'complimentary_license' ? 'Sem cartão / sem cobrança' : 'Assinatura Paddle') + '</div></td>' +
-            '<td>' + count + ' / ' + html(limit) + (pending ? '<div class="hint">' + pending + ' reserva(s) em andamento</div>' : '') + '</td>' +
-            '<td>' + html(formatDate(coupon.valid_until)) + '</td>' +
-            '<td>' + html(planName(coupon.billing_mode)) + '</td>' +
-            '<td><span class="status ' + (active ? "on" : "off") + '">' + (active ? "Ativo" : "Inativo") + '</span></td>' +
-            '<td><div class="coupon-actions"><button type="button" data-edit="' + html(coupon.id) + '">Editar</button>' +
+            '<td data-label="Código"><span class="code">' + html(coupon.code) + '</span><div class="hint">' + html(coupon.description || "") + '</div></td>' +
+            '<td data-label="Código">' + html(coupon.trial_days) + ' dias<div class="hint">' + (coupon.grant_mode === 'complimentary_license' ? 'Sem cartão / sem cobrança' : 'Assinatura Paddle') + '</div></td>' +
+            '<td data-label="Código">' + count + ' / ' + html(limit) + (pending ? '<div class="hint">' + pending + ' reserva(s) em andamento</div>' : '') + '</td>' +
+            '<td data-label="Código">' + html(formatDate(coupon.valid_until)) + '</td>' +
+            '<td data-label="Código">' + html(planName(coupon.billing_mode)) + '</td>' +
+            '<td data-label="Código"><span class="status ' + (active ? "on" : "off") + '">' + (active ? "Ativo" : "Inativo") + '</span></td>' +
+            '<td data-label="Código"><div class="coupon-actions"><button type="button" data-edit="' + html(coupon.id) + '">Editar</button>' +
             '<button type="button" data-toggle="' + html(coupon.id) + '" data-active="' + String(active) + '">' + (active ? "Desativar" : "Ativar") + '</button></div></td>' +
           '</tr>';
         }).join("");
