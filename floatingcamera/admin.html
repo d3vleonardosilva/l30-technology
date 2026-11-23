@@ -286,9 +286,9 @@
               '<td>'+html(customerLicenseStatus(customer.license_status))+'</td>'+
               '<td>'+coupons+'</td>'+
               '<td><div class="coupon-actions"><input aria-label="Código em letras maiúsculas" placeholder="NOMEESCOLHIDO" maxlength="40" data-code-for="'+id+'" style="width:175px;text-transform:uppercase" '+disabled+'>'+
-              '<input type="number" aria-label="Dias de licença" placeholder="Dias" min="1" max="365" value="180" data-days-for="'+id+'" style="width:80px" '+disabled+'>'+
+              '<input type="number" aria-label="Dias de licença" placeholder="Dias" min="1" max="3650" value="180" data-days-for="'+id+'" style="width:80px" '+disabled+'>'+
               '<button type="button" data-create-for="'+id+'" '+disabled+'>Criar cupom</button></div>'+
-              '<div class="hint">1 resgate · gratuito · sem cartão · até 365 dias</div></td></tr>'
+              '<div class="hint">1 resgate · gratuito · sem cartão · até 3650 dias</div></td></tr>'
           }).join(""):'<tr><td colspan="5" class="empty">Nenhuma conta encontrada.</td></tr>';
           rows.querySelectorAll("[data-code-for]").forEach(input=>input.addEventListener("input",()=>{
              const pos=input.selectionStart;input.value=input.value.toUpperCase().replace(/[^A-Z0-9_-]/g,"");input.setSelectionRange(pos,pos)
@@ -297,8 +297,8 @@
              const id=button.dataset.createFor;
              const code=rows.querySelector('[data-code-for="'+id+'"]').value.trim().toUpperCase();
              const days=Number(rows.querySelector('[data-days-for="'+id+'"]').value);
-             if(!/^[A-Z0-9_-]{3,40}$/.test(code)||!Number.isInteger(days)||days<1||days>365){
-               showNotice("Informe o código em caixa alta (3 a 40 caracteres) e o prazo de 1 a 365 dias.",true);return;
+             if(!/^[A-Z0-9_-]{3,40}$/.test(code)||!Number.isInteger(days)||days<1||days>3650){
+               showNotice("Informe o código em caixa alta (3 a 40 caracteres) e o prazo de 1 a 3650 dias.",true);return;
              }
              button.disabled=true;
              try{
