@@ -55,7 +55,7 @@
   <main>
     <div class="eyebrow">PAINEL ADMINISTRATIVO</div>
     <h1>Cupons promocionais</h1>
-    <p class="sub">Gerencie clientes, licenças e códigos promocionais. Cupons vinculados a clientes podem ser criados diretamente na respectiva linha.</p>
+    <p class="sub">Gerencie clientes e licenças. Crie cupons na seção superior e consulte os códigos disponíveis na lista suspensa de cada cliente.</p>
     <div id="notice" role="status" aria-live="polite"></div>
 
     <section class="card" id="loginCard" hidden>
@@ -129,12 +129,12 @@
         </div>
       </section>
       <section class="card" id="customerSection">
-        <div class="row"><div><h2>Contas dos clientes</h2><p class="hint">Contas cadastradas, confirmação de e-mail, dados pessoais, licenças e cupons individuais. Cada cupom pertence apenas à conta selecionada.</p></div>
+        <div class="row"><div><h2>Contas dos clientes</h2><p class="hint">Contas cadastradas, confirmação de e-mail, dados pessoais e licenças. Consulte os cupons criados na área superior por meio da lista suspensa.</p></div>
         <button id="refreshCustomers" type="button">Atualizar clientes</button></div>
-        <p class="hint">Conta corporativa: <strong>contact@l30.tec.br</strong>. Após criar e confirmar essa conta, ela receberá permissão administrativa automaticamente.</p>
+        <p class="hint">Conta corporativa: <strong>contact@l30.tec.br</strong> — acesso administrativo confirmado. A lista suspensa é apenas para consulta; selecionar um cupom não o atribui ao cliente.</p>
         <div class="table-wrap">
           <table style="min-width:1150px">
-            <thead><tr><th>Cliente / e-mail</th><th>Cadastro</th><th>Licença</th><th>Cupons vinculados</th><th>Criar cupom exclusivo para este cliente</th></tr></thead>
+            <thead><tr><th>Cliente / e-mail</th><th>Cadastro</th><th>Licença</th><th>Cupons vinculados</th><th>Lista de cupons cadastrados</th></tr></thead>
             <tbody id="customerRows"><tr><td colspan="5" class="empty">Carregando clientes...</td></tr></tbody>
           </table>
         </div>
@@ -270,45 +270,55 @@
         return active ? "Pro ativo até "+formatDate(active.ends_at) : rows.length ? "Sem Pro ativo" : "Nenhuma licença";
       }
       async function loadCustomers() {
-        const rows=$("customerRows");$("refreshCustomers").disabled=true;
+        const rows=$("customerRows");
+        $("refreshCustomers").disabled=true;
         try {
           const result=await invokeCustomers({action:"list_customers"});
           const customers=result.customers||[];
-          rows.innerHTML=customers.length ? customers.map(customer=>{
-            const id=html(customer.user_id);
+          const options=couponCache.map(coupon=>{
+            const label=coupon.code+" · "+coupon.trial_days+" dias · "+
+              (coupon.grant_mode==="complimentary_license"?"Gratuito":"Paddle")+
+              (coupon.is_active?"":" · Inativo");
+            return '<option value="'+html(coupon.id)+'">'+html(label)+'</option>';
+          }).join("");
+          rows.innerHTML=customers.length?customers.map(customer=>{
             const identity=html(customer.display_name||"Nome não informado");
             const email=html(customer.email||"");
-            const state=customer.email_confirmed?(customer.registration_completed_at?"Cadastro completo":"E-mail confirmado · dados pendentes"):"E-mail não confirmado";
-            const coupons=(customer.assigned_coupons||[]).map(c=>html(c.code)+" ("+html(c.trial_days)+" dias)").join("<br>")||"Nenhum";
-            const disabled=!customer.email_confirmed||!customer.registration_completed_at?"disabled":"";
-            return '<tr><td><strong>'+identity+'</strong><div class="hint">'+email+'</div><div class="hint">'+html(customer.phone||"")+'</div></td>'+
+            const state=customer.email_confirmed
+              ? (customer.registration_completed_at?"Cadastro completo":"E-mail confirmado · dados pendentes")
+              : "E-mail não confirmado";
+            const linked=(customer.assigned_coupons||[]).map(c=>html(c.code)+" ("+html(c.trial_days)+" dias)").join("<br>")||"Nenhum";
+            return '<tr>'+
+              '<td><strong>'+identity+'</strong><div class="hint">'+email+'</div><div class="hint">'+html(customer.phone||"")+'</div></td>'+
               '<td>'+html(state)+'<div class="hint">'+html(customer.customer_type||"")+'</div></td>'+
               '<td>'+html(customerLicenseStatus(customer.license_status))+'</td>'+
-              '<td>'+coupons+'</td>'+
-              '<td><div class="coupon-actions"><input aria-label="Código em letras maiúsculas" placeholder="NOMEESCOLHIDO" maxlength="40" data-code-for="'+id+'" style="width:175px;text-transform:uppercase" '+disabled+'>'+
-              '<input type="number" aria-label="Dias de licença" placeholder="Dias" min="1" max="3650" value="180" data-days-for="'+id+'" style="width:80px" '+disabled+'>'+
-              '<button type="button" data-create-for="'+id+'" '+disabled+'>Criar cupom</button></div>'+
-              '<div class="hint">1 resgate · gratuito · sem cartão · até 3650 dias</div></td></tr>'
+              '<td>'+linked+'</td>'+
+              '<td><select class="customer-coupon-list" aria-label="Consultar cupons cadastrados para '+identity+'" '+(couponCache.length?"":"disabled")+'>'+
+                '<option value="">'+(couponCache.length?"Selecione um cupom para consultar":"Nenhum cupom cadastrado")+'</option>'+
+                options+'</select>'+
+                '<div class="hint customer-coupon-detail" aria-live="polite">Somente consulta. Nenhum cupom será atribuído ao cliente.</div>'+
+              '</td></tr>';
           }).join(""):'<tr><td colspan="5" class="empty">Nenhuma conta encontrada.</td></tr>';
-          rows.querySelectorAll("[data-code-for]").forEach(input=>input.addEventListener("input",()=>{
-             const pos=input.selectionStart;input.value=input.value.toUpperCase().replace(/[^A-Z0-9_-]/g,"");input.setSelectionRange(pos,pos)
-          }));
-          rows.querySelectorAll("[data-create-for]").forEach(button=>button.addEventListener("click",async()=>{
-             const id=button.dataset.createFor;
-             const code=rows.querySelector('[data-code-for="'+id+'"]').value.trim().toUpperCase();
-             const days=Number(rows.querySelector('[data-days-for="'+id+'"]').value);
-             if(!/^[A-Z0-9_-]{3,40}$/.test(code)||!Number.isInteger(days)||days<1||days>3650){
-               showNotice("Informe o código em caixa alta (3 a 40 caracteres) e o prazo de 1 a 3650 dias.",true);return;
-             }
-             button.disabled=true;
-             try{
-               await invokeCustomers({action:"create_customer_coupon",customer_id:id,code,days});
-               await loadCustomers();await loadCoupons();
-               showNotice("Cupom individual criado para a conta selecionada. Não pode ser utilizado por outro cliente.");
-             }catch(e){showNotice("Não foi possível criar cupom: "+e.message,true);button.disabled=false}
-          }));
-        } catch(e){showNotice("Não foi possível carregar os clientes: "+e.message,true);rows.innerHTML='<tr><td colspan="5" class="empty">Falha ao carregar.</td></tr>'}
-        finally{$("refreshCustomers").disabled=false}
+          rows.querySelectorAll(".customer-coupon-list").forEach(select=>{
+            select.addEventListener("change",()=>{
+              const coupon=couponCache.find(c=>c.id===select.value);
+              const info=select.nextElementSibling;
+              if(!coupon){
+                info.textContent="Somente consulta. Nenhum cupom será atribuído ao cliente.";
+                return;
+              }
+              const limit=coupon.max_redemptions==null?"Ilimitado":String(coupon.max_redemptions);
+              info.textContent="Código: "+coupon.code+" | Prazo: "+coupon.trial_days+
+                " dias | Usos: "+(coupon.redeemed_count||0)+"/"+limit+
+                " | "+(coupon.is_active?"Ativo":"Inativo")+
+                " | Validade: "+formatDate(coupon.valid_until)+
+                ". Apenas consulta: não vincula nem resgata.";
+            });
+          });
+        }catch(e){
+          showNotice("Não foi possível carregar os clientes: "+e.message,true);
+          rows.innerHTML='<tr><td colspan="5" class="empty">Falha ao carregar.</td></tr>';
+        }finally{$("refreshCustomers").disabled=false}
       }
       function formatDate(value) {
         if (!value) return "Sem vencimento";
@@ -372,6 +382,7 @@
               const activating = button.dataset.active !== "true";
               await invoke({action:"toggle",id:button.dataset.toggle,is_active:activating});
               await loadCoupons();
+              await loadCustomers();
               showNotice(activating
                 ? "Cupom ativado. Novas utilizações estão liberadas."
                 : "Cupom desativado. Novas utilizações bloqueadas; licenças já concedidas permanecem válidas até o vencimento ou cancelamento normal da assinatura.");
@@ -491,6 +502,7 @@
           });
           closeEditDialog();
           await loadCoupons();
+          await loadCustomers();
           showNotice("Cupom atualizado. As alterações valem para novas utilizações.");
         } catch (error) {
           const message = error.message === "coupon_code_exists" ? "Este código já está em uso."
@@ -525,7 +537,8 @@
           $("trialDays").value = 15;
           $("billingMode").value = "all";
           await loadCoupons();
-          showNotice("Cupom cadastrado. Cupons gratuitos são resgatados em redeem.html, sem checkout.");
+          await loadCustomers();
+          showNotice("Cupom cadastrado e disponibilizado nas listas suspensas dos clientes.");
         } catch (error) {
           const message = error.message === "coupon_code_exists" ? "Este código já existe."
             : error.message === "invalid_coupon_code" ? "Use de 3 a 40 caracteres: letras, números, hífen ou sublinhado."
