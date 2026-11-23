@@ -30,21 +30,29 @@
     .code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:#9deefa;font-weight:800;letter-spacing:.04em}
     .status{display:inline-block;padding:4px 9px;border-radius:20px;font-size:11px;font-weight:800}.on{background:#123b34;color:#8ceac6}.off{background:#44212a;color:#ffadb7}
     .coupon-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-    /* Customer accounts use responsive cards: no horizontal scrolling. */
     #customerSection{min-width:0}
-    .customer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,410px),1fr));gap:14px;margin-top:18px}
-    .customer-card{min-width:0;background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:18px;overflow-wrap:anywhere}
-    .customer-card header{display:flex;justify-content:space-between;gap:12px;align-items:start;flex-wrap:wrap}
-    .customer-card h3{font-size:17px;margin:0;line-height:1.25}
-    .customer-card p{margin:4px 0}
-    .customer-card .customer-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0}
-    .customer-card .customer-label{font-size:11px;font-weight:800;letter-spacing:.07em;color:var(--muted);text-transform:uppercase}
-    .customer-card .customer-value{font-size:13px;margin-top:3px}
-    .customer-card .customer-coupon-control{display:flex;gap:9px;align-items:stretch;margin-top:9px;min-width:0}
-    .customer-card .customer-coupon-list{flex:1;min-width:0;width:0}
-    .customer-card [data-apply-coupon]{flex:0 0 auto;padding:9px 16px;background:#1c4355;border-color:#478c9a}
-    .customer-card [data-apply-coupon]:not(:disabled){background:linear-gradient(110deg,#66b6ff,#7ce9ed);color:#071321}
-    .customer-card .customer-coupon-detail{overflow-wrap:anywhere}
+    .customer-list{width:100%;min-width:0;margin-top:16px}
+    .customer-list-heading,.customer-list-row{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,.8fr) minmax(0,2fr);gap:12px;align-items:center}
+    .customer-list-heading{padding:10px 12px;border-bottom:2px solid var(--line);color:var(--muted);font-size:11px;font-weight:800;text-transform:uppercase}
+    .customer-list-row{padding:15px 12px;border-bottom:1px solid var(--line);min-width:0}
+    .customer-list-row:hover{background:#162438}
+    .customer-cell{min-width:0;overflow-wrap:anywhere;font-size:13px}
+    .customer-name{font-weight:750;font-size:14px}
+    .customer-list-row .hint{font-size:11px;margin:3px 0}
+    .customer-coupon-control{display:flex;gap:8px;align-items:center;min-width:0}
+    .customer-coupon-list{min-width:0;width:0;flex:1}
+    [data-apply-coupon]{flex:0 0 auto;padding:9px 13px;background:#1c4355;border-color:#478c9a}
+    [data-apply-coupon]:not(:disabled){background:linear-gradient(110deg,#66b6ff,#7ce9ed);color:#071321}
+    @media(max-width:950px){
+      .customer-list-heading{display:none}
+      .customer-list-row{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:12px 16px}
+      .customer-list-row .customer-cell::before{content:attr(data-label);display:block;font-size:10px;font-weight:800;text-transform:uppercase;color:var(--muted)}
+      .customer-list-row .customer-cell:last-child{grid-column:1/-1}
+    }
+    @media(max-width:520px){
+      .customer-list-row{grid-template-columns:minmax(0,1fr);padding:14px 5px;gap:12px}
+      .customer-list-row .customer-cell:last-child{grid-column:auto}
+    }
     .table-wrap{max-width:100%;overflow-x:visible}
     table{min-width:0;table-layout:fixed}
     td,th{overflow-wrap:anywhere}
@@ -59,12 +67,7 @@
       #couponRows~*{min-width:0}
       #adminPanel .table-wrap table thead{display:none}
     }
-    @media(max-width:480px){
-      .customer-card{padding:13px}
-      .customer-card .customer-meta{grid-template-columns:1fr}
-      .customer-card .customer-coupon-control{gap:6px}
-      .customer-card [data-apply-coupon]{padding:9px 11px}
-    }
+
     dialog.edit-dialog{width:min(720px,calc(100% - 24px));max-height:calc(100% - 32px);overflow:auto;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:18px;padding:clamp(18px,4vw,28px);box-shadow:0 24px 80px #0009}
     dialog.edit-dialog::backdrop{background:#020611c9;backdrop-filter:blur(3px)}
     dialog.edit-dialog h2{margin:0}
@@ -167,8 +170,11 @@
         <div class="row"><div><h2>Contas dos clientes</h2><p class="hint">Contas cadastradas, confirmação de e-mail, dados pessoais e licenças. Selecione um cupom da área superior e clique em Aplicar para conceder uma licença gratuita diretamente ao cliente.</p></div>
         <button id="refreshCustomers" type="button">Atualizar clientes</button></div>
         <p class="hint">Conta corporativa: <strong>contact@l30.tec.br</strong> — acesso administrativo confirmado. Selecione um cupom gratuito e clique em Aplicar para conceder a licença ao cliente. Cupons vinculados ao Paddle exigem checkout.</p>
-        <div id="customerRows" class="customer-grid" aria-live="polite">
-          <p class="empty">Carregando clientes...</p>
+        <div class="customer-list" role="table" aria-label="Contas dos clientes">
+          <div class="customer-list-heading" role="row">
+            <span role="columnheader">Cliente / cadastro</span><span role="columnheader">Licença</span><span role="columnheader">Cupons vinculados</span><span role="columnheader">Selecionar cupom e aplicar</span>
+          </div>
+          <div id="customerRows" aria-live="polite"><p class="empty">Carregando clientes...</p></div>
         </div>
       </section>
     </div>
@@ -320,21 +326,18 @@
               ? (customer.registration_completed_at?"Cadastro completo":"E-mail confirmado · dados pendentes")
               : "E-mail não confirmado";
             const linked=(customer.assigned_coupons||[]).map(c=>html(c.code)+" ("+html(c.trial_days)+" dias)").join("<br>")||"Nenhum";
-            return '<article class="customer-card">'+
-              '<header><div><h3>'+identity+'</h3><p class="hint">'+email+'</p><p class="hint">'+html(customer.phone||"Telefone não informado")+'</p></div>'+
-              '<span class="status '+(customer.registration_completed_at?"on":"off")+'">'+html(state)+'</span></header>'+
-              '<div class="customer-meta">'+
-              '<div><div class="customer-label">Tipo de conta</div><div class="customer-value">'+html(customer.customer_type||"Não informado")+'</div></div>'+
-              '<div><div class="customer-label">Licença</div><div class="customer-value">'+html(customerLicenseStatus(customer.license_status))+'</div></div>'+
-              '<div style="grid-column:1/-1"><div class="customer-label">Cupons vinculados</div><div class="customer-value">'+linked+'</div></div>'+
-              '</div>'+
-              '<div class="customer-label">Selecionar cupom para aplicar</div>'+
-              '<div class="customer-coupon-control"><select class="customer-coupon-list" data-customer-id="'+html(customer.user_id)+'" data-customer-email="'+email+'" aria-label="Selecionar cupom para '+identity+'" '+(couponCache.length?"":"disabled")+'>'+
-                '<option value="">'+(couponCache.length?"Selecione um cupom":"Nenhum cupom cadastrado")+'</option>'+
-                options+'</select>'+
-                '<button type="button" data-apply-coupon disabled>Aplicar</button></div>'+
+            return '<div class="customer-list-row" role="row">'+
+              '<div class="customer-cell" role="cell" data-label="Cliente / cadastro"><div class="customer-name">'+identity+'</div>'+
+              '<div class="hint">'+email+'</div><div class="hint">'+html(customer.phone||"Telefone não informado")+'</div>'+
+              '<span class="status '+(customer.registration_completed_at?"on":"off")+'">'+html(state)+'</span></div>'+
+              '<div class="customer-cell" role="cell" data-label="Licença">'+html(customerLicenseStatus(customer.license_status))+'</div>'+
+              '<div class="customer-cell" role="cell" data-label="Cupons vinculados">'+linked+'</div>'+
+              '<div class="customer-cell" role="cell" data-label="Aplicar cupom">'+
+                '<div class="customer-coupon-control"><select class="customer-coupon-list" data-customer-id="'+html(customer.user_id)+'" data-customer-email="'+email+'" aria-label="Selecionar cupom para '+identity+'" '+(couponCache.length?"":"disabled")+'>'+
+                  '<option value="">'+(couponCache.length?"Selecione um cupom":"Nenhum cupom cadastrado")+'</option>'+options+'</select>'+
+                  '<button type="button" data-apply-coupon disabled>Aplicar</button></div>'+
                 '<div class="hint customer-coupon-detail" aria-live="polite">Selecione uma licença gratuita para conceder ao cliente.</div>'+
-              '</article>';
+              '</div></div>';
           }).join(""):'<p class="empty">Nenhuma conta encontrada.</p>';
           rows.querySelectorAll(".customer-coupon-list").forEach(select=>{
             const applyButton=select.parentElement.querySelector("[data-apply-coupon]");
