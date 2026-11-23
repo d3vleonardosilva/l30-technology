@@ -129,9 +129,9 @@
         </div>
       </section>
       <section class="card" id="customerSection">
-        <div class="row"><div><h2>Contas dos clientes</h2><p class="hint">Contas cadastradas, confirmação de e-mail, dados pessoais e licenças. Consulte os cupons criados na área superior por meio da lista suspensa.</p></div>
+        <div class="row"><div><h2>Contas dos clientes</h2><p class="hint">Contas cadastradas, confirmação de e-mail, dados pessoais e licenças. Selecione um cupom da área superior e clique em Aplicar para conceder uma licença gratuita diretamente ao cliente.</p></div>
         <button id="refreshCustomers" type="button">Atualizar clientes</button></div>
-        <p class="hint">Conta corporativa: <strong>contact@l30.tec.br</strong> — acesso administrativo confirmado. A lista suspensa é apenas para consulta; selecionar um cupom não o atribui ao cliente.</p>
+        <p class="hint">Conta corporativa: <strong>contact@l30.tec.br</strong> — acesso administrativo confirmado. Selecione um cupom gratuito e clique em Aplicar para conceder a licença ao cliente. Cupons vinculados ao Paddle exigem checkout.</p>
         <div class="table-wrap">
           <table style="min-width:1150px">
             <thead><tr><th>Cliente / e-mail</th><th>Cadastro</th><th>Licença</th><th>Cupons vinculados</th><th>Lista de cupons cadastrados</th></tr></thead>
@@ -293,26 +293,65 @@
               '<td>'+html(state)+'<div class="hint">'+html(customer.customer_type||"")+'</div></td>'+
               '<td>'+html(customerLicenseStatus(customer.license_status))+'</td>'+
               '<td>'+linked+'</td>'+
-              '<td><select class="customer-coupon-list" aria-label="Consultar cupons cadastrados para '+identity+'" '+(couponCache.length?"":"disabled")+'>'+
-                '<option value="">'+(couponCache.length?"Selecione um cupom para consultar":"Nenhum cupom cadastrado")+'</option>'+
+              '<td><div class="coupon-actions"><select class="customer-coupon-list" data-customer-id="'+html(customer.user_id)+'" data-customer-email="'+email+'" aria-label="Selecionar cupom para '+identity+'" style="min-width:195px;flex:1" '+(couponCache.length?"":"disabled")+'>'+
+                '<option value="">'+(couponCache.length?"Selecione um cupom":"Nenhum cupom cadastrado")+'</option>'+
                 options+'</select>'+
-                '<div class="hint customer-coupon-detail" aria-live="polite">Somente consulta. Nenhum cupom será atribuído ao cliente.</div>'+
+                '<button type="button" data-apply-coupon disabled>Aplicar</button></div>'+
+                '<div class="hint customer-coupon-detail" aria-live="polite">Selecione uma licença gratuita para conceder ao cliente.</div>'+
               '</td></tr>';
           }).join(""):'<tr><td colspan="5" class="empty">Nenhuma conta encontrada.</td></tr>';
           rows.querySelectorAll(".customer-coupon-list").forEach(select=>{
+            const applyButton=select.parentElement.querySelector("[data-apply-coupon]");
+            const info=select.parentElement.nextElementSibling;
             select.addEventListener("change",()=>{
               const coupon=couponCache.find(c=>c.id===select.value);
-              const info=select.nextElementSibling;
               if(!coupon){
-                info.textContent="Somente consulta. Nenhum cupom será atribuído ao cliente.";
+                applyButton.disabled=true;
+                info.textContent="Selecione uma licença gratuita para conceder ao cliente.";
                 return;
               }
               const limit=coupon.max_redemptions==null?"Ilimitado":String(coupon.max_redemptions);
+              const redeemed=Number(coupon.redeemed_count||0);
+              const reserved=Number(coupon.reserved_count||0);
+              const expired=!!coupon.valid_until&&new Date(coupon.valid_until).getTime()<=Date.now();
+              const available=coupon.max_redemptions==null||redeemed+reserved<Number(coupon.max_redemptions);
+              const complimentary=coupon.grant_mode==="complimentary_license";
+              applyButton.disabled=!complimentary||!coupon.is_active||expired||!available;
               info.textContent="Código: "+coupon.code+" | Prazo: "+coupon.trial_days+
-                " dias | Usos: "+(coupon.redeemed_count||0)+"/"+limit+
+                " dias | Usos: "+redeemed+"/"+limit+
                 " | "+(coupon.is_active?"Ativo":"Inativo")+
                 " | Validade: "+formatDate(coupon.valid_until)+
-                ". Apenas consulta: não vincula nem resgata.";
+                (!complimentary?" | Cupom Paddle: requer checkout. Não pode ser aplicado diretamente.":
+                 expired?" | Cupom vencido.":!available?" | Sem utilizações disponíveis.":" | Pronto para aplicar.");
+            });
+            applyButton.addEventListener("click",async()=>{
+              const coupon=couponCache.find(c=>c.id===select.value);
+              if(!coupon||coupon.grant_mode!=="complimentary_license")return;
+              const email=select.dataset.customerEmail;
+              if(!window.confirm("Aplicar o cupom "+coupon.code+" ("+coupon.trial_days+" dias) à conta "+email+"?\n\nA licença Pro será ativada imediatamente, consumindo uma utilização do cupom. Esta ação não efetua cobrança."))return;
+              applyButton.disabled=true;
+              try{
+                const result=await invokeCustomers({action:"apply_customer_coupon",customer_id:select.dataset.customerId,coupon_id:coupon.id});
+                if(!result?.ok)throw Error(result?.error||"application_failed");
+                await loadCoupons();
+                await loadCustomers();
+                showNotice("Licença concedida a "+result.customer_email+" com o cupom "+result.coupon_code+
+                  ". Válida até "+formatDate(result.expires_at)+". Nenhuma cobrança foi realizada.");
+              }catch(error){
+                const reasons={
+                  "customer_registration_incomplete":"O cadastro do cliente precisa estar completo.",
+                  "customer_email_not_verified":"O e-mail do cliente precisa estar confirmado.",
+                  "coupon_already_used":"Este cliente já utilizou o cupom.",
+                  "coupon_limit_reached":"O cupom atingiu seu limite de utilizações.",
+                  "coupon_expired":"O cupom está vencido.",
+                  "coupon_inactive":"O cupom está inativo.",
+                  "coupon_assigned_to_another_account":"Este cupom está reservado a outra conta.",
+                  "paddle_coupon_requires_checkout":"Cupons vinculados à Paddle exigem checkout.",
+                  "coupon_invalid":"O cupom não é válido para licença gratuita."
+                };
+                showNotice("Não foi possível aplicar: "+(reasons[error.message]||error.message),true);
+                select.dispatchEvent(new Event("change"));
+              }
             });
           });
         }catch(e){
