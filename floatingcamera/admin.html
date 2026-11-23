@@ -32,6 +32,7 @@
     .status{display:inline-block;padding:4px 9px;border-radius:20px;font-size:11px;font-weight:800}.on{background:#123b34;color:#8ceac6}.off{background:#44212a;color:#ffadb7}
     .coupon-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
     .delete-coupon{border-color:#914657;color:#ffabb9;background:#301b27}.delete-coupon:hover{background:#552632}
+    .history-link{border:0;background:none;padding:2px 0;color:var(--cyan);font-size:12px;text-decoration:underline;text-underline-offset:3px;font-weight:700}.history-link:hover{color:#fff}
     #customerSection{min-width:0}
     .customer-list{width:100%;min-width:0;margin-top:16px}
     .customer-list-heading,.customer-list-row{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,.8fr) minmax(0,2fr);gap:12px;align-items:center}
@@ -181,6 +182,18 @@
       </section>
     </div>
 
+    <dialog id="couponHistoryDialog" class="edit-dialog" aria-labelledby="couponHistoryTitle">
+      <div class="dialog-heading">
+        <h2 id="couponHistoryTitle">Histórico de cupons</h2>
+        <button type="button" id="closeCouponHistory">Fechar</button>
+      </div>
+      <p class="hint" id="couponHistoryCustomer"></p>
+      <p class="hint">Registro dos cupons resgatados por esta conta. A licença ativa pode ser a de maior validade, não necessariamente o último cupom.</p>
+      <div class="table-wrap">
+        <table style="min-width:0"><thead><tr><th>Código</th><th>Prazo</th><th>Aplicado em</th></tr></thead><tbody id="couponHistoryBody"></tbody></table>
+      </div>
+    </dialog>
+
     <dialog id="editDialog" class="edit-dialog" aria-labelledby="editTitle">
       <form id="editCouponForm">
         <div class="dialog-heading">
@@ -329,11 +342,9 @@
               ? (customer.registration_completed_at?"Cadastro completo":"E-mail confirmado · dados pendentes")
               : "E-mail não confirmado";
             const history=customer.applied_coupons||[];
-            const linked=history.length?history.map((c,i)=>
-              (i===0?'<strong class="code">':'<span class="muted">')+
-              html(c.code)+(c.days?" ("+html(c.days)+" dias)":"")+
-              (i===0?' · Mais recente</strong>':'</span>')
-            ).join("<br>"):"Nenhum cupom utilizado";
+            const linked=history.length
+              ? '<button type="button" class="history-link" data-coupon-history="'+html(customer.user_id)+'">Histórico de cupons ('+history.length+')</button>'
+              : '<span class="muted">Nenhum cupom utilizado</span>';
             return '<div class="customer-list-row" role="row">'+
               '<div class="customer-cell" role="cell" data-label="Cliente / cadastro"><div class="customer-name">'+identity+'</div>'+
               '<div class="hint">'+email+'</div><div class="hint">'+html(customer.phone||"Telefone não informado")+'</div>'+
@@ -347,6 +358,25 @@
                 '<div class="hint customer-coupon-detail" aria-live="polite">Selecione uma licença gratuita para conceder ao cliente.</div>'+
               '</div></div>';
           }).join(""):'<p class="empty">Nenhuma conta encontrada.</p>';
+          rows.querySelectorAll("[data-coupon-history]").forEach(button=>{
+            button.addEventListener("click",()=>{
+              const customer=customers.find(c=>c.user_id===button.dataset.couponHistory);
+              if(!customer)return;
+              const history=customer.applied_coupons||[];
+              $("couponHistoryTitle").textContent="Histórico de cupons";
+              $("couponHistoryCustomer").textContent=(customer.display_name||customer.email||"Cliente")+
+                " · "+(customer.email||"");
+              const body=$("couponHistoryBody");
+              body.innerHTML=history.map((item,i)=>
+                '<tr>'+
+                  '<td><strong class="code">'+html(item.code)+'</strong>'+(i===0?'<div class="hint">Mais recente</div>':'')+'</td>'+
+                  '<td>'+html(item.days??"—")+' dias</td>'+
+                  '<td>'+html(formatDate(item.applied_at))+'</td>'+
+                '</tr>'
+              ).join("");
+              $("couponHistoryDialog").showModal();
+            });
+          });
           rows.querySelectorAll(".customer-coupon-list").forEach(select=>{
             const applyButton=select.parentElement.querySelector("[data-apply-coupon]");
             const info=select.parentElement.nextElementSibling;
@@ -406,6 +436,8 @@
           rows.innerHTML='<p class="empty">Falha ao carregar.</p>';
         }finally{$("refreshCustomers").disabled=false}
       }
+      $("closeCouponHistory").addEventListener("click",()=>$("couponHistoryDialog").close());
+      $("couponHistoryDialog").addEventListener("click",e=>{if(e.target===e.currentTarget)e.currentTarget.close()});
       function formatDate(value) {
         if (!value) return "Sem vencimento";
         return new Date(value).toLocaleString("pt-BR");
