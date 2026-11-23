@@ -527,7 +527,7 @@
             const { data, error } = await client.auth.signUp({
               email, password,
               options: {
-                emailRedirectTo: window.location.origin + window.location.pathname,
+                emailRedirectTo: new URL("./complete-registration.html", window.location.href).toString(),
                 data: { language: $("language").value }
               }
             });
@@ -536,9 +536,21 @@
               showMessage(t("confirmation"));
               return;
             }
+            window.location.assign(new URL("./complete-registration.html?plan=" + ($( "billingMode").value === "monthly_subscription" ? "monthly" : "annual"), window.location.href).toString());
+            return;
           } else {
-            const { error } = await client.auth.signInWithPassword({ email, password });
-            if (error) throw Object.assign(new Error(error.message), { kind: "signin" });
+            const { data: existing } = await client.auth.getSession();
+            if (!existing.session || existing.session.user?.email?.toLowerCase() !== email.toLowerCase()) {
+              const { error } = await client.auth.signInWithPassword({ email, password });
+              if (error) throw Object.assign(new Error(error.message), { kind: "signin" });
+            }
+          }
+          const {data: profileCheck, error: profileError} = await client.functions.invoke("customer-management", {body:{action:"profile_status"}});
+          if (profileError || !profileCheck?.completed) {
+            const url = new URL("./complete-registration.html", window.location.href);
+            url.searchParams.set("plan", $("billingMode").value === "monthly_subscription" ? "monthly" : "annual");
+            window.location.assign(url.toString());
+            return;
           }
 
           const { data, error } = await client.functions.invoke("create-checkout", {
@@ -610,6 +622,17 @@
         siteMenu.textContent = "☰";
       }));
       applyLanguage();
+      const sessionReady = new URLSearchParams(window.location.search).get("registered") === "1";
+      if (sessionReady) {
+        getClient()?.auth.getSession().then(({data}) => {
+          if (!data?.session?.user?.email) return;
+          $("email").value = data.session.user.email;
+          $("password").required = false;
+          $("password").placeholder = "Sessão ativa / Signed in";
+          const plan = new URLSearchParams(window.location.search).get("plan");
+          if (plan === "monthly") $("billingMode").value = "monthly_subscription";
+        });
+      }
       getClient();
     })();
   </script>
