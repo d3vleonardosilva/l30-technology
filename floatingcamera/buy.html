@@ -361,6 +361,18 @@
           { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
         );
         authClient.auth.onAuthStateChange((event) => {
+          if (event === "SIGNED_IN" && !creatingAccount) {
+            // After the email verification link returns to this whitelisted page,
+            // route unregistered customers to the required registration form.
+            setTimeout(async () => {
+              try {
+                const {data:profile,error:profileError} = await authClient.functions.invoke("customer-management", {body:{action:"profile_status"}});
+                if (!profileError && profile && !profile.completed) {
+                  window.location.assign(new URL("./complete-registration.html", window.location.href).toString());
+                }
+              }catch(e){ console.warn("Profile completion check:",e); }
+            }, 0);
+          }
           if (event === "PASSWORD_RECOVERY") {
             form.hidden = true;
             $("toggleAuth").hidden = true;
@@ -527,7 +539,7 @@
             const { data, error } = await client.auth.signUp({
               email, password,
               options: {
-                emailRedirectTo: new URL("./complete-registration.html", window.location.href).toString(),
+                emailRedirectTo: window.location.origin + window.location.pathname,
                 data: { language: $("language").value }
               }
             });
