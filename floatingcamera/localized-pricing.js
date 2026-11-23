@@ -17,7 +17,7 @@
     // USD and BRL both use two decimal places. The amount comes from Paddle,
     // so the monthly equivalent follows the selected currency's annual price.
     if (!Number.isFinite(minorUnits)) return null;
-    const locale = lang === "pt" ? "pt-BR" : lang === "es" ? "es-ES" : "en-US";
+    const locale = currencyCode() === "BRL" ? "pt-BR" : "en-US";
     const formatted = new Intl.NumberFormat(locale, {
       style: "currency", currency: currencyCode(),
       minimumFractionDigits: 2, maximumFractionDigits: 2
